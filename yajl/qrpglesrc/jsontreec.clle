@@ -1,0 +1,21 @@
+             PGM        PARM(&JSONFILE)
+
+             DCL        VAR(&JSONFILE) TYPE(*CHAR) LEN(60)
+             DCL        VAR(&RTNCDE) TYPE(*DEC) LEN(2 0)
+
+             CLRPFM     FILE(JSONTREEF)
+             MONMSG     MSGID(CPF3156) EXEC(DO)
+               SNDPGMMSG  MSG('Error to clear result JSONTREEF file')
+               RETURN
+             ENDDO
+
+             OVRPRTF    FILE(QSYSPRT)
+             CALL       PGM(JSONTREER) PARM(&JSONFILE &RTNCDE)
+             DLTOVR     FILE(QSYSPRT)
+
+             IF         COND(&RTNCDE *NE 0) THEN(DO)
+               SNDPGMMSG  MSG('Error in Parasing JSON File, Check the Dump in SPLF')
+               RETURN
+             ENDDO
+
+             ENDPGM

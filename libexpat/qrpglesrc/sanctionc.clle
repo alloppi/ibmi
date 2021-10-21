@@ -1,0 +1,9 @@
+             PGM        PARM(&XMLFILE)
+             DCL        VAR(&XMLFILE) TYPE(*CHAR) LEN(32)
+
+             CLRPFM     SANCTIONF
+
+             CALL       PGM(SANCTIONR) PARM(&XMLFILE)
+
+ $END:       RETURN
+             ENDPGM

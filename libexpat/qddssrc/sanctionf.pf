@@ -1,0 +1,77 @@
+     A*==============================================================*
+     A* File name: SANCTIONF                                         *
+     A*                                                              *
+     A* Purpose: United Nations Security Council Consolidated List   *
+     A*                                                              *
+     A* Date written: 2019/03/08                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2019/03/08 Alan       AC           New                       *
+     A*==============================================================*
+     A          R SANCTIONFR
+     A            DATAID        10P 0       TEXT('DATAID')
+     A                                      COLHDG('DATAID')
+     A            VERSIONNUM     2P 0       TEXT('VERSIONNUM')
+     A                                      COLHDG('VERSIONNUM')
+     A            FIRST_NAME    16A         TEXT('FIRST_NAME')
+     A                                      COLHDG('FIRST_NAME')
+     A                                      CCSID(1208)
+     A            SECOND_NAM    16A         TEXT('SECOND_NAME')
+     A                                      COLHDG('SECOND_NAME')
+     A                                      CCSID(1208)
+     A            THIRD_NAME    16A         TEXT('THIRD_NAME')
+     A                                      COLHDG('THIRD_NAME')
+     A                                      CCSID(1208)
+     A            FOURTH_NAM    16A         TEXT('FOURTH_NAME')
+     A                                      COLHDG('FOURTH_NAME')
+     A                                      CCSID(1208)
+     A            UN_LIST_TY    10A         TEXT('UN_LIST_TYPE')
+     A                                      COLHDG('UN_LIST_TYPE')
+     A                                      CCSID(1208)
+     A            REFERENCE_    10A         TEXT('REFERENCE_NUMBER')
+     A                                      COLHDG('REFERENCE_NUMBER')
+     A                                      CCSID(1208)
+     A            LISTED_ON       L         TEXT('LISTED_ON')
+     A                                      COLHDG('LISTED_ON')
+     A            SUBMITT_ON      L         TEXT('SUBMITTED_ON')
+     A                                      COLHDG('SUBMITTED_ON')
+     A            GENDER        10A         TEXT('GENDER')
+     A                                      COLHDG('GENDER')
+     A                                      CCSID(1208)
+     A            SUBMITT_BY      L         TEXT('SUBMITTED_BY')
+     A                                      COLHDG('SUBMITTED_BY')
+     A** UTF-8
+     A            NAME_ORIGI    50A         TEXT('NAME_ORIGINAL_SCRIPT')
+     A                                      COLHDG('NAME_ORIGINAL_SCRIPT')
+     A                                      CCSID(1208)
+     A** VARIABLE LENGTH
+     A            COMMENTS1    500A         TEXT('COMMENTS1')
+     A                                      COLHDG('COMMENTS1')
+     A                                      CCSID(1208)
+     A                                      VARLEN
+     A            NATIONAL_2    20A         TEXT('NATIONALITY2')
+     A                                      COLHDG('NATIONALITY2')
+     A                                      CCSID(1208)
+     A** Multiples
+     A            TITLE         20A         TEXT('TITLE')
+     A                                      COLHDG('TITLE')
+     A                                      CCSID(1208)
+     A** Multiples
+     A            DESIGNATIO    50A         TEXT('DESIGNATION')
+     A                                      COLHDG('DESIGNATION')
+     A                                      CCSID(1208)
+     A** Multiples
+     A            NATIONALIT    20A         TEXT('NATIONALITY')
+     A                                      COLHDG('NATIONALITY')
+     A                                      CCSID(1208)
+     A** Multiples
+     A            INDIVIDUAL   100A         TEXT('INDIVIDUAL_ALIAS')
+     A                                      COLHDG('INDIVIDUAL_ALIAS')
+     A**
+     A            LIST_TYPE    100A         TEXT('LIST_TYPE')
+     A                                      COLHDG('LIST_TYPE')
+     A                                      CCSID(1208)
+     A            LAST_DAY_U      L         TEXT('LAST_DAY_UPDATED')
+     A                                      COLHDG('LAST_DAY_UPDATED')

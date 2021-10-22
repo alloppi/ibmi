@@ -1,0 +1,12 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A          R DUMMYREC
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R RENDELS1
+     A                                      WINDOW(9 30 6 20)
+     A                                  2  1'File:'
+     A            SCFILE        14   O  2  7
+     A                                  3  1'Size:'
+     A            SCSIZE        10Y 0O  3  7EDTCDE(L)
+     A                                  5  1'Really? Delete it?'
+     A            SCREALLY       1   I  5 20

@@ -1,0 +1,62 @@
+             PGM        PARM(&CMDTYPE &FILE &DIR &ARMOR &INTEGRITY +
+                          &KEYFILE &PASSPHRASE &SIGACTION +
+                          &SIGKEYFILE &SIGKEYID &SIGPASSPHR)
+
+             DCL        VAR(&CMDTYPE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&DIR) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&ARMOR) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&INTEGRITY) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&KEYFILE) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&PASSPHRASE) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&SIGACTION) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&SIGKEYFILE) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&SIGKEYID) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&SIGPASSPHR) TYPE(*CHAR) LEN(200)
+
+             DCL        VAR(&EMSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&EMSGDTA) TYPE(*CHAR) LEN(100)
+             DCL        VAR(&WMSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&WMSGDTA) TYPE(*CHAR) LEN(100)
+
+             DCL        VAR(&NBR) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&DA) TYPE(*CHAR) LEN(10)
+
+             RTVJOBA    NBR(&NBR)
+             CHGVAR     VAR(&DA) VALUE('PGPM' || &NBR)
+
+             CRTDTAARA  DTAARA(QGPL/&DA) TYPE(*CHAR) LEN(220)
+             MONMSG     MSGID(CPF1023) EXEC(CHGDTAARA +
+                          DTAARA(QGPL/&DA *ALL) VALUE(' '))
+
+             ADDENVVAR  ENVVAR(JAVA_HOME) +
+                          VALUE('/QOpenSys/QIBM/ProdData/JavaVM/jdk70/32bit')
+
+             JAVA       CLASS(pgp.util.CmdProc) PARM(&CMDTYPE &DA +
+                          &FILE &DIR &ARMOR &INTEGRITY &KEYFILE +
+                          &PASSPHRASE &SIGACTION &SIGKEYFILE &SIGKEYID +
+                          &SIGPASSPHR) +
+                          OUTPUT(* *CONTINUE)
+
+             RMVENVVAR  ENVVAR(JAVA_HOME)
+
+             RTVDTAARA  DTAARA(QGPL/&DA (1 7)) RTNVAR(&EMSGID)
+             RTVDTAARA  DTAARA(QGPL/&DA (8 100)) RTNVAR(&EMSGDTA)
+
+             RTVDTAARA  DTAARA(QGPL/&DA (108 7)) RTNVAR(&WMSGID)
+             RTVDTAARA  DTAARA(QGPL/&DA (115 100)) RTNVAR(&WMSGDTA)
+
+             DLTDTAARA  DTAARA(QGPL/&DA)
+             MONMSG     MSGID(CPF0000)
+
+             IF         COND(&EMSGID *NE '       ') THEN(DO)
+             SNDPGMMSG  MSGID(&EMSGID) MSGF(pgpmsg) +
+                          MSGDTA(&EMSGDTA) MSGTYPE(*ESCAPE)
+             ENDDO
+
+             IF         COND(&WMSGID *NE '       ') THEN(DO)
+             SNDPGMMSG  MSGID(&WMSGID) MSGF(pgpmsg) +
+                          MSGDTA(&WMSGDTA) MSGTYPE(*INFO)
+             ENDDO
+
+             ENDPGM

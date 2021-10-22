@@ -1,0 +1,175 @@
+/*=========================================================================================*/
+/* Program name: DECVFYC                                                                   */
+/* Purpose.....: Program to process command                                                */
+/*               Decrypt and Verifying File Process                                        */
+/*                                                                                         */
+/* Modification:                                                                           */
+/* Date       Name       Pre  Ver  Mod#  Remarks                                           */
+/* ---------- ---------- --- ----- ----- ------------------------------------------------- */
+/* 2020/12/04 Alan       AC        08170 New                                               */
+/*=========================================================================================*/
+   PGM  PARM(&VFG &PATH &INFILE &PVTKEYFILE &PASSPHRASE &PUBKEYFILE)
+
+   DCL  VAR(&VFG)        TYPE(*CHAR) LEN(4)
+   DCL  VAR(&PATH)       TYPE(*CHAR) LEN(24)
+   DCL  VAR(&INFILE)     TYPE(*CHAR) LEN(24)
+   DCL  VAR(&PVTKEYFILE) TYPE(*CHAR) LEN(24)
+   DCL  VAR(&PASSPHRASE) TYPE(*CHAR) LEN(20)
+   DCL  VAR(&PUBKEYFILE) TYPE(*CHAR) LEN(24)
+
+   DCL  VAR(&INNAME)     TYPE(*CHAR) LEN(50)
+   DCL  VAR(&PVTKEYNAME) TYPE(*CHAR) LEN(50)
+   DCL  VAR(&PUBKEYNAME) TYPE(*CHAR) LEN(50)
+
+   DCL  VAR(&MSGID)    TYPE(*CHAR) LEN(7)
+   DCL  VAR(&MSGDTA)   TYPE(*CHAR) LEN(256)
+   DCL  VAR(&RESULT)   TYPE(*CHAR) LEN(4)
+   DCL  VAR(&STATUS)   TYPE(*DEC)  LEN(10 0)
+   DCL  VAR(&SIGNAL)   TYPE(*DEC)  LEN(10 0)
+   DCL  VAR(&CHARSTAT) TYPE(*CHAR) LEN(10)
+   DCL  VAR(&CHARSIG)  TYPE(*CHAR) LEN(10)
+
+   DCL  VAR(&JavaCmd)   TYPE(*CHAR) LEN(512)
+   DCL  VAR(&Args)      TYPE(*CHAR) LEN(256)
+
+   /* Actaully Java running class that compiled in ./bin */
+   DCL  VAR(&RunClass)  TYPE(*CHAR) LEN(50) +
+          VALUE('hk.com.promise.openpgp.KeyBasedSignFileProcess')
+
+   /* Set Java running class path and third party library provided by bouncycastle.org */
+   DCL  VAR(&ClassPath) TYPE(*CHAR) LEN(256) +
+          VALUE('-cp "bin:lib/bcpg-jdk15to18-165.jar:lib/bcprov-jdk15to18-165.jar"')
+
+   DCLF  FILE(PHZQ2F) OPNID(OUT)
+   DCLF  FILE(PHZQ3F) OPNID(ERR)
+
+   /* Remove Java running environment first before add */
+   RMVENVVAR  ENVVAR(JAVA_HOME)
+     MONMSG  MSGID(CPFA981)
+
+   RMVENVVAR  ENVVAR(QIBM_QSH_CMD_OUTPUT)
+     MONMSG  MSGID(CPFA981)
+
+   RMVENVVAR  ENVVAR(QIBM_QSH_CMD_ESCAPE_MSG)
+     MONMSG  MSGID(CPFA981)
+
+   /* Add Java environment */
+   ADDENVVAR  ENVVAR(JAVA_HOME) VALUE('/QOpenSys/QIBM/ProdData/JavaVM/jdk71/32bit')
+
+   /* No screen popup if error occured in QSH */
+   ADDENVVAR  ENVVAR(QIBM_QSH_CMD_OUTPUT) VALUE(*NONE)
+
+   /* Send Escape Message if error occured in QSH */
+   ADDENVVAR  ENVVAR(QIBM_QSH_CMD_ESCAPE_MSG) VALUE(Y)
+
+   /* Delete and re-create file in QTEMP to capture STDOUT and STDERR run in QShell */
+   DLTF  FILE(QTEMP/PHZQ2F)                                            /* File to Capture STDOUT */
+     MONMSG  MSGID(CPF0000)
+   DLTF  FILE(QTEMP/PHZQ3F)                                            /* File to Capture STDERR */
+     MONMSG  MSGID(CPF0000)
+
+   CRTDUPOBJ  OBJ(PHZQ2F) FROMLIB(*LIBL) OBJTYPE(*FILE) TOLIB(QTEMP)
+   CRTDUPOBJ  OBJ(PHZQ3F) FROMLIB(*LIBL) OBJTYPE(*FILE) TOLIB(QTEMP)
+
+   OVRDBF  FILE(STDOUT) TOFILE(QTEMP/PHZQ2F) OVRSCOPE(*CALLLVL)
+   OVRDBF  FILE(STDERR) TOFILE(QTEMP/PHZQ3F) OVRSCOPE(*CALLLVL)
+
+   CHGVAR  VAR(&INNAME) VALUE(&PATH *TCAT '/' *TCAT &INFILE)
+   CHGVAR  VAR(&PVTKEYNAME) VALUE(&PATH *TCAT '/' *TCAT &PVTKEYFILE)
+   CHGVAR  VAR(&PUBKEYNAME) VALUE(&PATH *TCAT '/' *TCAT &PUBKEYFILE)
+
+   /* Built Java command argument from paramaters */
+   IF    COND(&VFG *EQ '*YES') THEN( +
+     CHGVAR  VAR(&Args) VALUE('-dv' *BCAT &INNAME *BCAT &PUBKEYNAME +
+                                *BCAT &PVTKEYNAME *BCAT &PASSPHRASE))
+   ELSE  CMD( +
+     CHGVAR  VAR(&Args) VALUE('-d' *BCAT &INNAME *BCAT &PVTKEYNAME *BCAT &PASSPHRASE))
+
+   /* Built Java command */
+   CHGVAR  VAR(&JavaCmd) VALUE('java' *BCAT &ClassPath *BCAT &RunClass *BCAT &Args)
+
+   /* Change current directory that PGP program classes installed */
+   CHDIR  DIR('/PGP')
+
+   /* Run QShell command */
+   STRQSH  CMD(&JavaCmd)
+
+   /* From "Handling QShell Errors in a CL Program" By Scott Klement */
+   MONMSG MSGID(QSH0005 QSH0006 QSH0007) EXEC(DO)
+     RCVMSG  MSGTYPE(*LAST) RMV(*YES) MSGDTA(&MSGDTA) MSGID(&MSGID)
+
+     /* CPF0005 - QShell command ended "NORMALLY." */
+     IF (&MSGID *EQ 'QSH0005') THEN(DO)
+         CHGVAR  VAR(&RESULT) VALUE(%SST(&MSGDTA 1 4))
+         CHGVAR  VAR(&STATUS) VALUE(%BIN(&RESULT))
+         CHGVAR  VAR(&SIGNAL) VALUE(0)
+     ENDDO
+
+     /* QSH0006 - QShell command ended when it received a signal. */
+     IF (&MSGID *EQ 'QSH0006') THEN(DO)
+        CHGVAR  VAR(&RESULT) VALUE(%SST(&MSGDTA 1 4))
+        CHGVAR  VAR(&SIGNAL) VALUE(%BIN(&RESULT))
+        CHGVAR  VAR(&STATUS) VALUE(-1)
+     ENDDO
+
+     /* QSH0007 - QShell command ended due to an exception, +
+         for example the program crashed with a CPF MSG.  */
+     IF (&MSGID *EQ 'QSH0007') THEN(DO)
+        CHGVAR  VAR(&STATUS) VALUE(-1)
+        CHGVAR  VAR(&SIGNAL) VALUE(-1)
+     ENDDO
+   ENDDO
+
+   /* If QSH fail to execute */
+   IF (&STATUS *NE 0) THEN(DO)
+       CHGVAR  VAR(&CHARSTAT) VALUE(&STATUS)
+       CHGVAR  VAR(&CHARSIG) VALUE(&SIGNAL)
+       CHGVAR  VAR(&MSGDTA) VALUE('QShell command failed +
+         with status ' *CAT &CHARSTAT *CAT ' and signal ' *CAT &CHARSIG)
+       GOTO $ExitPgm
+   ENDDO
+
+   /* Capture QSH standard output details */
+   RCVF  OPNID(OUT)
+     MONMSG  MSGID(CPF0864) EXEC(GOTO CMDLBL($GetStdErr))
+
+   /* Capture STDOUT message and output to spool file */
+   CPYF  FROMFILE(QTEMP/PHZQ2F) TOFILE(*PRINT)
+   CHGVAR  VAR(&MSGDTA) VALUE('Java STDOUT:' |> &OUT_QSHOUT +
+     |< ', please check spool file for details')
+   GOTO $ExitPgm
+
+$GetStdErr:
+   /* Capture QSH standard error details */
+   RCVF  OPNID(ERR)
+   /* If QSHERR has no output, Java command run successfully */
+     MONMSG  MSGID(CPF0864) EXEC(GOTO CMDLBL($DspCnt))
+
+   /* Capture STDERR message and output to spool file */
+   CPYF  FROMFILE(QTEMP/PHZQ3F) TOFILE(*PRINT)
+   CHGVAR  VAR(&MSGDTA) VALUE('Java STDERR:' |> &ERR_QSHERR +
+     |< ', please check spool file for details')
+   GOTO $ExitPgm
+
+$DspCnt:
+   /* Display decrypted file content for debugging */
+   /* DSPF  STMF(&INNAME *TCAT '.out') */
+
+$ExitPgm:
+   DLTOVR  FILE(STDOUT) LVL(*)
+   DLTOVR  FILE(STDERR) LVL(*)
+
+   /* Remove Java running environment */
+   RMVENVVAR  ENVVAR(JAVA_HOME)
+     MONMSG  MSGID(CPFA981)
+   RMVENVVAR  ENVVAR(QIBM_QSH_CMD_OUTPUT)
+     MONMSG  MSGID(CPFA981)
+   RMVENVVAR  ENVVAR(QIBM_QSH_CMD_ESCAPE_MSG)
+     MONMSG  MSGID(CPFA981)
+
+   /* Send Escape Message and exit program for any error */
+   IF (&MSGDTA *NE ' ') THEN(DO)
+     SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGTYPE(*ESCAPE) MSGDTA(&MSGDTA)
+   ENDDO
+
+   ENDPGM

@@ -1,0 +1,49 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CHGINPDFT(CS)
+     A                                      PRINT
+     A                                      INDARA
+     A                                      HELP
+      *
+     A          R DSP01
+     A                                      OVERLAY
+     A                                      CF01(01 'EXE')
+     A                                      CF02(01 'SWAP')
+     A                                      CA03(03 'END')
+     A                                  1 25'*** Testing for Base64 ***'
+     A                                  3  1'Action:'
+     A            D1ACTION       1A  B  3 10COLOR(YLW)
+     A                                      DSPATR(UL)
+     A                                      CHECK(LC)
+     A                                  3 12'(E-Encode;D-Decode)'
+     A                                  3 33'( Encode: EBCDIC 937 -> UTF-8 -
+     A                                      -> Base64 )'
+     A                                  4 33'( Decode: Base64 -> UTF-8 -> -
+     A                                      EBCDIC 937 )'
+     A                                  6  1'Input CCSID:'
+     A            D1INPCCSID     5  0B  6 14EDTCDE(4)
+     A                                      COLOR(YLW)
+     A                                      DSPATR(UL)
+     A                                  6 25'Output CCSID:'
+     A            D1OUTCCSID     5  0B  6 39EDTCDE(4)
+     A                                      COLOR(YLW)
+     A                                      DSPATR(UL)
+     A                                  8  1'Input Encode value:'
+     A            D1INP        256O  B  9  1COLOR(YLW)
+     A                                      DSPATR(UL)
+     A                                      CHECK(LC)
+     A                                 14  1'Return Text value:'
+     A            D1OUT        256O  O 15  1COLOR(WHT)
+      *
+     A          R FT001
+     A            HDMSGID   R        O 20  2REFFLD(RFMSGID *LIBL/REFFILE)
+     A                                      DSPATR(HI)
+     A            HDMSG     R        O 20 10REFFLD(RFMSG *LIBL/REFFILE)
+     A                                      DSPATR(HI)
+     A                                 21  2'F1 - Execution     F2 - Swap      -
+     A                                          F3 - Exit          F4 -        -
+     A                                                 F5 -               F6 - -
+     A                                                    F7 -               F8-
+     A                                       -                   F9 -          -
+     A                                           F10-               F11-       -
+     A                                              F12-              '
+     A                                      COLOR(BLU)

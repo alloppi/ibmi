@@ -1,0 +1,24 @@
+/* Open multiple files in CL */
+             pgm
+             dclf       file(CUSTFILE) opnid(c)
+             dclf       file(ITEMFILE) opnid(i)
+
+             opndbf     file(CUSTFILE) option(*inp) opnid(c)
+
+loop:        clof       opnid(i)
+               monmsg     msgid(CPF0000)
+             opndbf     file(ITEMFILE) option(*inp) opnid(i)
+             ovrdbf     file(ITEMFILE) share(yes)
+             posdbf     opnid(i) position(*start)
+             rcvf       opnid(c)
+               monmsg     msgid(CPF0000) exec(goto cmdlbl(end))
+
+loop1:       rcvf       opnid(i)
+               monmsg     msgid(CPF0000) exec(goto cmdlbl(loop))
+             sndmsg     msg(&c_SHIPNAME *tcat ', ' *tcat &i_DESC) +
+                          tousr(*requester)
+             goto       cmdlbl(loop1)
+
+end:         clof       opnid(c)
+             clof       opnid(i)
+             endpgm

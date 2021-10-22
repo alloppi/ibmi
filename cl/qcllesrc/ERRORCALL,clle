@@ -1,0 +1,7 @@
+/* Call Error Handling Template */
+/* Refer to https://www.itjungle.com/2004/05/05/fhg050504-story02/ */
+pgm
+             CALL       PGM(ERRORTPL)
+             MONMSG     MSGID(CPF0000) EXEC(SNDPGMMSG MSG('Found +
+                          error in Calling ERRORTPL program '))
+endpgm

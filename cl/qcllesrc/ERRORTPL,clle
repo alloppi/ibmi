@@ -1,0 +1,48 @@
+/* Error Handling Template */
+/* Refer to https://www.itjungle.com/2004/05/05/fhg050504-story02/ */
+pgm
+
+   dcl   &Abending      *lgl
+   dcl   &MsgID         *char      7
+   dcl   &MsgDta        *char    256
+   dcl   &MsgF          *char     10
+   dcl   &MsgFLib       *char     10
+   dcl   &MsgKey        *char      4
+   dcl   &MsgType       *char     10
+   dcl   &RtnType       *char      2
+   dcl   &PgmName       *char     10
+   dcl   &Sender        *char     80
+
+   monmsg cpf0000 exec(goto abend)
+
+   /* retrieve the program name */
+   sndpgmmsg msg(' ') topgmq(*same) msgtype(*info) keyvar(&msgkey)
+   rcvmsg    pgmq(*same) msgtype(*info) sender(&sender) rmv(*yes)
+   chgvar    &PgmName   %sst(&Sender 56 10)
+
+   /* begin regular routine */
+   /*        CHKOBJ     OBJ(AAA) OBJTYPE(*FILE)  */
+
+   /* normal end of job */
+      sndpgmmsg  msgid(cpf9898) msgf(qcpfmsg) msgtype(*comp) +
+                   msgdta('Program' *bcat &PgmName *bcat +
+                          'completed normally')
+      return
+
+   /* Routine to handle unexpected errors */
+Abend:
+      if &Abending then(return)
+      chgvar   &Abending '1'
+
+      rcvmsg     msgtype(*last) msgdta(&msgdta) msgid(&msgid) +
+                    rtntype(&RtnType) +
+                    msgf(&msgf) sndmsgflib(&msgflib)
+      if ((&RtnType *eq '15') *or (&RtnType *eq '17')) do  /* *escape */
+         sndpgmmsg  msgid(&msgid)  msgf(&msgf)   msgtype(*diag) +
+                   msgdta(&msgdta)
+      enddo
+Escape:
+   sndpgmmsg  msgid(cpf9898) msgf(qcpfmsg) msgtype(*escape) +
+                msgdta('Program' *bcat &PgmName *bcat +
+                       'ended abnormally')
+endpgm

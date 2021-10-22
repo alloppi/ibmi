@@ -1,0 +1,23 @@
+/* Read again after EOF */
+             PGM
+
+             DCL        VAR(&LOOP) TYPE(*LGL) VALUE('1')
+
+             DCLF       FILE(CUSTFILE) OPNID(ID1)
+
+             DOWHILE    COND(&LOOP)
+               RCVF       OPNID(ID1)
+               MONMSG     MSGID(CPF0864) EXEC(LEAVE)
+               SNDPGMMSG  MSG(%CHAR(&ID1_CUSTNO)) TOUSR(*REQUESTER) +
+                            MSGTYPE(*INFO)
+             ENDDO
+
+             CLOSE      OPNID(ID1)
+
+             RCVF       OPNID(ID1)
+             SNDPGMMSG  MSG('After EOF : ' || %CHAR(&ID1_CUSTNO)) +
+                          TOUSR(*REQUESTER) MSGTYPE(*INFO)
+
+             CLOSE      OPNID(ID1)
+
+             ENDPGM

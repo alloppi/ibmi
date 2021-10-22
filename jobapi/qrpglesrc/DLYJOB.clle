@@ -1,0 +1,4 @@
+             PGM        PARM(&DLYTIME)
+             DCL        VAR(&DLYTIME) TYPE(*DEC) LEN(6 0)
+             DLYJOB     DLY(&DLYTIME)
+             ENDPGM

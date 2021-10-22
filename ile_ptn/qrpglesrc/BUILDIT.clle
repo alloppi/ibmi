@@ -1,0 +1,80 @@
+/*   CL PROGRAM TO BUILD THE CUSTOMER MAINTENANCE              +
+     TO COMPILE:                                               +
+        CRTBNDCL BUILDIT SRCFILE(XXX/QCLSRC) DBGVIEW(*LIST)    */
+PGM
+
+    /********************************************************+
+     * DELETE DEMO FILES IF THEY EXIST                       +
+     ********************************************************/
+
+             DLTF       FILE(*CURLIB/CUSTFILE)
+             MONMSG     CPF2105
+
+    /********************************************************+
+     * BUILD NEW FILES AND RENAME THEM:                      +
+     *   -- SQL MAKES RECFMT NAMES SAME AS FILENAMES.        +
+     *   -- SO WE BUILD THE FILE WITH THE INTENDED RECFMT    +
+     *   -- THEN RENAME TO GET THE PROPER FILE NAME          +
+     *                                                       +
+     *  NOTE: IN V5R4, THERE'S A RECFMT KEYWORD TO THE       +
+     *        CREATE TABLE STATEMENT SO THIS ISN'T NEEDED    +
+     *        BUT THIS CODE STRIVES TO BE V5R3 COMPATIBLE    +
+     ********************************************************/
+
+     RUNSQLSTM  SRCFILE(ILE_ORDER) SRCMBR(MKFILESSQL) +
+                COMMIT(*NONE) NAMING(*SYS)
+     DLTSPLF    FILE(MKFILESSQL) SPLNBR(*LAST)
+
+     RNMOBJ OBJ(*CURLIB/CUSTFILEF) OBJTYPE(*FILE) NEWOBJ(CUSTFILE)
+     RNMOBJ OBJ(*CURLIB/ITEMFILEF) OBJTYPE(*FILE) NEWOBJ(ITEMFILE)
+     RNMOBJ OBJ(*CURLIB/ORDHEADF)  OBJTYPE(*FILE) NEWOBJ(ORDHEAD)
+     RNMOBJ OBJ(*CURLIB/ORDITEMF)  OBJTYPE(*FILE) NEWOBJ(ORDITEM)
+     RNMOBJ OBJ(*CURLIB/CTRLFILEF) OBJTYPE(*FILE) NEWOBJ(CTRLFILE)
+
+     RUNSQLSTM  SRCFILE(ILE_ORDER) SRCMBR(DEMORECS) +
+                COMMIT(*NONE) NAMING(*SYS)
+     DLTSPLF    FILE(DEMORECS) SPLNBR(*LAST)
+
+     /******************************************************+
+     * BUILD THE SERVICE PROGRAM THAT CONTAINS THE BUSINESS +
+     * LOGIC FOR THIS PROJECT                               +
+     ********************************************************/
+
+     CRTSQLRPGI OBJ(QTEMP/ORDERR4) +
+                OBJTYPE(*MODULE) +
+                SRCFILE(*LIBL/ILE_ORDER) +
+                DBGVIEW(*SOURCE)
+
+     CRTSRVPGM SRVPGM(*CURLIB/ORDERR4) +
+               MODULE(QTEMP/ORDERR4) +
+               EXPORT(*SRCFILE) +
+               SRCFILE(*LIBL/QSRVSRC) +
+               ACTGRP(*CALLER)
+
+     DLTMOD MODULE(QTEMP/ORDERR4)
+
+     DLTSPLF    FILE(ORDERR4) JOB(*) SPLNBR(*LAST)
+     MONMSG     MSGID(CPF3303)
+
+     /******************************************************+
+     * CREATE STORED PROCEDURE INTERFACES FOR ORDERR4       +
+     ********************************************************/
+
+     RUNSQLSTM  SRCFILE(ILE_ORDER) SRCMBR(CRTPROC) +
+                COMMIT(*NONE) NAMING(*SYS) ERRLVL(20)
+     DLTSPLF    FILE(CRTPROC) SPLNBR(*LAST)
+
+
+     /******************************************************+
+     * BUILD THE 5250 INTERFACE FOR PLACING ORDERS          +
+     ********************************************************/
+
+     CRTDSPF    FILE(ACMEORDS) SRCFILE(*LIBL/ILE_ORDER)
+     CRTRPGMOD  MODULE(QTEMP/ACMEORDR4) SRCFILE(*LIBL/ILE_ORDER) +
+                  DBGVIEW(*LIST)
+     CRTPGM     PGM(ACMEORDR4) MODULE(QTEMP/ACMEORDR4) BNDSRVPGM(ORDERR4) +
+                  ACTGRP(ACME)
+     DLTSPLF    FILE(ACMEORDS) JOB(*) SPLNBR(*LAST)
+     DLTSPLF    FILE(ACMEORDR4) JOB(*) SPLNBR(*LAST)
+
+ENDPGM

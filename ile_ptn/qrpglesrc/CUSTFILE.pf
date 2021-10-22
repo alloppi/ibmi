@@ -1,0 +1,12 @@
+     A* CUSTFILE:  Sample customer file
+     A*  To compile:
+     A*       CRTPF FILE(CUSTFILE) SRCFILE(xxx/QDDSSRC)
+     A                                      UNIQUE
+     A          R RCUST
+     A            CUSTNO         4S 0
+     A            NAME          25A
+     A            STREET        25A
+     A            CITY          25A
+     A            STATE          2A
+     A            ZIP           10A
+     A          K CUSTNO

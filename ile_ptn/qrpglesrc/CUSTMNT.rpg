@@ -1,0 +1,131 @@
+      *  Sample of an old RPG/400 customer file maintenance
+      *  program.                     Scott Klement, Feb 2007
+      *
+      *  To Compile:
+      *    - First create the CUSTFILE physical file
+      *    - Then the CUSTS display file.
+      *    CRTRPGPGM PGM(CUSTMNT) SRCFILE(xxx/QRPGSRC) +
+      *              OPTION(*LSTDBG)
+      *
+     FCUSTFILEUF  E           K        DISK                      A
+     FCUSTS   CF  E                    WORKSTN
+     E                    ERR     1   8 60
+     C                     EXSR SCRN1
+     C                     EXSR SCRN2
+     C        N12          EXSR UPDATE
+     C        N12          EXSR CLEAR
+      *****************************************************
+      * ASK FOR CUSTOMER NUMBER
+      *****************************************************
+     C           SCRN1     BEGSR
+     C           SCMSG     DOUEQ*BLANKS
+      *
+     C                     EXFMTCUSTS1
+     C                     MOVE *BLANKS   SCMSG
+      *
+     C           *IN03     IFEQ *ON
+     C                     MOVE *ON       *INLR
+     C                     RETRN
+     C                     ENDIF
+      *
+     C           SCCUST    CHAINCUSTFILE            N99
+     C           *IN99     IFEQ *ON
+     C           *IN10     ANDEQ*OFF
+     C                     MOVELERR,1     SCMSG
+     C                     ENDIF
+      *
+     C           *IN99     IFEQ *OFF
+     C           *IN10     ANDEQ*ON
+     C                     MOVELERR,2     SCMSG
+     C                     ENDIF
+      *
+     C                     ENDDO
+     C                     ENDSR
+      *****************************************************
+      * EDIT CUSTOMER RECORD
+      *****************************************************
+     C           SCRN2     BEGSR
+      *
+     C                     MOVE CUSTNO    SCCUST
+     C                     MOVE NAME      SCNAME
+     C                     MOVE STREET    SCADDR
+     C                     MOVE CITY      SCCITY
+     C                     MOVE STATE     SCSTAT
+     C                     MOVE ZIP       SCZIP
+      *
+     C           SCMSG     DOUEQ*BLANKS
+      *
+     C                     EXFMTCUSTS2
+     C                     MOVE *BLANKS   SCMSG
+      *
+     C           *IN12     IFEQ *ON
+     C                     LEAVE
+     C                     ENDIF
+      *
+     C           SCCUST    IFEQ 0
+     C                     MOVELERR,3     SCMSG
+     C                     ENDIF
+      *
+     C           SCNAME    IFEQ *BLANKS
+     C                     MOVELERR,4     SCMSG
+     C                     ENDIF
+      *
+     C           SCADDR    IFEQ *BLANKS
+     C                     MOVELERR,5     SCMSG
+     C                     ENDIF
+      *
+     C           SCCITY    IFEQ *BLANKS
+     C                     MOVELERR,6     SCMSG
+     C                     ENDIF
+      *
+     C           SCSTAT    IFEQ *BLANKS
+     C                     MOVELERR,7     SCMSG
+     C                     ENDIF
+      *
+     C           SCZIP     IFEQ *BLANKS
+     C                     MOVELERR,8     SCMSG
+     C                     ENDIF
+      *
+     C                     ENDDO
+     C                     ENDSR
+      *****************************************************
+      * UPDATE FILE
+      *****************************************************
+     C           UPDATE    BEGSR
+      *
+     C           SCCUST    CHAINCUSTFILE             99
+      *
+     C                     MOVE SCCUST    CUSTNO
+     C                     MOVE SCNAME    NAME
+     C                     MOVE SCADDR    STREET
+     C                     MOVE SCCITY    CITY
+     C                     MOVE SCSTAT    STATE
+     C                     MOVE SCZIP     ZIP
+      *
+     C           *IN99     IFEQ *ON
+     C                     WRITERCUST
+     C                     ELSE
+     C                     UPDATRCUST
+     C                     ENDIF
+     C                     ENDSR
+      *****************************************************
+      * CLEAR FIELDS SO NOTHING CARRIES OVER TO NEXT CUST
+      *****************************************************
+     C           CLEAR     BEGSR
+     C                     MOVE *ZEROS    SCCUST
+     C                     MOVE *BLANKS   SCNAME
+     C                     MOVE *BLANKS   SCADDR
+     C                     MOVE *BLANKS   SCCITY
+     C                     MOVE *BLANKS   SCSTAT
+     C                     MOVE *BLANKS   SCZIP
+     C                     MOVE *BLANKS   SCMSG
+     C                     ENDSR
+**
+Customer number not found! F10=Add
+Customer number already exists!
+Customer number can't be empty!
+Name can't be empty!
+Street address can't be empty!
+City can't be empty!
+State can't be empty!
+Zip can't be empty!

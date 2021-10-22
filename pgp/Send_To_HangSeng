@@ -1,0 +1,9 @@
+{
+  "transactionDate": "2020-08-26", 
+  "transactionTimeFrom": "12:56", 
+  "transactionTimeTo": "18:56", 
+  "accountNumber": "1234576789", 
+  "accountCountry": "1234576789", 
+  "institutionCode": "HBEU", 
+  "accountType": "CA"
+}

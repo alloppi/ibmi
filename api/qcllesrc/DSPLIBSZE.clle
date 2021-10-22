@@ -1,0 +1,112 @@
+/*===================================================================*/
+/* Program name: DSPLIBSZE                                           */
+/* Purpose.....: Retrieve Library Size                               */
+/* Description.: Use QLIRLIBD API                                    */
+/*               to Retrieve Library Size and Number of Objects      */
+/*                                                                   */
+/* Input Parameter:  Library Name      (10A)                         */
+/*                                                                   */
+/* Date written: 2019/11/12                                          */
+/*                                                                   */
+/* Modification:                                                     */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- --- ----- ----- --------------------------- */
+/* 2019/11/12 Alan       AC              New Development             */
+/*===================================================================*/
+             PGM        PARM(&LIBNAME)
+
+             DCL        VAR(&LIBNAME) TYPE(*CHAR) LEN(10)
+
+/* Message for Display to User */
+             DCL        VAR(&MSG) TYPE(*CHAR) LEN(103)
+
+/* Variables for Calling QLIRLIBD API                               */
+             DCL        VAR(&BYTESP) TYPE(*DEC) LEN(8) VALUE(0)
+             DCL        VAR(&KEY1) TYPE(*DEC) LEN(8)
+             DCL        VAR(&KEY2) TYPE(*DEC) LEN(8)
+             DCL        VAR(&LIBSIZ) TYPE(*DEC) LEN(15 0)
+             DCL        VAR(&LIBSIZM) TYPE(*DEC) LEN(15 0)
+             DCL        VAR(&LIBCNT) TYPE(*DEC) LEN(15 0)
+             DCL        VAR(&NBRVARREC) TYPE(*DEC) LEN(8)
+             DCL        VAR(&RCVLD) TYPE(*DEC) LEN(8) VALUE(200)
+             DCL        VAR(&ERRCODE) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&INFSTAT) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&RCVL) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&RCVVAR) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&RTVINFO) TYPE(*CHAR) LEN(16)
+
+/* Variables for Decimal to Character Conversion                     */
+             DCL        VAR(&CHARCNV) TYPE(*CHAR) LEN(15)
+
+/* Set up to call the QLIRLIBD API:                                  */
+/* Parms:                                                            */
+/* - RCVVAR    Receiver variable to receive the information          */
+/* - RCVL      Length of the receiver variable                       */
+/* - LIBNAME   Library Name to return information                    */
+/* - RTVINFO   Defines attributes of Library to retrieve             */
+/* - NBRVARREC Number of Keys requested: Two Keys are requested      */
+/* - KEY1      Return Info. for Key 6, Library Size                  */
+/* - KEY2      Return Info. for Key 7, Numbers of Objects in Library */
+
+             CHGVAR     VAR(&KEY1) VALUE(6)
+             CHGVAR     VAR(&KEY2) VALUE(7)
+             CHGVAR     VAR(&NBRVARREC) VALUE(2)
+             CHGVAR     VAR(%BIN(&RTVINFO 1 4)) VALUE(&NBRVARREC)
+             CHGVAR     VAR(%BIN(&RTVINFO 5 4)) VALUE(&KEY1)
+             CHGVAR     VAR(%BIN(&RTVINFO 9 4)) VALUE(&KEY2)
+             CHGVAR     VAR(%BIN(&ERRCODE)) VALUE(&BYTESP)
+             CHGVAR     VAR(%BIN(&RCVL)) VALUE(&RCVLD)
+
+ /* Call the QLIRLIBD API */
+             CALL       PGM(QLIRLIBD) PARM(&RCVVAR &RCVL &LIBNAME +
+                          &RTVINFO &ERRCODE)
+
+ /* Process the Information returned by the QLIRLIBD API.            */
+ /* Return info about Library Size, Key 6.                           */
+             CHGVAR     VAR(&KEY1) VALUE(%BIN(&RCVVAR 21 4))
+             CHGVAR     VAR(&LIBSIZ) VALUE(%BIN(&RCVVAR 29 4))
+             CHGVAR     VAR(&LIBSIZM) VALUE(%BIN(&RCVVAR 33 4))
+             CHGVAR     VAR(&INFSTAT) VALUE(%SST(&RCVVAR 37 1))
+
+ /* Return info about Numbers of Objects in Library, Key 7           */
+             CHGVAR     VAR(&KEY2) VALUE(%BIN(&RCVVAR 45 4))
+             CHGVAR     VAR(&LIBCNT) VALUE(%BIN(&RCVVAR 53 4))
+
+/*********************************************************************/
+/* Display Info returned from QLIRLIBD API                           */
+/*********************************************************************/
+             CHGVAR     VAR(&MSG) VALUE('Info for Library ')
+             CHGVAR     VAR(%SST(&MSG 32 10)) VALUE(&LIBNAME)
+             SNDPGMMSG  MSG(&MSG)
+
+/* Convert the decimal values returned to character values           */
+             CHGVAR     VAR(&CHARCNV) VALUE(&LIBCNT)
+
+             CHGVAR     VAR(&MSG) VALUE('# of Objects in Library ')
+             CHGVAR     VAR(%SST(&MSG 32 15)) VALUE(&CHARCNV)
+             SNDPGMMSG  MSG(&MSG)
+/* CONVERT THE DECIMAL VALUES RETURNED TO CHARACTER VALUES */
+             CHGVAR     VAR(&CHARCNV) VALUE(&LIBSIZ)
+
+             CHGVAR     VAR(&MSG) VALUE('LIBRARY SIZE ')
+             CHGVAR     VAR(%SST(&MSG 32 15)) VALUE(&CHARCNV)
+             SNDPGMMSG  MSG(&MSG)
+
+/* Convert the decimal values returned to character values */
+             CHGVAR     VAR(&CHARCNV) VALUE(&LIBSIZM)
+             CHGVAR     VAR(&MSG) VALUE('LIBRARY SIZE MULTIPLIER ')
+             CHGVAR     VAR(%SST(&MSG 32 15)) VALUE(&CHARCNV)
+             SNDPGMMSG  MSG(&MSG)
+
+ /* Check if the library size includes all objects in the library */
+             IF         COND(&INFSTAT = '1') THEN(DO)
+               CHGVAR     VAR(&MSG) +
+                            VALUE('Size of all objects used in library size')
+               SNDPGMMSG  MSG(&MSG)
+             ENDDO
+             ELSE       CMD(DO)
+               SNDPGMMSG  MSG('Some objects locked or not authorized.')
+               SNDPGMMSG  MSG('Library size does not include all objects.')
+             ENDDO
+
+             ENDPGM

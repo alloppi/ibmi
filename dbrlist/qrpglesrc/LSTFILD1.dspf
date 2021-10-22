@@ -1,0 +1,39 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'EXIT')
+     A          R LSTFILSFL                 SFL
+     A  50                                  SFLNXTCHG
+     A            SELECT         1A  B  9  2VALUES(' ' '2' '3')
+     A            FNAME         10A  O  9  5
+     A            FSIZE         10Y 0O  9 16EDTCDE(Z)
+     A            OBJOWN        10   O  9 29
+     A            FTEXT         40A  O  9 40
+     A          R LSTFILCTL                 SFLCTL(LSTFILSFL)
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A  91                                  SFLDSP
+     A  90                                  SFLDSPCTL
+     A  89                                  SFLCLR
+     A  99                                  SFLEND(*MORE)
+     A            RCDNBR         2  0H      SFLRCDNBR(CURSOR)
+     A                                  1 25'List Physical Files By Library'
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                  3 28'File Library :'
+     A                                      DSPATR(HI)
+     A            ILIB          10A  B  3 43
+     A                                  5  5'Type Option'
+     A                                  6  9'2=Record Formats'
+     A                                  6 27'3=Database Relations'
+     A                                  8  5'File Name'
+     A                                      DSPATR(HI)
+     A                                  8 22'Size'
+     A                                      DSPATR(HI)
+     A                                  8 40'Text'
+     A                                      DSPATR(HI)
+     A                                  8 29'Obj Owner'
+     A                                      DSPATR(HI)
+     A          R LSTFILFTR
+     A                                 23  5'F3=Exit'
+     A                                      COLOR(BLU)

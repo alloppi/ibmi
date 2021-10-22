@@ -1,0 +1,36 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'EXIT')
+     A          R LSTFMTSFL                 SFL
+     A            SELECT         1A  B  9  2VALUES(' ' '2')
+     A            RFORMAT       10   O  9  5
+     A            RLEN           5Y 0O  9 16EDTCDE(Z)
+     A            R#FIELDS       5Y 0O  9 24EDTCDE(Z)
+     A            RTEXT         50   O  9 31
+     A          R LSTFMTCTL                 SFLCTL(LSTFMTSFL)
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A  91                                  SFLDSP
+     A  90                                  SFLDSPCTL
+     A  89                                  SFLCLR
+     A  99                                  SFLEND(*MORE)
+     A            RCDNBR         2  0H      SFLRCDNBR(CURSOR)
+     A                                  1 27'List Record Formats'
+     A                                      DSPATR(HI)
+     A                                  3 29'Lib/File:'
+     A                                      DSPATR(HI)
+     A            ILIBFIL       21   O  3 39
+     A                                  5  5'Type Option'
+     A                                  6  9'2=List Fields'
+     A                                  8  5'Format'
+     A                                      DSPATR(HI)
+     A                                  8 16'Len'
+     A                                      DSPATR(HI)
+     A                                  8 23'# Flds'
+     A                                      DSPATR(HI)
+     A                                  8 31'Record Text'
+     A                                      DSPATR(HI)
+     A          R LSTFMTFTR
+     A                                 23  5'F3=Exit'
+     A                                      COLOR(BLU)

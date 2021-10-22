@@ -1,0 +1,39 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'EXIT')
+     A          R LSTFLDSFL                 SFL
+     A            FNAME         10A  O  6  2
+     A            FTYPE          1A  O  6 14
+     A            FUSAGE         1A  O  6 18
+     A            FLEN           4Y 0O  6 21EDTCDE(Z)
+     A            FDEC           4Y 0O  6 26EDTCDE(Z)
+     A            FTEXT         50A  O  6 31
+     A          R LSTFLDCTL                 SFLCTL(LSTFLDSFL)
+     A                                      SFLSIZ(0017)
+     A                                      SFLPAG(0016)
+     A                                      OVERLAY
+     A  91                                  SFLDSP
+     A  90                                  SFLDSPCTL
+     A  89                                  SFLCLR
+     A  99                                  SFLEND(*MORE)
+     A            RCDNBR         2  0H      SFLRCDNBR(CURSOR)
+     A                                  1 27'List File Fields'
+     A                                      DSPATR(HI)
+     A                                  3 20'Lib/File/Format:'
+     A                                      DSPATR(HI)
+     A            ILIBFIL       31A  O  3 37
+     A                                  5  2'Name'
+     A                                      DSPATR(HI)
+     A                                  5 13'Typ'
+     A                                      DSPATR(HI)
+     A                                  5 17'Use'
+     A                                      DSPATR(HI)
+     A                                  5 22'Len'
+     A                                      DSPATR(HI)
+     A                                  5 27'Dec'
+     A                                      DSPATR(HI)
+     A                                  5 31'Text'
+     A                                      DSPATR(HI)
+     A          R LSTFLDFTR
+     A                                 23  5'F3=Exit'
+     A                                      COLOR(BLU)

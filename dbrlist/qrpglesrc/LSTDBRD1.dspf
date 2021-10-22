@@ -1,0 +1,38 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'EXIT')
+     A          R LSTDBRSFL                 SFL
+     A  50                                  SFLNXTCHG
+     A            SELECT         1   B  9  2VALUES(' ' '2')
+     A            DFL           32A  O  9  5
+     A            DEPTYP        15A  O  9 38
+     A            CONSTRT       25A  O  9 55
+     A          R LSTDBRCTL                 SFLCTL(LSTDBRSFL)
+     A                                      OVERLAY
+     A  91                                  SFLDSP
+     A  90                                  SFLDSPCTL
+     A  89                                  SFLCLR
+     A  99                                  SFLEND(*MORE)
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0013)
+     A            RCDNBR         2  0H      SFLRCDNBR(CURSOR)
+     A                                  1 27'LIST DATABASE RELATIONS'
+     A                                      DSPATR(UL)
+     A                                      DSPATR(HI)
+     A                                  3 11'PHYSICAL FILE:'
+     A                                      DSPATR(HI)
+     A            IFILE         10A  B  3 26
+     A                                  3 39'FILE LIBRARY :'
+     A                                      DSPATR(HI)
+     A            ILIB          10A  B  3 54
+     A                                  5  5'TYPE OPTION'
+     A                                  6  9'2=RECORD FORMATS'
+     A                                  8  5'DEPENDENT LIB/FILE/MBR'
+     A                                      DSPATR(HI)
+     A                                  8 38'DEPENDENCY TYPE'
+     A                                      DSPATR(HI)
+     A                                  8 55'CONSTRAINT NAME'
+     A                                      DSPATR(HI)
+     A          R LSTDBRFTR
+     A                                 23  5'F3=EXIT'
+     A                                      COLOR(BLU)

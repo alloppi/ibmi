@@ -1,0 +1,80 @@
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                         booth@martinvt.com   *
+      ****************************************************************
+      * A program to show a pop-up calendar                          *
+      *    7/02  Booth M.  Rewritten 2/12 & 5/14                     *
+      *                                                              *
+      ****************************************************************
+                                            DSPSIZ(*DS3 *DS4)
+                                            ENTFLDATR(*NOCURSOR (*COLOR WHT))
+                                            CHGINPDFT
+                R FMT001
+       N90                                  DSPMOD(*DS3)
+        90                                  DSPMOD(*DS4)
+                                            CA03 CA12
+                                            RTNCSRLOC(&CSRRCD &CSRFLD)
+                                            OVERLAY
+                                            WINDOW(*DFT 9 21 *NOMSGLIN)
+                                            MOUBTN(*ULP ENTER)
+                  CSRRCD        10   H
+                  CSRFLD        10   H
+                  MONTHYEAR     18   O  1  4DSPATR(HI)
+                                        3  2'S' COLOR(RED)
+                                        3  5'M' COLOR(BLU)
+                                        3  8'T' COLOR(BLU)
+                                        3 11'W' COLOR(BLU)
+                                        3 14'T' COLOR(BLU)
+                                        3 17'F' COLOR(BLU)
+                                        3 20'S' COLOR(RED)
+                  DAY01          2I  B  4  1DSPATR(PR)
+                  DAY02          2I  B  4  4DSPATR(PR)
+                  DAY03          2I  B  4  7DSPATR(PR)
+                  DAY04          2I  B  4 10DSPATR(PR)
+                  DAY05          2I  B  4 13DSPATR(PR)
+                  DAY06          2I  B  4 16DSPATR(PR)
+                  DAY07          2I  B  4 19DSPATR(PR)
+                  DAY08          2I  B  5  1DSPATR(PR)
+                  DAY09          2I  B  5  4DSPATR(PR)
+                  DAY10          2I  B  5  7DSPATR(PR)
+                  DAY11          2I  B  5 10DSPATR(PR)
+                  DAY12          2I  B  5 13DSPATR(PR)
+                  DAY13          2I  B  5 16DSPATR(PR)
+                  DAY14          2I  B  5 19DSPATR(PR)
+                  DAY15          2I  B  6  1DSPATR(PR)
+                  DAY16          2I  B  6  4DSPATR(PR)
+                  DAY17          2I  B  6  7DSPATR(PR)
+                  DAY18          2I  B  6 10DSPATR(PR)
+                  DAY19          2I  B  6 13DSPATR(PR)
+                  DAY20          2I  B  6 16DSPATR(PR)
+                  DAY21          2I  B  6 19DSPATR(PR)
+                  DAY22          2I  B  7  1DSPATR(PR)
+                  DAY23          2I  B  7  4DSPATR(PR)
+                  DAY24          2I  B  7  7DSPATR(PR)
+                  DAY25          2I  B  7 10DSPATR(PR)
+                  DAY26          2I  B  7 13DSPATR(PR)
+                  DAY27          2I  B  7 16DSPATR(PR)
+                  DAY28          2I  B  7 19DSPATR(PR)
+                  DAY29          2I  B  8  1DSPATR(PR)
+                  DAY30          2I  B  8  4DSPATR(PR)
+                  DAY31          2I  B  8  7DSPATR(PR)
+                  DAY32          2I  B  8 10DSPATR(PR)
+                  DAY33          2I  B  8 13DSPATR(PR)
+                  DAY34          2I  B  8 16DSPATR(PR)
+                  DAY35          2I  B  8 19DSPATR(PR)
+                  DAY36          2I  B  9  1DSPATR(PR)
+                  DAY37          2I  B  9  4DSPATR(PR)
+                  DAY38          2I  B  9  7DSPATR(PR)
+                  PREVYEAR       2I  B  9 10COLOR(TRQ) DFTVAL('<<')
+                  PREVMONTH      2I  B  9 13COLOR(TRQ) DFTVAL(' <')
+                  NEXTMONTH      2I  B  9 16COLOR(TRQ) DFTVAL('> ') DSPATR(PC)
+                  NEXTYEAR       2I  B  9 19COLOR(TRQ) DFTVAL('>>')
+                R DUMMY
+                                            TEXT('Prevents Previous +
+                                            screen from being cleared')
+                                            ASSUME
+                                        5  9' '

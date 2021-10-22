@@ -1,0 +1,5 @@
+     A          R FILTERS2PR
+     A            ST             2A         TEXT('ST')
+     A                                      COLHDG('ST')
+     A            STATE         17A         TEXT('STATE')
+     A                                      COLHDG('STATE')

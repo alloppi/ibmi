@@ -1,0 +1,3186 @@
+       //***************************************************************
+       //   ___             _    _     __ __             _    _        *
+       //  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+       //  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+       //  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+       //                                                              *
+       //  A full-screen data editor                                   *
+       //                                                              *
+       //   3/2015                                 booth@martinvt.com  *
+       //***************************************************************
+       // COMMENTS  Added error checking with cursor positioning.      *
+       //                                                              *
+       //***************************************************************
+
+     h COPYRIGHT('(C) Booth Martin 2013.')
+     h option(*nodebugio) dftactgrp(*no) actgrp(*new)
+     fDATAEDITD cf   e             workstn sfile(SFL1 : SF1NUM)
+     FTESTFILE  if a f  128        disk
+
+     d FIGLET          ds
+     d Figar                         65    dim(5) ctdata perrcd(1)
+
+     d wNewRecords     s              5  0 inz(30)
+     d wNdx            s              5  0
+     d wErrorFound     s               n
+
+     d NewRecordDS     ds
+     d  NewData                            like(DATA)
+
+     d wcmd            s           1024    varying
+     d QCMD            pr                  ExtPgm('QCMDEXC')
+     d                             1024    const
+     d                               15  5 const
+
+     iTESTFILE  NS
+     i                                  1  128  DATA
+
+      //====================================================================*
+      // MAINLINE-BEGIN                                                     *
+      //====================================================================*
+      // Display screen.
+      /FREE
+         //   Display screen.
+         write S1CMD;
+         exfmt S1;
+         select;
+         when *inkc = *on;    // F3=Exit.
+           exsr ExitPgm;
+         other;
+           exsr Validate;
+           if wErrorFound = *off;    // save data & refill subfile.
+             exsr SaveData;
+             exsr S1Fill;
+           endif;
+         endsl;
+       //====================================================================*
+       // MAINLINE-END                                                       *
+       //====================================================================*
+       //-------------------------------*  Sub-Routine  *
+       // INZSR()                       *---------------*
+       //                                               *
+       //-----------------------------------------------*
+       begsr *INZSR;
+         exsr S1Fill;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // ExitPgm()                     *---------------*
+       // Exit program.                                 *
+       //-----------------------------------------------*
+       begsr ExitPgm;
+         *inlr = *on;
+         return;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Fill()                      *---------------*
+       // Screen - Fill screen.                         *
+       //-----------------------------------------------*
+       begsr S1Fill;
+         // Clear subfile.
+         *in50 = *on;
+         write S1;
+         *in50 = *off;
+         // Fill SFL.
+         SF1NUM = *zero;
+         // Read the file.
+         setll *start TESTFILE;
+         read TESTFILE;
+         dow not %eof;
+           SF1NUM = SF1NUM + 1;
+           write SFL1;
+           read TESTFILE;
+         enddo;
+         // Create some empty records for adding records.
+         clear DATA;
+         for wNdx = 1 to wNewRecords;
+           SF1NUM = SF1NUM + 1;
+           write SFL1;
+         endfor;
+         // Save values.
+         SF1RECS = SF1NUM;
+         SF1TOP = 1;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // Validate()                    *---------------*
+       // Validate the data.                            *
+       //-----------------------------------------------*
+       begsr Validate;
+         wErrorFound = *off;
+         // Check the lines of data for errors
+         for wNdx = 1 to SF1RECS;
+           chain wNdx SFL1;
+           If %trim(DATA) = 'Error';  //  <-demo error condition.
+             wErrorFound = *on;
+             *in33 = *on;
+             update SFL1;
+           endif;
+         endfor;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // SaveData()                    *---------------*
+       // Save the edited data                          *
+       //-----------------------------------------------*
+       begsr SaveData;
+         // Clear the data file.
+         close TESTFILE;
+         wCmd = 'CLRPFM FILE(TESTFILE)';
+         qcmd(wCmd:%len(wCmd));
+         open TESTFILE;
+         // Find the last filled record.  ( This process ia to allow blank
+         // records in the file.)
+         for SF1RECS = SF1NUM downto 1;
+           chain SF1RECS SFL1;
+           if DATA <> *blanks;
+             leave;
+           endif;
+         endfor;
+         // Fill the data file with the data.
+         for wNdx = 1 to SF1RECS;
+           chain wNdx SFL1;
+           NewData = DATA;
+           write TESTFILE NewRecordDS;
+         endfor;
+         // Refill the subfile with the new data.
+         exsr S1Fill;
+       endsr;
+
+      /END-FREE
+** Figar 1....+....2....+....3....+....4....+....5....+....6....+
+    ____        __           ______    ___ __
+   / __ \____ _/ /_____ _   / ____/___/ (_) /_____  _____
+  / / / / __ `/ __/ __ `/  / __/ / __  / / __/ __ \/ ___/
+ / /_/ / /_/ / /_/ /_/ /  / /___/ /_/ / / /_/ /_/ / /
+/_____/\__,_/\__/\__,_/  /_____/\__,_/_/\__/\____/_/
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *                                          booth@martinvt.com  *
+      ****************************************************************
+      * WRITTEN BY    : Booth Martin                                 *
+      * DATE WRITTEN  : 01-2007   Revised 3/2015                     *
+      * COMMENTS      : Screen format simple data editor             *
+      ****************************************************************
+                                            DSPSIZ(*DS4)
+                                            PRINT
+                                            ERRSFL
+                                            CA03
+      *****************************************************************
+                R SFL1                      SFL
+                  DATA         128   B  9  2CHECK(LC)
+        33                                  DSPATR(PC RI) COLOR(TRQ)
+      *****************************************************************
+                R S1                        SFLCTL(SFL1)
+                                            SFLPAG(0016)
+                                            SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP
+       N50                                  SFLDSPCTL
+       N50                                  SFLEND(*SCRBAR *MORE)
+        50                                  SFLCLR
+                                            RTNCSRLOC(&PM_RCD &PM_FLD)
+        33                                  SFLMSG('Error Message' 33)
+                  PM_RCD        10A  H
+                  PM_FLD        10A  H
+                  SF1NUM         4S 0H
+                  SF1RECS        5S 0P
+                  SF1TOP         4S 0H      SFLRCDNBR(CURSOR *TOP)
+                  FIGLET       325   B  1 32CNTFLD(65) CHGINPDFT
+                                            DSPATR(PR) COLOR(YLW)
+                                        1123DATE
+                                            EDTCDE(Y)
+                                        2123TIME
+                                        3123'SYSTEM X'
+                                        6  2'                                  -
+                                                                               -
+                                                                          1    -
+                                                 1         1         1'
+                                            COLOR(TRQ)
+                                        7  2'         1         2         3    -
+                                                  4        5         6         -
+                                            7         8         9         0    -
+                                                 1         2         3'
+                                            COLOR(TRQ)
+                                        8  2'1234567890123456789012345678901234-
+                                            56789012345678901234567890123456789-
+                                            01234567890123456789012345678901234-
+                                            56789012345678901234567890'
+                                            COLOR(TRQ)
+                                            DSPATR(UL)
+      *****************************************************************
+                R S1CMD
+                  LINE130      130     26  2DSPATR(UL)
+                                            COLOR(BLU)
+                                       27  3'F3=Exit'
+                                            COLOR(BLU)
+
+											
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A file for the subfile dropdown box demo.                   *
+      *                                                              *
+      *  11/2010                                 booth@martinvt.com  *
+      ****************************************************************
+                                            UNIQUE
+                R RSFLDRPDWN
+                  TERMS         20
+				
+				
+                K TERMS
+
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A display screen for the subfile dropdown box demo.         *
+      *                                                              *
+      *  11/2010                                 booth@martinvt.com  *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            REF(SFLDRPDWNP)
+                                            ERRSFL
+                                            CA03
+                R SFL1                      SFL
+                  W1TERMS   R        B  1  2REFFLD(TERMS) CHECK(LC)
+        41                                  DSPATR(PR)
+       N41                                  DSPATR(HI UL)
+                  W1TERMSSV R        H      REFFLD(TERMS)
+                R FMT01                     SFLCTL(SFL1)
+                                            SFLSIZ(&SFL1RECS)
+                                            SFLPAG(5)
+                                            WINDOW(13 08 5 24 *NOMSGLIN)
+                                            OVERLAY
+                                            SFLCSRRRN(&RRNA)
+        90                                  SFLDSP SFLDSPCTL
+       N90                                  SFLCLR
+        91                                  SFLEND(*SCRBAR)
+                                            MOUBTN(*ULD ENTER)
+                  RRNA           5S 0H
+                  SFL1RECS       5S 0P
+                R DUMMY
+                                            TEXT('Prevents previous screen-
+                                             from being cleared.')
+                                            ASSUME
+                                        5  9' '
+
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to display a dropdown box, with mouse pick.       *
+      *    Features:                                                 *
+      *     - If a parm is used then a mouse click on an item will   *
+      *       return the clicked item as a choice.                   *
+      *     - The first line displayed is always blank and provides  *
+      *       a means for adding a new TERM to the list of TERMs.    *
+      *     - If the program is called without a parm then the file  *
+      *       is in Edit Mode and any lines may be changed or        *
+      *       deleted.                                               *
+      *                                                              *
+      *                                                              *
+      *  11/2010                                 booth@martinvt.com  *
+      ****************************************************************
+     H COPYRIGHT('(C) Copyright Booth Martin 2010, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*caller)
+
+     FSFLDRPDWNDcf   e             workstn SFILE(SFL1:RRNA)
+     FSFLDRPDWNPuf a e           k disk
+
+      *  ..................................................
+
+     D pTerms          s                       like(TERMS)
+     D wNdx            s              5s 0
+     D wRRNASaved      s                       like(RRNA)
+     D weojFlag        s               n       inz(*off)
+      *  ..................................................
+     C     *entry        plist
+     C                   parm                    pTerms
+
+     C                   dou       weojFlag = *on
+      * Clear subfile.
+     C                   eval      *in90 = *off
+     C                   write     FMT01
+     C                   eval      *in90 = *on
+
+      * Fill the subfile:
+      *  Make a leading blank record, so a new TERMS can be entered:
+     C                   eval      *in41 = *off
+     C                   eval      RRNA = 1
+     C                   eval      W1TERMS = *blanks
+     C                   eval      W1TERMSSV = *blanks
+     C                   write     SFL1
+      * Allow editing of the file if this program is run stand-alone.
+      *  Otherwise protect the fields.
+     C                   if        %parms = 1
+     C                   eval      *in41 = *on
+     C                   endif
+      * Fill the subfile:
+     C     *start        setll     SFLDRPDWNP
+     C                   read      SFLDRPDWNP
+     C                   dow       not %eof
+     C                   eval      RRNA = RRNA + 1
+     C                   eval      W1TERMS = TERMS
+     C                   eval      W1TERMSSV = TERMS
+     C                   write     SFL1
+     C                   read      SFLDRPDWNP
+     C                   enddo
+     C                   eval      *in91 = *on
+      * Set subfile size:
+     C                   eval      SFL1RECS = RRNA
+     C                   exfmt     FMT01
+     C                   eval      weojFlag = *on
+      * Save the RRNA
+     C                   eval      wRRNASaved = RRNA
+      * See if there have been any changes:
+     C                   for       wNdx = 1 to SFL1RECS
+     C     wNdx          chain     SFL1
+      * Look for changes in the subfile:
+     C                   if        W1TERMS <> W1TERMSSV
+     C                   exsr      FixTERMS
+      * If any changes, (after the first line) do not end yet:
+      *  or, in edit mode and still making additions.
+     C                   if        (wNdx > 1)
+     C                               or (%parms = 0
+     C                                   and wNdx = 1
+     C                                   and W1TERMS <> *blanks)
+     C                   eval      weojFlag = *off
+     C                   endif
+     C                   endif
+     C                   endfor
+     C                   enddo
+
+      * If a choice was made, save it to PARM for return:
+     C                   if        (%parms = 1)
+     C                               and (wRRNASaved > *zeros)
+     C     wRRNASaved    chain     SFL1
+     C                   eval      pTerms = W1TERMS
+     C                   endif
+     C                   eval      *inlr = *on
+      *  ..................................................
+      *  FixTERMS sub routine  add/delete/update TERMS
+      *  ..................................................
+     C     FixTERMS      begsr
+     C                   select
+
+      * New Terms:
+     C                   when      W1TERMSSV = *blank
+     C                   eval      TERMS  = W1TERMS
+     C                   write(e)  RSFLDRPDWN
+
+      * Existing record cleared:
+     C                   when      W1TERMS = *blank
+     C     W1TERMSSV     delete    SFLDRPDWNP
+
+      * Only choice left is update:
+     C                   other
+     C     W1TERMSSV     chain     SFLDRPDWNP
+     C                   eval      TERMS = W1TERMS
+     C                   update    RSFLDRPDWN
+     C                   endsl
+     C                   endsr
+      *-------------------------------------------------------------------
+
+      //***************************************************************
+      //   ___             _    _     __ __             _    _        *
+      //  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      //  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      //  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      //                                                              *
+      //  A program to display a dropdown box, with mouse pick.       *
+      //    Features:                                                 *
+      //     - If a parm is used then a mouse click on an item will   *
+      //       return the clicked item as a choice.                   *
+      //     - The first line displayed is always blank and provides  *
+      //       a means for adding a new TERM to the list of TERMs.    *
+      //     - If the program is called without a parm then the file  *
+      //       is in Edit Mode and any lines may be changed or        *
+      //       deleted.                                               *
+      //                                                              *
+      //                                                              *
+      //  11/2010                                 booth@martinvt.com  *
+      //***************************************************************
+     H COPYRIGHT('(C) Copyright Booth Martin 2010, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*caller)
+
+     FSFLDRPDWNDcf   e             workstn SFILE(SFL1:RRNA)
+     FSFLDRPDWNPuf a e           k disk
+
+      //  ..................................................
+
+     D pTerms          s                       like(TERMS)
+     D wNdx            s              5s 0
+     D wRRNASaved      s                       like(RRNA)
+     D weojFlag        s               n       inz(*off)
+      //  ..................................................
+     C     *entry        plist
+     C                   parm                    pTerms
+
+      /FREE
+       dou weojFlag = *on;
+         // Clear subfile.
+         *in90 = *off;
+         write FMT01;
+         *in90 = *on;
+
+         // Fill the subfile:
+         //  Make a leading blank record, so a new TERMS can be entered:
+         *in41 = *off;
+         RRNA = 1;
+         W1TERMS = *blanks;
+         W1TERMSSV = *blanks;
+         write SFL1;
+         // Allow editing of the file if this program is run stand-alone.
+         //  Otherwise protect the fields.
+         if %parms = 1;
+           *in41 = *on;
+         endif;
+         // Fill the subfile:
+         setll *start SFLDRPDWNP;
+         read SFLDRPDWNP;
+         dow not %eof;
+           RRNA = RRNA + 1;
+           W1TERMS = TERMS;
+           W1TERMSSV = TERMS;
+           write SFL1;
+           read SFLDRPDWNP;
+         enddo;
+         *in91 = *on;
+         // Set subfile size:
+         SFL1RECS = RRNA;
+         exfmt FMT01;
+         weojFlag = *on;
+         // Save the RRNA
+         wRRNASaved = RRNA;
+         // See if there have been any changes:
+         for wNdx = 1 to SFL1RECS;
+           chain wNdx SFL1;
+           // Look for changes in the subfile:
+           if W1TERMS <> W1TERMSSV;
+             exsr FixTERMS;
+             // If any changes, (after the first line) do not end yet:
+             //  or, in edit mode and still making additions.
+             if (wNdx > 1)
+                   or (%parms = 0
+                   and wNdx = 1
+                   and W1TERMS <> *blanks);
+               weojFlag = *off;
+             endif;
+           endif;
+         endfor;
+       enddo;
+
+       // If a choice was made, save it to PARM for return:
+       if (%parms = 1)
+             and (wRRNASaved > *zeros);
+         chain wRRNASaved SFL1;
+         pTerms = W1TERMS;
+       endif;
+       *inlr = *on;
+       //  ..................................................
+       //  FixTERMS sub routine  add/delete/update TERMS
+       //  ..................................................
+       begsr FixTERMS;
+         select;
+
+           // New Terms:
+         when W1TERMSSV = *blank;
+           TERMS  = W1TERMS;
+           write(e) RSFLDRPDWN;
+
+           // Existing record cleared:
+         when W1TERMS = *blank;
+           delete W1TERMSSV SFLDRPDWNP;
+
+           // Only choice left is update:
+         other;
+           chain W1TERMSSV SFLDRPDWNP;
+           TERMS = W1TERMS;
+           update RSFLDRPDWN;
+         endsl;
+       endsr;
+
+	
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *   June, 2013                        booth@martinvt.com       *
+      ****************************************************************
+      *                                                              *
+      *  Names of States: STATES                                     *
+      *                                                              *
+      *   June, 2013                        booth@martinvt.com       *
+      ****************************************************************
+                                            UNIQUE
+                R RSTATES
+                  ST             2
+                  STATE         20
+                K ST
+				
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *   June, 2013                        booth@martinvt.com       *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            REF(STATES)
+                                            ERRSFL
+                                            CA03 CA12
+                R SFL1                      SFL
+                  ST        R        O  1  2REFFLD(ST) COLOR(TRQ)
+                  STATE     R        O   + 1REFFLD(STATE)
+                R FMT01                     SFLCTL(SFL1)
+                                            SFLSIZ(&SFL1RECS)
+                                            SFLPAG(6)
+                                            WINDOW(&WLINE &WPOS 6 27 *NOMSGLIN)
+                                            OVERLAY
+                                            SFLCSRRRN(&RRNA)
+        90                                  SFLDSP SFLDSPCTL
+       N90                                  SFLCLR
+        91                                  SFLEND(*SCRBAR)
+                                            MOUBTN(*ULD ENTER)
+                  RRNA           5S 0H
+                  SFL1RECS       5S 0P
+                  WLINE          2S 0P
+                  WPOS           3S 0P
+                R DUMMY
+                                            TEXT('Prevents previous screen-
+                                             from being cleared.')
+                                            ASSUME
+                                        5  9' '
+
+
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *   June, 2013                        booth@martinvt.com       *
+      ****************************************************************
+     H COPYRIGHT('(C) Copyright Booth Martin, 2013, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*caller)
+
+     FGETSTD    cf   e             workstn SFILE(SFL1:RRNA)
+     FSTATES    if   e           k disk
+       //  ...................... Work Fields
+     D wNdx            s              5s 0
+     D aWLine          s              2
+     D aWPos           s              3
+       //  ...................... Prototype
+     D GETSTR          pr
+     D  zSt                                like(ST)
+     D  zState                             like(STATE)
+     D  zWLine                             like(aWLINE)
+     D  zWPOS                              like(aWPOS)
+       // ....................... Procedure interface
+     D GETSTR          pi
+     D  pSt                                like(ST)
+     D  pState                             like(STATE)
+     D  pWLine                             like(aWLINE)
+     D  pWPOS                              like(aWPOS)
+        // ....................... Mainline
+      /FREE
+         if %parms > 2 and pWLine > '0';
+           WLINE = %int(pWLine);
+         else;
+           WLINE = 9;
+         endif;
+         if %parms > 3 and pWPos > '0';
+           WPOS = %int(pWPos);
+         else;
+           WPOS = 30;
+         endif;
+         *in90 = *off;
+         write FMT01;      // Clear subfile.
+         *in90 = *on;
+
+         setll *start STATES;  // Fill the subfile:
+         read STATES;
+           dow not %eof;
+             RRNA += 1;
+             write SFL1;
+             read STATES;
+           enddo;
+           if RRNA = 0; // Empty STATES file?
+             ST = '??';
+             STATE = 'No States in File';
+             RRNA += 1;
+             write SFL1;
+           endif;
+         *in91 = *on;
+         SFL1RECS = RRNA;    // Set subfile size:
+         exfmt FMT01;
+           if *inkc <> *on and *inkl <> *on
+               and %parms >1 and RRNA > 0;  // If a choice was made
+               chain RRNA SFL1;
+               pSt = ST;
+               pState = STATE;
+           endif;
+         *inlr = *on;
+				
+
+The Display file for the FTP Utility Selection program.
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to show a subfile of FTP scripts                  *
+      *   Name: FTP10D                                               *
+      *                                                              *
+      *   08/2011                                booth@martinvt.com  *
+      ****************************************************************
+                                            REF(FTP20P1)
+                                            ERRSFL
+                                            CA03 CA05 CA11
+                                            MOUBTN(*ULD ENTER)
+      *****************************************************************
+                R SFL1                      SFL
+                  M0PROF    R        B  9  2REFFLD(M0PROF) CHECK(LC)
+        33                                  DSPATR(PR)
+                  M0USRO    R        B  9 13REFFLD(M0USRO) CHECK(LC)
+        33                                  DSPATR(PR)
+                  M0HOST    R        O  9 24REFFLD(M0HOST)
+                  M0NAME    R        O  9 45REFFLD(M0NAME)
+      *****************************************************************
+                R S1                        SFLCTL(SFL1)
+                                            SFLPAG(0011)
+                                            SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP
+       N50                                  SFLDSPCTL
+       N50                                  SFLEND(*SCRBAR *MORE)
+        50                                  SFLCLR
+                                            SFLCSRRRN(&SF1PICKED)
+                                            RTNCSRLOC(&PM_RCD &PM_FLD)
+                  PM_RCD        10A  H
+                  PM_FLD        10A  H
+                  SF1NUM         4S 0H
+                  SF1RECS        5S 0P
+                  SF1PICKED      5S 0H
+                  SF1TOP         4S 0H      SFLRCDNBR(CURSOR *TOP)
+                                        1  4'    ________________     __  ____ -
+                                             _ ___ __       '
+                                            COLOR(YLW)
+                                        2  4'   / ____/_  __/ __ \   / / / / /_-
+                                            (_) (_) /___  __'
+                                            COLOR(YLW)
+                                        3  4'  / /_    / / / /_/ /  / / / / __/-
+                                             / / / __/ / / /'
+                                            COLOR(YLW)
+                                        4  4' / __/   / / / ____/  / /_/ / /_/ -
+                                            / / / /_/ /_/ / '
+                                            COLOR(YLW)
+                                        5  4'/_/     /_/ /_/       \____/\__/_/-
+                                            _/_/\__/\__, /  '
+                                            COLOR(YLW)
+                                        6  4'                                  -
+                                                   /____/   '
+                                            COLOR(YLW)
+
+                                        1 69DATE
+                                            EDTCDE(Y)
+                                        2 69TIME
+                                        3 69'system i'
+                                        4 69USER
+                                        8  2'FTP Script Dept/User  FTP site    -
+                                                     User at FTP site          -
+                                                    '
+                                            COLOR(BLU)
+                                            DSPATR(UL)
+      *****************************************************************
+                R S1CMD
+                                       22  2'                                  -
+                                                                               -
+                                                     '
+                                            DSPATR(UL)
+                                            COLOR(BLU)
+                                       23  3'F3=Exit'
+                                            COLOR(BLU)
+                                         + 3'F5=Refresh'
+                                            COLOR(BLU)
+                                         + 3'F11=Delete'
+                                            COLOR(BLU)
+                                       23 50'Enter or mouse click to FTP'
+                                            COLOR(BLU)
+
+
+
+
+This is the RPGIV for the FTP Selection program
+
+       //***************************************************************
+      //   ___             _    _     __ __             _    _        *
+      //  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      //  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      //  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      //                                                              *
+      //  A program to  show a subfile that displays FTP scripts.     *
+      //   Name: FTP10R                                               *
+      //                                                              *
+      //                                                              *
+      //  08/2011                                 booth@martinvt.com  *
+      //***************************************************************
+      // COMMENTS   This program uses MOUBTN() or the Enter key       *
+      //            to select an FTP script to be run.                *
+      //                                                              *
+      //--------------------------------------------------------------*
+     H COPYRIGHT('Booth Martin, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*new)
+
+     FFTP10D    cf   e             workstn sfile(SFL1 : SF1NUM)
+     FFTP20P1   uf   e           k disk
+
+     D wNdx            s             10i 0
+
+      *-------------------------------------------------------------
+      *  This prototype for FTP20C uses two parameters:
+      *   1- a 10 character field that is the title & first key for
+      *      the FTP Script file
+      *   2- a 10 character field that is a sub-setting key.
+      *-------------------------------------------------------------
+     D ftp20c          PR                  extpgm('FTP20C')
+     D                               10
+     D                               10
+
+     D QCMDEXC         PR                  ExtPgm('QCMDEXC')
+     D  wCommand                  32702A   const options(*varsize)
+     D  wLength                      15P 5 const
+     D wCmd            s           1000    varying
+
+      //====================================================================*
+      // MAINLINE-BEGIN                                                     *
+      //====================================================================*
+      /FREE
+       exsr S1Fill;
+       // Display screen.
+       exsr S1Main;
+       // Exit.
+       exsr ExitPgm;
+       //====================================================================*
+       // MAINLINE-END                                                       *
+       //====================================================================*
+       //-------------------------------*  Sub-Routine  *
+       // *inzsr()                      *---------------*
+       // Initializing sub routine                      *
+       //-----------------------------------------------*
+       begsr *inzsr;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // ExitPgm()                     *---------------*
+       // end of processing                             *
+       //-----------------------------------------------*
+       begsr ExitPgm;
+         *inlr = *on;
+         return;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Main()                      *---------------*
+       // Screen - Main processing.                     *
+       //-----------------------------------------------*
+       begsr S1Main;
+         // Loop until exit.
+         dow *inkc = *off;
+           //   Display screen.
+           write S1CMD;
+           exfmt S1;
+
+           select;
+             // F3=Exit.
+           when *inkc = *on;
+             exsr ExitPgm;
+           when  *inke;
+             exsr SFL1Refresh;
+           when SF1PICKED > 0 and *inkk;
+             exsr SFL1Delete;
+             // either Enter or by mouseclick, and on a subfile line.
+           when SF1PICKED > 0;
+             exsr SFL1FTP;
+           endsl;
+         enddo;
+       endsr;
+
+       //-------------------------------*  Sub-Routine  *
+       // SFL1Refresh()                 *---------------*
+       // Refresh subfile.                              *
+       //-----------------------------------------------*
+       begsr SFL1Refresh;
+        exsr S1Fill;
+       endsr;
+
+       //-------------------------------*  Sub-Routine  *
+       // SFL1Delete()                  *---------------*
+       // Delete a script.                              *
+       //-----------------------------------------------*
+       begsr SFL1Delete;
+         chain SF1PICKED SFL1;
+         delete(e) (M0PROF: M0USRO) FTP2P1R;
+         exsr S1Fill;
+       endsr;
+
+       //-------------------------------*  Sub-Routine  *
+       // SFL1FTP()                     *---------------*
+       // Start FTP script.                             *
+       //-----------------------------------------------*
+       begsr SFL1FTP;
+         chain SF1PICKED SFL1;
+         callp(e) FTP20C(M0PROF: M0USRO);
+         exsr S1Fill;
+       endsr;
+
+       //-------------------------------*  Sub-Routine  *
+       // S1Fill()                      *---------------*
+       // Screen - Fill screen.                         *
+       //-----------------------------------------------*
+       begsr S1Fill;
+         // Clear subfile.
+         *in50 = *on;
+         *in33 = *off;
+         clear SFL1;
+         write S1;
+         *in50 = *off;
+         // Fill SFL.
+         SF1NUM = 1;
+          write(e) SFL1;   // write one blank line for new scripts
+          *in33 = *on;
+         // Fill the subfile.
+         //   Read the file.
+         setll *start FTP20P1;
+         read(en) FTP2P1R;
+         dow %eof = *off;
+           SF1NUM = SF1NUM + 1;
+
+           write(e) SFL1;
+           read(en) FTP2P1R;
+         enddo;
+
+         // Save values.
+         SF1RECS = SF1NUM;
+         SF1TOP = 1;
+       endsr;
+
+
+FTP20	
+
+The Display file for the FTP Script & Submit program.
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *   08/2011                                booth@martinvt.com  *
+      ****************************************************************
+      *  SOURCE       -  FTP20F                                      *
+      *  PROGRAMMER   -  BOOTH MARTIN                                *
+      *  DATE         -   8/98                                       *
+      *  COMMENTS     -  DISPLAY FTP DEFAULTS, COLLECT VALUES FOR    *
+      *  BUILDING AN FTP SCRIPT.                                     *
+      *                                                              *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            REF(*LIBL/FTP20P1 FTP2P1R)
+                                            CHGINPDFT(HI UL LC)
+                                            MSGLOC(17)
+                                            PRINT
+                                            CF12(12 'CANCEL')
+                                            CF23(23 'UNPROTECT')
+                R FTP20A
+                                            OVERLAY
+                                            WINDOW(3 3 17 72)
+                                        1 22'FTP site (IP address or name)     -
+                                                             '
+                  M1HOST    R        B  1  1REFFLD(M0HOST)
+       N33                                  DSPATR(PR)
+                                        2 22'Login ID'
+        34                              2 55'(log to File  )' COLOR(TRQ)
+       N34                              2 55'(log to Screen)' COLOR(TRQ)
+                  M1NAME    R        B  2  1REFFLD(M0NAME)
+                                        3 22'Password'
+                  M1PASS    R        B  3  1REFFLD(M0PASS)
+        31                                  DSPATR(PC)
+                                            DSPATR(ND)
+                                            DSPATR(UL)
+        32                              3 31'A password is required.'
+                                            COLOR(RED)
+                  M1LN1     R        B  5  1REFFLD(M0LN1)
+       N33                                  DSPATR(PR)
+                  M1LN2     R        B  6  1REFFLD(M0LN2)
+       N33                                  DSPATR(PR)
+                  M1LN3     R        B  7  1REFFLD(M0LN3)
+       N33                                  DSPATR(PR)
+                  M1LN4     R        B  8  1REFFLD(M0LN4)
+       N33                                  DSPATR(PR)
+                  M1LN5     R        B  9  1REFFLD(M0LN5)
+       N33                                  DSPATR(PR)
+                  M1LN6     R        B 10  1REFFLD(M0LN6)
+       N33                                  DSPATR(PR)
+                  M1LN7     R        B 11  1REFFLD(M0LN7)
+       N33                                  DSPATR(PR)
+                  M1LN8     R        B 12  1REFFLD(M0LN8)
+       N33                                  DSPATR(PR)
+                  M1LN9     R        B 13  1REFFLD(M0LN9)
+       N33                                  DSPATR(PR)
+                  PB1            2Y 0B 15  1PSHBTNFLD
+                                            CHCAVAIL((*COLOR TRQ))
+                                            PSHBTNCHC(1 'Cancel(F12)   ' CF12)
+       N34                                  PSHBTNCHC(2 'Log to File   ')
+        34                                  PSHBTNCHC(3 'Log to Screen ')
+       N33                                  PSHBTNCHC(4 'Unprotect(F23)' CF23)
+        33                                  PSHBTNCHC(5 'Protect(F23)  ' CF23)
+                                        4  1'FTP script for the session        -
+                                                                               -
+                                               '
+                                            COLOR(BLU)
+                                        3 56'                 '
+                                       14  1'                                  -
+                                                                               -
+                                               '
+                R DUMMY
+                                            TEXT('PREVENTS PREVIOUS SCREEN FROM-
+                                             BEING CLEARED')
+                                            ASSUME
+                                        5  9' '
+
+
+
+
+This is the RPGIV for the Script & Submit program
+
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *   08/2011                                booth@martinvt.com  *
+      ****************************************************************
+      //  SOURCE       -  FTP20R                                      */
+      //  PROGRAMMER   -  BOOTH MARTIN                                */
+      //  DATE         -   8/98 (rev. 8/2011)                         */
+      //  COMMENTS     -  A PROGRAM TO DISPLAY FTP DEFAULT VALUES,    */
+      //                  ALLOW KEYING IN NEW VALUES, AND             */
+      //                  WRITING BACK THE VALUES, PLUS               */
+      //                  WRITING OUT AN FTP SCRIPT FILE.             */
+      //***************************************************************/
+     H COPYRIGHT('Booth Martin, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*caller)
+     FFTP20D    cf   e             workstn
+     FFTP20P1   uf a e           k disk
+     FFTP20P2   o    e             disk
+      // A Named Constant field - (in case user name is blank.)
+     D NC01            c                   const('Anonymous')
+     D exit            s              3
+     D PROF            s                   like(M0PROF)
+     D USEROR          s                   like(USER)
+     D                SDS
+     D  USER                 254    263
+      // *============================================================= *
+      // INDICATOR USAGE:
+      //  31 = Name in default record, position cursor at Password field.
+      //  32 = NO PASSWORD, RE-DO
+      //  33 = UNPROTECTS FIELDS; default is "protect" use F23 UNPROTECT
+      //  34 = Log FTP actions to File; N34 = Log FTP actions to screen.
+      //  KL = Return to calling program, script not written.
+      //  "PROF" is used to pass in a profile for this process. It is
+      //  PROF + USER is the key to look up a  default Script Record.
+      //  PB1 is the pushbutton field on the screen.
+      // *=============================================================*
+     C     *entry        plist
+     C                   parm                    PROF
+     C                   parm                    M1HOST
+     C                   parm                    exit
+     C                   parm                    USEROR
+     C     KEY1          klist
+     C                   kfld                    PROF
+     C                   kfld                    USER
+      //  ..  ..
+      /FREE
+       PB1 = *zeros;
+       exfmt FTP20A;
+       *in32 = *off;
+
+       select;
+       when PB1 = 2 or PB1 = 3;
+         if *in34 = *off;
+           *in34 = *on;
+           exit = 'LOG';
+         else;
+           *in34 = *off;
+           exit = 'NO ';
+         endif;
+
+         //  ..  KL? Exit/cancel; don't do process:
+       when *inkl = *on or PB1 = 1;
+         exit = 'YES';
+         *inlr = *on;
+         //  ..  KX?
+       when (*inkx = *on) or (PB1 = 4) or (PB1 = 5);
+         if *in33 = *on;
+           *in33 = *off;
+         else;
+           *in33 = *on;
+         endif;
+         //
+         //  ..  Password blank?
+       when M1PASS = *blank;
+         *in32 = *on;
+         //
+         //  ..  Otherwise, process the screen:
+       other;
+         chain KEY1 FTP2P1R;
+         //** DON'T save the password!!!
+         M0HOST = M1HOST;
+         M0NAME = M1NAME;
+         M0LN1  = M1LN1;
+         M0LN2  = M1LN2;
+         M0LN3  = M1LN3;
+         M0LN4  = M1LN4;
+         M0LN5  = M1LN5;
+         M0LN6  = M1LN6;
+         M0LN7  = M1LN7;
+         M0LN8  = M1LN8;
+         M0LN9  = M1LN9;
+         M0DATO = %date();
+         M0TIMO = %time();
+         if not %found;
+           M0PROF = PROF;
+           M0USRO = USER;
+           write FTP2P1R;
+         else;
+           update FTP2P1R;
+         endif;
+         // MAKE THE RECORDS FOR THE FTP SCRIPT FILE:
+         // HEADINGS
+         FTP2LN = %trim(M1Name) + ' ' + %trim(M1PASS);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 1:
+         FTP2LN = %trim(M1LN1);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 2:
+         FTP2LN = %trim(M1LN2);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 3:
+         FTP2LN = %trim(M1LN3);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 4:
+         FTP2LN = %trim(M1LN4);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 5:
+         FTP2LN = %trim(M1LN5);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 6:
+         FTP2LN = %trim(M1LN6);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 7:
+         FTP2LN = %trim(M1LN7);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 8:
+         FTP2LN = %trim(M1LN8);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // LINE 9:
+         FTP2LN = %trim(M1LN9);
+         if FTP2LN > *blanks;
+           write FT2P2R;
+         endif;
+         // Present job finished normally:
+         *inlr = *on;
+       endsl;
+
+       // *=============================================================*
+       // *==           SUB ROUTINES                                  ==*
+       // *=============================================================*
+       begsr *inzsr;
+         IF USEROR > *blanks;
+           USER =  USEROR;
+         endif;
+         exit = 'NO ';
+         chain KEY1 FTP20P1;
+         if %found;
+           // USUALLY THE PARM-IN WILL BE EMPTY, BUT IF NOT, USE IT.
+           IF M1HOST = *blanks;
+             M1HOST =      M0HOST;
+           endif;
+           // If name is blank, substitute "anonymous"
+           // otherwise, move in the name and set the cursor at Password field.
+           if M0Name = *blanks;
+             M1NAME = NC01;
+           else;
+             M1NAME    =   M0NAME;
+             *in31 = *on;
+           endif;
+           M1PASS = *blanks;
+           M1LN1  =      M0LN1;
+           M1LN2  =      M0LN2;
+           M1LN3  =      M0LN3;
+           M1LN4  =      M0LN4;
+           M1LN5  =      M0LN5;
+           M1LN6  =      M0LN6;
+           M1LN7  =      M0LN7;
+           M1LN8  =      M0LN8;
+           M1LN9  =      M0LN9;
+         endif;
+       endsr;
+      /END-FREE
+
+
+
+
+
+This is the CL program for the Script & Submit application
+
+
+             PGM        PARM(&PROFILE &USEROR)
+
+             DCL        VAR(&PROFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&USEROR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&M1HOST) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&EXIT) TYPE(*CHAR) LEN(3)
+             CHGVAR     VAR(&EXIT) VALUE('NO ')
+
+  /* The PARM &PROFILE is provided as a key field for getting the correct   +
+     default information for the FTP script file for the application.    +
+     It can be any unique name.  It will write a new record with the     +
+     key being &PROFILE + User's name.                                     */
+
+  /* The PARM &USEROR allows the CL to specify a common USER for      +
+     the FTP application, and not be different for each independant      +
+     user of the application.  It is designed to allow a departmental    +
+     PROFILE for a departmental application.                            */
+
+  /* The file FTP2P1 is a regular data file designed to hold the working +
+     Script file records for the RPG display screen program.             +
+     The file FTP20P2 will be processed in QTEMP as the Password is saved +
+     in it, in the clear.                                               */
+
+             CALL       PGM(FTP20R) PARM(&PROFILE &M1HOST &EXIT &USEROR)
+             IF         COND(&EXIT *EQ 'YES') THEN(RETURN)
+
+             CPYF       FROMFILE(FTP20P2) TOFILE(QTEMP/FTP20P2) FROMMBR(*ALL) TO
+                          MBROPT(*NONE) CRTFILE(*YES)
+             MONMSG     MSGID(CPF2817)
+
+             CLRPFM     FILE(QTEMP/FTP20P2) MBR(FTPCMDS)
+
+             OVRDBF     FILE(FTP20P2) TOFILE(QTEMP/FTP20P2) MBR(FTPCMDS)
+             OVRDBF     FILE(INPUT) TOFILE(QTEMP/FTP20P2) MBR(FTPCMDS)
+  /*         OVRDBF     FILE(OUTPUT) TOFILE(QTEMP/FTP20P2) MBR(FTPLOG) */
+  /*         By commenting this command the FTP process prints the   +
+             log file to the screen.  Uncommenting the command will  +
+             print and save the log in ____/FTP20P2/FTPLOG              */
+             IF         COND(&EXIT *EQ 'LOG') THEN(OVRDBF FILE(OUTPUT) TOFILE(QT
+                          MBR(FTPLOG))
+
+             FTP        RMTSYS(&M1HOST)
+
+             ENDPGM
+
+
+
+
+
+The DDS for the two files used in this application
+ Name of the Script file: FTP20P1:
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *   08/2011                                booth@martinvt.com  *
+      ****************************************************************
+      *  SOURCE       -  FTP20P1                                     */
+      *  PROGRAMMER   -  Booth Martin                                */
+      *  DATE         -   8/98                                       */
+      *  COMMENTS     -  A Physical file holding the default         */
+      *                  values for each individual's FTP Script     */
+      *                  File processes.                             */
+      *                                                              */
+      ****************************************************************/
+                R FTP2P1R
+
+                  M0HOST        20          TEXT('HOST SITES NAME')
+                  M0NAME        20          TEXT('USERS NAME AT HOST')
+                  M0PASS        20          TEXT('PASSWORD AT HOST')
+                  M0LN1         72          TEXT('LINE 1')
+                  M0LN2         72          TEXT('LINE 2')
+                  M0LN3         72          TEXT('LINE 3')
+                  M0LN4         72          TEXT('LINE 4')
+                  M0LN5         72          TEXT('LINE 5')
+                  M0LN6         72          TEXT('LINE 6')
+                  M0LN7         72          TEXT('LINE 7')
+                  M0LN8         72          TEXT('LINE 8')
+                  M0LN9         72          TEXT('LINE 9')
+      **********************
+      * AUDIT TRAIL FIELDS *
+                  M0TIMO          T         TEXT('TIME')
+                  M0DATO          L         TEXT('DATE')
+                  M0PROF        10          TEXT('PROFILE')
+                  M0USRO        10          TEXT('USER')
+      **********************
+                K M0PROF
+                K M0USRO
+
+Name of the Script and Logging file: FTP20P2
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *   08/2011                                booth@martinvt.com  *
+      ****************************************************************
+      *  SOURCE       -  FTP20P2                                     */
+      *  PROGRAMMER   -  Booth Martin                                */
+      *  DATE         -   8/98                                       */
+      *  COMMENTS     -  A Physical file holding the Script and      */
+      *                  Log for an FTP session.                     */
+      *                  This file is always empty.                  */
+      *                  It has member FTPCMDS and                   */
+      *                         member FTPLOG                        */
+      *                                                              */
+      ****************************************************************/
+                R FT2P2R
+      *
+                  FTP2LN        72          TEXT('SCRIPT')
+
+
+DSPF for a Page-at-a-Time subfile
+       ***********************************************************************
+      *       ___            _             __________                       *
+      *      / _ \___ ____ _(_)__  ___ _  / __/ __/ /                       *
+      *     / ___/ _ `/ _ `/ / _ \/ _ `/ _\ \/ _// /__                      *
+      *    /_/   \_,_/\_, /_/_//_/\_, / /___/_/ /____/                      *
+      *              /___/       /___/                                      *
+      *                                                                     *
+      *   December, 2013                           booth@martinvt.com       *
+      ***********************************************************************
+                                            DSPSIZ(*DS3)
+                                            REF(CITIES)
+                                            ERRSFL
+                                            CA03
+                                            PAGEDOWN(61) PAGEUP
+                R SFL1                      SFL
+                  ACCENTCITYR        O 10 10
+                  COUNTRY   R        O   + 1
+                  POPULATIONR        O   + 3 EDTCDE(2)
+                  LATITUDE  R        O   + 2 EDTCDE(2)
+                  LONGITUDE R        O   + 1 EDTCDE(2)
+                R SCR1                      SFLCTL(SFL1)
+                                            SFLPAG(12)
+                                            SFLSIZ(12)
+                                            OVERLAY
+       N50                                  SFLDSP SFLDSPCTL
+        50                                  SFLCLR
+                  FIGLET       360   B  1  3CNTFLD(60) CHGINPDFT
+                                            DSPATR(PR) COLOR(YLW)
+                                        1 73DATE EDTCDE(Y)
+                                        2 73TIME
+                                        7  2'Set to:' COLOR(BLU)
+                  LOOKUPCITYR        I   + 1REFFLD(CITY) CHECK(LC)
+                  S1CBFIELD1     2Y 0B   + 5SNGCHCFLD
+                                            CHOICE(1 &CB01)
+                  CB01          35   P
+                  HEADING1      62   O  9 10DSPATR(UL)
+                R S1CMD
+                  FIELDUL2      78     22  2DSPATR(UL)
+                                            COLOR(BLU)
+                                       23  3'F3=Exit'
+                                            COLOR(BLU)
+
+
+
+
+
+
+
+The RPG for a Page-at-a-Time subfile
+
+
+      ***********************************************************************
+      *       ___            _             __________                       *
+      *      / _ \___ ____ _(_)__  ___ _  / __/ __/ /                       *
+      *     / ___/ _ `/ _ `/ / _ \/ _ `/ _\ \/ _// /__                      *
+      *    /_/   \_,_/\_, /_/_//_/\_, / /___/_/ /____/                      *
+      *              /___/       /___/                                      *
+      *                                                                     *
+      *    A subfile one-page-at-a-time demonstration.                      *
+      *      - useful for large files. The CITIES file is 2,600,000 records *
+      *                                                                     *
+      *    December, 2013                          booth@martinvt.com       *
+      ***********************************************************************
+     H COPYRIGHT('(C) Copyright Booth Martin, 2013, All rights reserved.')
+     H  option(*nodebugio) dftactgrp(*no) actgrp(*new)
+
+     FSFL1PAGED cf   e             workstn SFILE(SFL1:RRN1)
+     FCITIES    if   e           k disk
+
+      *  ASCII art panel for heading. (Use a Figlet generator.)
+     D FIGLET          ds
+     D Figar                         60    dim(6) ctdata perrcd(1)
+
+     D pageSize        c                   12
+     D RRN1            s              4  0
+     D wEOFFlag        s               n
+     D wAdd2SFL        s               n
+     D wPopFlag        s                   like(S1CBFIELD1)
+
+      *  %xlate upper/lower case.
+     D up              c                   CONST('ABCDEFGHIJKLMNOPQRST-
+     D                                     UVWXYZ')
+     D lo              c                   CONST('abcdefghijklmnopqrst-
+     D                                     uvwxyz')
+      /FREE
+        //====================================================================*
+        // MAINLINE                                                           *
+        //====================================================================*
+         dou *inkc = *on;
+           if not(wEOFFlag = *on and *in61 = *off and LOOKUPCITY = ' ');
+            // (If e-o-f and no pagedown or lookup, do nothing, cycle around.)
+             exsr FillSFL1;
+           endif;
+             write S1CMD;
+             exfmt SCR1;
+         enddo;
+         exsr ExitPgm;
+        //====================================================================*
+        // MAINLINE-END                                                       *
+        //====================================================================*
+       //-------------------------------*  Sub-Routine  *
+       // *inzsr()                      *---------------*
+       // Initializing sub routine                      *
+       //-----------------------------------------------*
+       begsr *inzsr;
+        HEADING1 =
+        // ....+....1....+....2....+....3....+....4....+....5....+....6....+
+          'City              Country  Population     Latitude   Longitude   ';
+          LOOKUPCITY = 'London';  // It has to start somewhere, right?
+          CB01 = 'Only cities showing population';  // Label for check box.
+          wPopFlag = S1CBFIELD1;
+          setll LOOKUPCITY CITIES;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // ExitPgm()                     *---------------*
+       // end of processing                             *
+       //-----------------------------------------------*
+       begsr ExitPgm;
+         *inlr = *on;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Fill()                      *---------------*
+       // Screen - Fill screen.                         *
+       //-----------------------------------------------*
+       begsr FillSFL1;
+         // Clear subfile.
+         RRN1 = 0;
+         *in50 = *on;
+         write SCR1;
+         *in50 = *off;
+         // re-set the starting place?
+         select;
+         when S1CBFIELD1 <> wPopFlag;
+           exsr S1Reset;
+           wPopFlag = S1CBFIELD1;
+         when *in61 = *on;  //  PAGEDOWN
+            exsr S1GoDown;
+         when LOOKUPCITY <> *blanks;
+            LOOKUPCITY = %xlate(up: lo: LOOKUPCITY); // Keyfield is lower case.
+            setll LOOKUPCITY CITIES;
+         other;
+         endsl;
+         // Fill subfile - Must be already positioned properly but not yet read.
+         dow %eof(CITIES) = *off and RRN1 < pageSize;
+             read CITIES;
+             if %eof(CITIES);
+               exsr S1EOFUp;
+             else;
+               exsr S1GetSFLRecord;
+                 if wAdd2SFL;
+                   COUNTRY = %xlate(lo: up: COUNTRY);
+                   RRN1 += 1;
+                   write SFL1;
+                 endif;
+             endif;
+         enddo;
+         select;
+         when RRN1 = 0 and CITY <> *hival;
+           ACCENTCITY = 'No records in file';
+           RRN1 = 1;
+           write SFL1;
+         when RRN1 = 0 and CITY = *hival;
+           ACCENTCITY = ' =End of file=';
+           RRN1 = 1;
+           write SFL1;
+         endsl;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1GoDown()                    *---------------*
+       // Screen - Count down 2 screens to set start.   *
+       //-----------------------------------------------*
+       begsr S1GoDown;
+         wEOFFlag = *off;
+         RRN1 = 0;
+         dow %eof(CITIES) = *off and RRN1 < (pageSize * 2);
+           readp CITIES;
+           exsr S1GetSFLRecord;
+             if wAdd2SFL;
+               RRN1 += 1;
+             endif;
+         enddo;
+           if %eof(CITIES);
+             exsr S1EOFDown;
+           else;
+             RRN1 = 0;
+           endif;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1GetSFLRecord()              *---------------*
+       // Screen - Is this a valid record selection?    *
+       //-----------------------------------------------*
+       begsr S1GetSFLRecord;
+         wAdd2SFL = *off;
+         if ACCENTCITY <> ' ';  // Do not do blank cities.
+           if wPopFlag = 0 or (wPopFlag <> 0 and POPULATION <> 0); // Checkbox1
+              wAdd2SFL = *on;
+           endif;
+         endif;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Reset()                     *---------------*
+       // Screen - Set to specific spot.                *
+       //-----------------------------------------------*
+       begsr S1Reset;
+         RRN1 = 1;
+         readp CITIES;
+         dow %eof(CITIES) = *off and RRN1 < (pageSize);
+           readp CITIES;
+           exsr S1GetSFLRecord;
+             if wAdd2SFL;
+               RRN1 += 1;
+             endif;
+         enddo;
+           if %eof(CITIES);
+             exsr S1EOFDown;
+           else;
+             RRN1 = 0;
+           endif;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1EOFDown()                   *---------------*
+       // End-of-file  (down)                                 *
+       //-----------------------------------------------*
+       begsr S1EOFDown;
+             exsr S1ClearLine;
+             ACCENTCITY = ' =Beginning of file=';
+             RRN1 = 1;
+             write SFL1;
+             setll *loval CITIES;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1EOFUp()                     *---------------*
+       // End-of-file (up)                              *
+       //-----------------------------------------------*
+       begsr S1EOFUp;
+           if RRN1 < pageSize;
+             exsr S1ClearLine;
+             ACCENTCITY = ' =End of file=';
+             RRN1 += 1;
+             write SFL1;
+             CITY = *hival;
+             setgt CITY CITIES;
+             RRN1 = pageSize;
+           endif;
+           wEOFFlag = *on;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1ClearLine()                 *---------------*
+       // Screen - Clear SFL1 line                      *
+       //-----------------------------------------------*
+       begsr S1ClearLine;
+         CITY = ' ';
+         ACCENTCITY = ' ';
+         COUNTRY = ' ';
+         POPULATION = 0;
+         LATITUDE = 0;
+         LONGITUDE = 0;
+       endsr;
+** Figar 1....+....2....+....3....+....4....+....5....+....6
+         ___            _             __________
+        / _ \___ ____ _(_)__  ___ _  / __/ __/ /
+       / ___/ _ `/ _ `/ / _ \/ _ `/ _\ \/ _// /__
+      /_/   \_,_/\_, /_/_//_/\_, / /___/_/ /____/
+                /___/       /___/
+
+
+
+
+
+
+
+The DDS for the CITIES file used in this demo.
+
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  Cities file, 2.6 million records                            *
+      *                                                              *
+      *   1/2013                                 booth@martinvt.com  *
+      ****************************************************************
+                R RCITIES
+                  COUNTRY        2
+                  CITY          20
+                  ACCENTCITY    20
+                  REGION        20
+                  POPULATION     9  0
+                  LATITUDE      10S 7
+                  LONGITUDE     10S 7
+                K CITY
+                K COUNTRY
+				
+
+DSPF for the Scroll Bar demo
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A display screen for an Ice Cream Demo.                     *
+      *   (To demo scroll bar and radio button & check box.          *
+      *                                                              *
+      *   3/2013                                 booth@martinvt.com  *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            ERRSFL
+                                            CA03
+                                            CA05
+                                            REF(ICECREAMP)
+      *****************************************************************
+                R SFL1                      SFL
+                  S1ICAVAIL R        B 12  3CHECK(LC) REFFLD(ICAVAIL)
+                                            SFLCSRPRG
+        31                                  DSPATR(PC) COLOR(WHT)
+       N31                                  DSPATR(PR)
+                  S1ICFLAVORR        B   + 1CHECK(LC) REFFLD(ICFLAVOR)
+       N31                                  DSPATR(PR)
+        31                                  COLOR(WHT)
+                  S1ICIMAGE R        B   + 1CHECK(LC) REFFLD(ICIMAGE)
+       N31                                  DSPATR(PR)
+        31                                  COLOR(WHT)
+                  S1SVAVAIL R        H      REFFLD(ICAVAIL)
+                  S1SVFLAVORR        H      REFFLD(ICFLAVOR)
+                  S1SVIMAGE R        H      REFFLD(ICIMAGE)
+      *****************************************************************
+                R S1FMT                     SFLCTL(SFL1)
+                                            SFLPAG(010) SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP SFLDSPCTL
+        50                                  SFLCLR
+       N91                                  SFLEND(*SCRBAR )
+                                            SFLCSRRRN(&SF1RRN)
+                                            MOUBTN(*ULD ENTER)
+                  SF1RRN         5S 0H
+                  SF1RECS        5S 0P
+                                        2  2'   ___             _    _     __ _-
+                                            _             _    _       '
+                                            COLOR(RED)
+                                        3  2'  | . > ___  ___ _| |_ | |_  |  \ -
+                                             \ ___  _ _ _| |_ <_>._ _  '
+                                            COLOR(RED)
+                                        4  2'  | . \/ . \/ . \ | |  | . | |    -
+                                             |<_> || ''_> | |  | || '' | '
+                                            COLOR(RED)
+                                        5  2'  |___/\___/\___/ |_|  |_|_| |_|_|-
+                                             |<___||_|   |_|  |_||_|_| '
+                                            COLOR(RED)
+                                        7 53'& Friends   '
+                                            COLOR(WHT)
+                                        1 69DATE
+                                            EDTCDE(Y)
+                                        2 69TIME
+                                        3 69'system i'
+                                        4 69USER
+                  POSCSR         1   B  8  3DSPATR(ND PC)
+                  CHBOX1         2Y 0B  9  3MLTCHCFLD COLOR(BLU)
+                                            CHOICE(1 &CB01)
+                                            CHOICE(2 &CB02)
+                                            CHCCTL(1 &CB01CHC)
+                                            CHCCTL(2 &CB02CHC)
+                  CB01CHC        1Y 0H
+                  CB02CHC        1Y 0H
+                  CB01          30A  P
+                  CB02          30A  P
+                                       11  2'Avail.    Flavors                 -
+                                            image file name                    -
+                                                 '
+                                            DSPATR(UL) COLOR(TRQ)
+      *****************************************************************
+                R S1CMD
+                  LINE77        77     23  2DSPATR(UL)
+                                            COLOR(BLU)
+                                       24  3'F3=Exit'
+                                            COLOR(BLU)
+                                         + 3'F5=Refresh'
+                                            COLOR(BLU)
+
+
+
+
+The RPG program for the Scroll Bar demo
+
+       //***************************************************************
+      //   ___             _    _     __ __             _    _        *
+      //  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      //  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      //  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      //                                                              *
+      //  A program to demo scroll bar & check box.                   *
+      //                                                              *
+      //   3/2013                                 booth@martinvt.com  *
+      //***************************************************************
+     H COPYRIGHT('Booth Martin, 2013,  All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*new)
+
+     FICECREAM2Dcf   e             workstn SFILE(SFL1:SF1RRN)
+     FICECREAMP uf a e           k disk
+
+     **--------------------------------------------------------------------*
+     ** DEFINITIONS                                                        *
+     **--------------------------------------------------------------------*
+      * Working fields.
+     D wNdx            s                   like(SF1RRN)
+     D wSvCB01CHC      s                   like(CB01CHC)
+
+      * Prototypes.
+
+       //====================================================================*
+       // MAINLINE                                                           *
+       //====================================================================*
+      /free
+         exsr FillSFL1;
+         // Edit the ICECREAMP file.
+         dou *inkc;
+           write S1CMD;
+           exfmt S1FMT;
+           select;
+           when *inkc;
+             exsr ExitPgm;
+           when *inke;
+             exsr RefreshSFL1;
+           other;
+             exsr UpdateICECREAMP;
+           endsl;
+         enddo;
+       //====================================================================*
+       // MAINLINE-END                                                       *
+       //====================================================================*
+       //-------------------------------*  Sub-Routine  *
+       // *inzsr()                      *---------------*
+       // Initializing sub routine                      *
+       //-----------------------------------------------*
+       begsr *inzsr;
+         CB01CHC = 0;
+         CB02CHC = 0;
+         CB01 = 'Show only available flavors.';
+         CB02 = 'Allow editing of flavors.';
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // ExitPgm()                     *---------------*
+       // end of processing                             *
+       //-----------------------------------------------*
+       begsr ExitPgm;
+         *inlr = *on;
+         return;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // FillSFL1()                    *---------------*
+       // Fill the subfile.                             *
+       //-----------------------------------------------*
+       begsr FillSFL1;
+         *in50 = *on;
+         clear SFL1;
+         write S1FMT;
+         *in50 = *off;
+           SF1RRN = 0;
+         if CB02CHC = 1;   // protect mode.
+           *in31 = *on;
+         else;
+           *in31 = *off;
+         endif;
+         // Fill the subfile:
+         setll *start ICECREAMP;
+         read(n) ICECREAMP;
+         dow not %eof;
+            if CB01CHC = 0
+               or (CB01CHC = 1 and ICAVAIL <> ' '); // Show only available items
+               if ICAVAIL <> ' ';
+                  S1ICAVAIL = 'Y';
+               else;
+                  S1ICAVAIL = ' ';
+               endif;
+               S1ICIMAGE = ICIMAGE;
+               S1ICFLAVOR = ICFLAVOR;
+               S1SVFLAVOR = S1ICFLAVOR;  // Save original data.
+               S1SVAVAIL = S1ICAVAIL;
+               S1SVIMAGE = S1ICIMAGE;
+               SF1RRN = SF1RRN + 1;
+               write SFL1;
+             endif;
+           read(n)ICECREAMP;
+         enddo;
+             S1ICFLAVOR = *blanks;  // Add some blank rows for new records
+             S1ICAVAIL = *blanks;
+             S1ICIMAGE = *blanks;
+             S1SVFLAVOR = S1ICFLAVOR;  // Save original data.
+             S1SVAVAIL = S1ICAVAIL;
+             S1SVIMAGE = S1ICIMAGE;
+           for wNdx = 1 to 5;
+             SF1RRN = SF1RRN + 1;
+             write SFL1;
+           endfor;
+         SF1RECS = SF1RRN;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // RefreshSFL1()                 *---------------*
+       //                                               *
+       //-----------------------------------------------*
+       begsr RefreshSFL1;
+         // ReFill the subfile:
+           for wNdx = 1 to SF1RECS;
+             chain wNdx SFL1;
+             S1ICIMAGE = S1SVIMAGE;
+             S1ICFLAVOR = S1SVFLAVOR;
+               if S1SVAVAIL <> ' ';
+                 S1ICAVAIL = 'Y';
+               else;
+                   S1ICAVAIL = ' ';
+               endif;
+           endfor;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // UpdateICECREAMP()             *---------------*
+       // Update the data file                          *
+       //-----------------------------------------------*
+       begsr UpdateICECREAMP;
+           for wNdx = 1 to SF1RECS;
+             chain wNdx SFL1;
+             select;
+               when S1ICFLAVOR = ' ' and S1SVFLAVOR <> ' '; // delete a flavor
+                 delete (S1SVFLAVOR) ICECREAMP;
+               when S1ICFLAVOR <> ' ' and S1SVFLAVOR = ' '; // add a flavor
+                  ICFLAVOR = S1ICFLAVOR;
+                  ICIMAGE = S1ICIMAGE;
+                  if S1ICAVAIL <> ' ';
+                    ICAVAIL = 'Y';
+                  else;
+                    ICAVAIL = ' ';
+                  endif;
+                  write(e) RICECREAMP;  // It is possible to try to write a dupl
+                                        // record.  Code to deal with that issue
+                                        // beyond the scope of this demo.  BE WA
+               when (S1SVFLAVOR <> ' ') and
+                    ((S1ICFLAVOR <> S1SVFLAVOR)
+                 or (S1ICAVAIL <> S1SVAVAIL)
+                 or (S1ICIMAGE <> S1SVIMAGE));   // update a flavor
+                  chain S1SVFLAVOR ICECREAMP;
+                  ICFLAVOR = S1ICFLAVOR;
+                  ICIMAGE = S1ICIMAGE;
+                  if S1ICAVAIL <> ' ';
+                    ICAVAIL = 'Y';
+                  else;
+                    ICAVAIL = ' ';
+                  endif;
+                  update RICECREAMP %fields(ICFLAVOR: ICAVAIL: ICIMAGE);
+               other;
+               endsl;
+             endfor;
+                  // cmd('RGZPFM FILE(ICECREAMP) KEYFILE(*FILE)': 38);
+             if wSvCB01CHC <> CB01CHC;
+             exsr FillSFL1;
+             wSvCB01CHC = CB01CHC;
+             endif;
+       endsr;
+
+
+The RPG for the Subfile Column Sorting program
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to  show a sortable subfile  (Version II)         *
+      *                                                              *
+      *   4/2014                                 booth@martinvt.com  *
+      ****************************************************************
+      * COMMENTS   Subfile can be sorted by                          *
+      *            columns (ascending & descending). Click an        *
+      *            underlined column heading or place the cursor     *
+      *            on an underlined column heading and press enter.  *
+      *            Choosing the same column heading again reverses   *
+      *            the sorting order.                                *
+      *--------------------------------------------------------------*
+     h COPYRIGHT('Â© Booth Martin, 2010, 2015. All rights reserved.')
+     h option(*nodebugio) dftactgrp(*no) actgrp(*new)
+
+     fSFLSORTD  cf   e             workstn sfile(SFL1: RRN)
+     fSFLSORTP  if   e             disk
+
+      *  ASCII art panel for heading. (Use a Figlet generator.)
+     d FIGLET          ds
+     d Figar                         60    dim(6) ctdata perrcd(1)
+
+      * Constants
+     d cTRQ            c                   x'30'
+     d cTRQu           c                   x'34'
+     d cBLUu           c                   x'3E'
+
+      * Data structures.
+     d ScreenFields    ds
+     d  PRESIDENT
+     d  COLOR
+     d  NUMBER
+     d  OCEAN
+     d  CONTINENT
+
+      * Set the subfile for sorting - ascending & descending
+     d                 ds
+     d SflArrayUp                          dim(200) Ascend
+     d  APRESIDENT                         overlay(SflArrayUp)
+     d                                     like(PRESIDENT)
+     d  ACOLOR                             overlay(SflArrayUp: *next)
+     d                                     like(COLOR    )
+     d  ANUMBER                            overlay(SflArrayUp: *next)
+     d                                     like(NUMBER   )
+     d  AOCEAN                             overlay(SflArrayUp: *next)
+     d                                     like(OCEAN    )
+     d  ACONTINENT                         overlay(SflArrayUp: *next)
+     d                                     like(CONTINENT)
+     d SflArrayDown                        dim(200) Descend
+     d  DPRESIDENT                         overlay(SflArrayDown)
+     d                                     like(PRESIDENT)
+     d  DCOLOR                             overlay(SflArrayDown: *next)
+     d                                     like(COLOR    )
+     d  DNUMBER                            overlay(SflArrayDown: *next)
+     d                                     like(NUMBER   )
+     d  DOCEAN                             overlay(SflArrayDown: *next)
+     d                                     like(OCEAN    )
+     d  DCONTINENT                         overlay(SflArrayDown: *next)
+     d                                     like(CONTINENT)
+
+     d wCol1           s               n
+     d wCol2           s               n
+     d wCol3           s               n
+     d wCol4           s               n
+     d wCol5           s               n
+     d wAscendingFlag  s               n
+     d wNdx            s             10i 0
+
+      //====================================================================*
+      // MAINLINE-BEGIN                                                     *
+      //====================================================================*
+      /FREE
+       // Display screen.
+       exsr S1Main;
+       // Exit.
+       exsr ExitPgm;
+       //====================================================================*
+       // MAINLINE-END                                                       *
+       //====================================================================*
+       //-------------------------------*  Sub-Routine  *
+       // *inzsr()                      *---------------*
+       // Initializing sub routine                      *
+       //-----------------------------------------------*
+       begsr *inzsr;
+         exsr FillArray;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // ExitPgm()                     *---------------*
+       // end of processing                             *
+       //-----------------------------------------------*
+       begsr ExitPgm;
+         *inlr = *on;
+         return;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Main()                      *---------------*
+       // Screen - Main processing.                     *
+       //-----------------------------------------------*
+       begsr S1Main;
+         // Loop until exit.
+         dow *inkc = *off;
+           //   Display screen.
+           exfmt S1;
+           select;
+           when *inkc = *on;   // F3=Exit.
+             leave;
+           when %subst(pm_fld: 1: 6) = 'SF1HDG';    // Cursor located in a
+             exsr SFL1Resort;                       // column heading field.
+           endsl;
+         enddo;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Fill()                      *---------------*
+       // Screen - Fill screen.                         *
+       //-----------------------------------------------*
+       begsr S1Fill;
+         TIMEUSA = %char(%time(): *usa);
+         DATEMDY = %char(%date(): *mdy);
+         write S1CMD;
+
+         // Clear subfile.
+         *in50 = *on;
+         write S1;
+         *in50 = *off;
+
+         // Fill SFL.
+         RRN = *zero;
+         // Fill the subfile.
+         if wAscendingFlag = *off;  // Sort descending.
+           for wNdx = 1 to %elem(SflArrayDown);
+             if SflArrayDown(wNdx) > *blanks;
+               ScreenFields = SflArrayDown(wNdx);  // Move array to data structu
+               RRN = RRN + 1;
+               write SFL1;
+             endif;
+           endfor;
+         else;
+           for wNdx = 1 to %elem(SflArrayUp); // Sort ascending.
+             if SflArrayUp(wNdx) > *blanks;
+               ScreenFields = SflArrayUp(wNdx);  // Move array to data structure
+               RRN = RRN + 1;
+               write SFL1;
+             endif;
+           endfor;
+         endif;
+         // No records?
+         if RRN = *zero;
+           RRN = 1;
+           write(e) SFL1;
+         endif;
+
+         // Save values.
+         SF1RECS = RRN;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // FillArray()                   *---------------*
+       // Fill the sortable array & fill subfile.       *
+       //-----------------------------------------------*
+       begsr FillArray;
+         wNdx = 0;
+         clear SflArrayUp;
+         clear SflArrayDown;
+         // Read the file.
+         setll *start SFLSORTP;
+         read(e) SFLSORTP;
+         dow %eof = *off and wNdx < 200;    // (Limited for demo at 200 records.
+           wNdx = wNdx + 1;
+           SflArrayUp(wNdx)   = ScreenFields;
+           SflArrayDown(wNdx) = ScreenFields;
+           read(e) SFLSORTP;
+         enddo;
+         wCol1 = *on;  // always start with column 1-ascending when filling arra
+         exsr SFL1Resort;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // SFL1Resort()                  *---------------*
+       // Sort subfile by column heading chosen.        *
+       //-----------------------------------------------*
+       begsr SFL1Resort;
+           SF1HDG1 = cBLUu + 'President';  // Set all headings to BLU
+           SF1HDG2 = cBLUu + 'Color';
+           SF1HDG3 = cBLUu + 'Number';
+           SF1HDG4 = cBLUu + 'Ocean';
+           SF1HDG5 = cBLUu + 'Continent';
+       // Select prompted column to sort by.
+       select;
+         // if columm1, see "other"  (for first cycle.)
+         when pm_fld = 'SF1HDG2';
+           SF1HDG2 = cTRQu + 'Color';
+           wCol1 = *off;
+           wCol3 = *off;
+           wCol4 = *off;
+           wCol5 = *off;
+           if wCol2 = *off;
+             wAscendingFlag = *off;
+             wCol2 = *on;
+           endif;
+           if wAscendingFlag;
+             wAscendingFlag = *off;
+             sorta DCOLOR;
+           else;
+             wAscendingFlag = *on;
+             sorta ACOLOR;
+           endif;
+
+         when pm_fld = 'SF1HDG3';
+           SF1HDG3 = cTRQu + 'Number';
+           wCol2 = *off;
+           wCol1 = *off;
+           wCol4 = *off;
+           wCol5 = *off;
+           if wCol3 = *off;
+             wAscendingFlag = *on;
+             wCol3 = *on;
+           endif;
+           if wAscendingFlag;
+             wAscendingFlag = *off;
+             sorta DPRESIDENT;
+           else;
+             wAscendingFlag = *on;
+             sorta APRESIDENT;
+           endif;
+
+         when pm_fld = 'SF1HDG4';
+           SF1HDG4 = cTRQu + 'Ocean';
+           wCol2 = *off;
+           wCol3 = *off;
+           wCol1 = *off;
+           wCol5 = *off;
+           if wCol4 = *off;
+             wAscendingFlag = *on;
+             wCol4 = *on;
+           endif;
+           if wAscendingFlag;
+             wAscendingFlag = *off;
+             sorta DOCEAN;
+           else;
+             wAscendingFlag = *on;
+             sorta AOCEAN;
+           endif;
+
+         when pm_fld = 'SF1HDG5';
+           SF1HDG5 = cTRQu + 'Continent';
+           wCol2 = *off;
+           wCol3 = *off;
+           wCol4 = *off;
+           wCol1 = *off;
+           if wCol5 = *off;
+             wAscendingFlag = *on;
+             wCol5 = *on;
+           endif;
+           if wAscendingFlag;
+             wAscendingFlag = *off;
+             sorta DCONTINENT;
+           else;
+             wAscendingFlag = *on;
+             sorta ACONTINENT;
+           endif;
+
+         other;    // Column 1 or *inzsr
+           SF1HDG1 = cTRQu + 'President';
+           wCol2 = *off;
+           wCol3 = *off;
+           wCol4 = *off;
+           wCol5 = *off;
+           if wCol1 = *off;
+             wAscendingFlag = *on;
+             wCol1 = *on;
+           endif;
+           if wAscendingFlag;
+             wAscendingFlag = *off;
+             sorta DPRESIDENT;
+           else;
+             wAscendingFlag = *on;
+             sorta APRESIDENT;
+           endif;
+         endsl;
+         exsr S1Fill;   // fill subfile
+       endsr;
+      /END-FREE
+** FIGAR 1....+....2....+,,,,3,,,,+,,,,4,,,,+....5....+....6....+
+  ___          _     _                  _
+ / __| ___ _ _| |_  | |__ _  _   __ ___| |_  _ _ __  _ _
+ \__ \/ _ \ '_|  _| | '_ \ || | / _/ _ \ | || | '  \| ' \
+ |___/\___/_|  \__| |_.__/\_, | \__\___/_|\_,_|_|_|_|_||_|
+                          |__/
+
+
+
+
+
+
+
+
+The DDS for the Screen
+
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to show a sortable subfile, by mouse click.       *
+      *                                                              *
+      *                                                              *
+      *    4/2014                                booth@martinvt.com  *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            REF(SFLSORTP)
+                                            ERRSFL
+                                            CA03
+                                            MOUBTN(*ULD ENTER)
+      *****************************************************************
+                R SFL1                      SFL
+                  PRESIDENT R        O  9  4
+                  COLOR     R        O   + 1
+                  NUMBER    R        O   + 1
+                  OCEAN     R        O   + 1
+                  CONTINENT R        O   + 1
+      *****************************************************************
+                R S1                        SFLCTL(SFL1)
+                                            SFLPAG(0011)
+                                            SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP SFLDSPCTL
+        50                                  SFLCLR
+       N91                                  SFLEND(*SCRBAR)
+                                            RTNCSRLOC(&PM_RCD &PM_FLD)
+                  PM_RCD        10A  H
+                  PM_FLD        10A  H
+                  RRN            4S 0H
+                  SF1RECS        5S 0P
+
+                  FIGLET       360   B  2  3CNTFLD(60) CHGINPDFT
+                                            DSPATR(PR) COLOR(YLW)
+                  DATEMDY        8      2 70
+                  TIMEUSA        8      3 70
+                                        4 70'system i'
+                                        5 70USER
+                  SF1HDG1   R        B  8  3REFFLD(PRESIDENT)
+                                            DSPATR(PR)
+                  SF1HDG2   R        B   + 1REFFLD(COLOR)
+                                            DSPATR(PR)
+                  SF1HDG3   R        B   + 1REFFLD(NUMBER)
+                                            DSPATR(PR)
+                  SF1HDG4   R        B   + 1REFFLD(OCEAN)
+                                            DSPATR(PR)
+                  SF1HDG5   R        B   + 1REFFLD(CONTINENT)
+                                            DSPATR(PR)
+      *****************************************************************
+                R S1CMD
+                                       24 73'F3=Exit'
+                                            COLOR(BLU)
+                                       22  2'These subfile columns may be sorte-
+                                            d by clicking a column heading or b-
+                                            y placing  the cursor on the column-
+                                             heading and press Enter.  A second-
+                                             click will reverse  the ascending/-
+                                            descending order of the column.'
+                                            COLOR(TRQ)
+                                       21  2'                                  -
+                                                                               -
+                                                     '
+                                            DSPATR(UL)
+                                            COLOR(BLU)
+
+
+
+
+
+
+The DDS for the Data File
+
+
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A file for the sortable subfile demo program.               *
+      *                                                              *
+      *  10/2010                                 booth@martinvt.com  *
+      ****************************************************************
+
+                R RSFLSORTP
+                  PRESIDENT     12
+                  COLOR          8
+                  NUMBER         8
+                  OCEAN         10
+                  CONTINENT     20
+
+
+The DDS for the two-subfile program.
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to demo a two-subfile program.                    *
+      *    Feature: radio buttons and checkboxes in the subfiles     *
+      *   Name: SFLTWOD                                              *
+      *                                                              *
+      *   10/2012                                booth@martinvt.com  *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            CHGINPDFT(HI UL)
+                                            ERRSFL
+                                            CA03(03 'Exit')
+                                            CA05(05 'Refresh')
+                                            CA08(08 'Continue')
+                                            MOUBTN(*ULD ENTER)
+                R HEADER
+                                        1 69DATE
+                                            EDTCDE(Y)
+                                        2 69TIME
+      *                                 3 69SYSNAME
+                                        3 69'SYSTEM X'
+                                        4 69USER
+                                        2  5'   __                            _-
+                                            _    ___ _  __          '
+                                        3  5'  / /_ _    __ ___    ___ __ __ / -
+                                            /   / _/(_)/ /___  ___  '
+                                        4  5' / __/| |/|/ // _ \  (_- / // // _-
+                                             \ / _// // // -_)(_-   '
+                                        5  5' \__/ |__,__/ \___/ /___/\_,_//_._-
+                                            _//_/ /_//_/ \__//___/  '
+                                        6  5'                                  -
+                                                                    '
+                R SFLA                      SFL
+                  CTLFLD         1Y 0H      SFLCHCCTL
+                  STATES        10A  O  2  1
+
+                R FMT01                     SFLCTL(SFLA)
+                                            TEXT('States subfile')
+                                            OVERLAY
+                                            WINDOW(9 5 8 27 *NOMSGLIN)
+                                            WDWTITLE((*TEXT ' States '))
+                                            SFLSNGCHC(*SLTIND)
+                                            SFLPAG(0006)
+                                            SFLSIZ(&NBRRECA)
+                                            RTNCSRLOC(&REC &FLD)
+        90                                  SFLDSP SFLDSPCTL
+       N90                                  SFLCLR
+        91                                  SFLEND(*SCRBAR *MORE)
+                                            USRRSTDSP
+                  TOPREC         4S 0H      SFLRCDNBR(*TOP)
+                  TOPRECIN       5S 0H      SFLSCROLL
+                  NBRRECA        5S 0P
+                  REC           10A  H
+                  FLD           10A  H
+
+                R SFLB                      SFL
+                  CTLFLD         1Y 0H      SFLCHCCTL
+                  CITIES        20A  O  2  2
+
+                R FMT02                     SFLCTL(SFLB)
+                                            TEXT('Cities subfile')
+                                            RTNCSRLOC(&REC &FLD)
+                                            OVERLAY
+        80                                  SFLDSP SFLDSPCTL
+       N80                                  SFLCLR
+        81                                  SFLEND(*SCRBAR *MORE)
+                                            SFLSIZ(&NBRRECB)
+                                            SFLPAG(0006)
+                                            WINDOW(9 45 8 26 *NOMSGLIN)
+                                            WDWTITLE((*TEXT &TITLE))
+        33                                  WDWTITLE((*TEXT ' F8=Continue ') +
+                                            *LEFT *BOTTOM)
+                                            SFLMLTCHC(*SLTIND)
+                                            USRRSTDSP
+                  NBRRECB        5S 0P
+                  REC           10A  H
+                  FLD           10A  H
+                  TITLE         12A  P
+
+                R FMT03
+                                            WINDOW(8 40 5 28 *NOMSGLIN)
+                                            TEXT('Process SFL2 ')
+                                            OVERLAY
+                                            WDWBORDER((*COLOR RED))
+                                        2  3'Processed Cities list.'
+                                        4  3'Enter = continue.'
+                R FOOTER
+                                            OVERLAY
+                                       23  3'F3=Exit   F5=Refresh'
+                                            COLOR(TRQ)
+                                       20 46'Select as many cities as you like.'
+                                            COLOR(BLU)
+                                       21 46'Use the space bar or mouse click'
+                                            COLOR(BLU)
+                                       22 46'to make your selections.'
+                                            COLOR(BLU)
+
+
+
+
+This is the RPGIV for the two subfile program
+
+       //***************************************************************
+      //   ___             _    _     __ __             _    _        *
+      //  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      //  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      //  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      //                                                              *
+      //  A program to demonstrate a two-subfile program.             *
+      //   Name: SFLTWOR                                              *
+      //                                                              *
+      //  10/2012                                 booth@martinvt.com  *
+      //***************************************************************
+      // COMMENTS:                                                    *
+      //    - This program uses MOUBTN() or the Enter key             *
+      //      to select an item from the subfile.                     *
+      //    - A feature of this program are the checkboxes            *
+      //      on the subfile records.                                 *
+      //                                                              *
+      //--------------------------------------------------------------*
+     H COPYRIGHT('Booth Martin, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*new)
+     FSFLTWOD   cf   e             workstn
+     F                                     SFILE(SFLA:RRNA)
+     F                                     SFILE(SFLB:RRNB)
+     FSFLTWOSP  if   e           k disk
+     FSFLTWOCP  if   e           k disk
+
+           // Working fields.
+     D wNdx            s                   like(NBRRECA)
+     D RRNA            s              4s 0
+     D RRNB            s              4s 0
+     D TopRec          s              4s 0
+     D SavedStates     s                   Like(States)
+      //  ..................................................
+      /FREE
+          exsr FillScreen;
+
+       dow *inlr = *off;
+
+           select;
+           when *inkc;    // End of job
+            *inlr = *on;
+
+           when *inke;  // Refresh
+             exsr FillScreen;
+
+           when *inkh  // Continue
+             and REC = 'SFLB';
+             exsr DoSFL2Process;
+
+           when REC = 'SFLA';
+             exsr FillSubfileB;
+             *in33 = *on;
+             exfmt FMT02;
+             *in33 = *off;
+
+           when REC = 'SFLB';
+             exfmt FMT01;
+
+           other;
+             exfmt FMT01;
+           endsl;
+
+       enddo;
+           //  _________________________________________________________________
+         begsr FillSubfileA;
+         RRNA = 0;
+         // Clear subfile & screen, prepare to re-fill or fill:
+         *in90=*off;
+         clear SFLA;
+         write FMT01;
+         *in90 = *on;
+
+         setll *LoVal SFLTWOSP;
+         read SFLTWOSP;
+         dow not %eof(SFLTWOSP);
+           RRNA = RRNA + 1;
+           write SFLA;
+           read SFLTWOSP;
+         enddo;
+
+           TopRec = 1;    // set States subfile at first record.
+           NBRRECA = RRNA;
+
+         if RRNA > 6;
+           *IN91 = *on;
+         endif;
+
+       endsr;
+         //  _________________________________________________________________
+       begsr FillSubfileB;
+         // fill SFLB
+         RRNB = 0;
+
+         *IN80=*off;
+         clear SFLB;
+         Title = ' Cities ';
+         write FMT02;
+         *in80 = *on;
+
+          SavedStates = *blanks;
+          STATES = SavedStates;
+             for wNdx = 1 to NBRRECA;
+              chain wNdx SFLA;
+               if  CTLFLD = 1;
+                   Title  = ' ' + STATES + ' ';
+                   SavedStates = STATES;
+                 leave;
+               endif;
+             endfor;
+
+         if SavedStates = *blanks;
+           CITIES = 'No State chosen';
+             RRNB = 1;
+             write SFLB;
+         else;
+           setll SavedStates SFLTWOCP;
+           read(e) SFLTWOCP;
+           if States <> SavedStates or
+                 %eof(SFLTWOCP);
+             cities = 'No cities listed';
+             RRNB = RRNB + 1;
+             write SFLB;
+           else;
+             dow Not %eof(SFLTWOCP) and
+                   States = SavedStates;
+                   CTLFLD = 0;
+               RRNB = RRNB + 1;
+               write SFLB;
+               read SFLTWOCP;
+             enddo;
+           endif;
+         endif;
+
+         NBRRECB = RRNB;
+         if RRNB > 6;
+           *in81 = *on;
+         endif;
+       endsr;
+         //  _____________________________________________________
+       begsr FillScreen;
+          exsr FillSubfileA;
+          exsr FillSubfileB;
+          write(e) Header;
+          write(e) Footer;
+          write(e) FMT02;
+          exfmt  FMT01;
+       endsr;
+         //  _________________________________________________________________
+       begsr DoSFL2Process;
+             for wNdx = 1 to NBRRECB;
+              chain wNdx SFLB;
+               if  CTLFLD = 1;
+         // whatever process you may desire with the Cities subfile list:
+               endif;
+             endfor;
+             exfmt FMT03;
+             exsr FillScreen;
+       endsr;
+         //  _________________________________________________________________
+
+
+
+
+
+
+The DDS for the two files used in this application
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A Physical file of Names of states                          *
+      *                                                              *
+      *   Name of states file: SFLTWOSP                              *
+      *                                                              *
+      *  10/2012                                 booth@martinvt.com  *
+      ****************************************************************
+                                            UNIQUE
+
+                R RSFLTWOSP
+                  STATES        10
+                K STATES
+
+
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A Physical file of Names of cities in states                *
+      *                                                              *
+      *   Name of cities file: SFLTWOCP                              *
+      *                                                              *
+      *  10/2012                                 booth@martinvt.com  *
+      ****************************************************************
+                R RSFLTWOCP
+                  STATES        10
+                  CITIES        20
+                K STATES
+                K CITIES
+
+
+The RPGIV for the Subfile Image program
+
+      //***************************************************************
+      //   ___             _    _     __ __             _    _        *
+      //  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      //  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      //  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      //                                                              *
+      //  A program to  show a subfile that can link to images.       *
+      //                                                              *
+      //                                                              *
+      //                                                              *
+      //  10/2010                                 booth@martinvt.com  *
+      //***************************************************************
+      // COMMENTS   This program uses MOUBTN() to click F8 to pick    *
+      //            a subfile line for linking to an image.           *
+      //            It uses the PC Client's file extension default    *
+      //            to open the image.                                *
+      //                                                              *
+      //            (I suppose it could open any file.  I know if     *
+      //             one uses a filename of "NOTEPAD" then            *
+      //             NOTEPAD.EXE opens with a blank panel.)           *
+      //                                                              *
+      //  Note:  This program uses STRPCCMD.  STRPCCMD uses a command *
+      //         parm of 123 characters.  This is normally a problem  *
+      //         but solving it is not part of this demo.             *
+      //         -= be warned =-                                      *
+      //                                                              *
+      //--------------------------------------------------------------*
+     H COPYRIGHT('Booth Martin, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*new)
+
+     FSFLIMAGED cf   e             workstn sfile(SFL1 : SF1NUM)
+     FSFLIMAGEP if   e             disk
+
+     D STRPCOflag      s               n
+     D wNdx            s             10i 0
+
+     D QCMDEXC         PR                  ExtPgm('QCMDEXC')
+     D  wCommand                  32702A   const options(*varsize)
+     D  wLength                      15P 5 const
+     D wCmd            s           1000    varying
+
+      //====================================================================*
+      // MAINLINE-BEGIN                                                     *
+      //====================================================================*
+      /FREE
+       exsr S1Fill;
+       // Display screen.
+       exsr S1Main;
+       // Exit.
+       exsr ExitPgm;
+       //====================================================================*
+       // MAINLINE-END                                                       *
+       //====================================================================*
+       //-------------------------------*  Sub-Routine  *
+       // *inzsr()                      *---------------*
+       // Initializing sub routine                      *
+       //-----------------------------------------------*
+       begsr *inzsr;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // ExitPgm()                     *---------------*
+       // end of processing                             *
+       //-----------------------------------------------*
+       begsr ExitPgm;
+         *inlr = *on;
+         return;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Main()                      *---------------*
+       // Screen - Main processing.                     *
+       //-----------------------------------------------*
+       begsr S1Main;
+         // Loop until exit.
+         dow *inkc = *off;
+           //   Display screen.
+           write S1CMD;
+           exfmt S1;
+
+           select;
+             // F3=Exit.
+           when *inkc = *on;
+             // F8 on either by key or by mouseclick, and on a subfile line.
+           when *inkh and SF1PICKED > 0;
+             exsr SFL1Link;
+           endsl;
+         enddo;
+       endsr;
+
+       //-------------------------------*  Sub-Routine  *
+       // SFL1Link()                    *---------------*
+       // Link to the images.                           *
+       //-----------------------------------------------*
+       begsr SFL1Link;
+         // Start PC Organizer if not started.
+         if STRPCOflag = *off;
+           wCmd = 'STRPCO PCTA(*NO)';
+           callp(e) QCmdExc(wCmd: %len(wCmd) );
+           STRPCOflag = *on;
+         endif;
+
+         chain SF1PICKED SFL1;
+         if HAVEFILE = '*';
+           wCmd =
+               'STRPCCMD PCCMD('
+               + '''rundll32 shell32,ShellExec_RunDLL '
+               + %trim(SERVERLOC) + %trim(FILENAME)
+               + ''') PAUSE(*NO)';
+           QCmdExc(wCmd: %len(wCmd) );
+         else;
+           // do whatever you want to when there is no hit.
+         endif;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Fill()                      *---------------*
+       // Screen - Fill screen.                         *
+       //-----------------------------------------------*
+       begsr S1Fill;
+         // Clear subfile.
+         *in50 = *on;
+         write S1;
+         *in50 = *off;
+         // Fill SFL.
+         SF1NUM = *zero;
+         // Fill the subfile.
+         //   Read the file.
+         setll *start SFLIMAGEP;
+         read(e) SFLIMAGEP;
+         dow %eof = *off;
+           SF1NUM = SF1NUM + 1;
+           if SERVERLOC <> *blanks or FILENAME <> *blanks;
+             HAVEFILE = '*';
+             *in31 = *on;
+           else;
+             HAVEFILE = *blanks;
+             *in31 = *off;
+           endif;
+           write(e) SFL1;
+           read(e) SFLIMAGEP;
+         enddo;
+
+         // No records?
+         if SF1NUM = *zero;
+           SF1NUM = 1;
+           DESCRIPT = 'No records in file';
+           write(e) SFL1;
+         endif;
+
+         // Save values.
+         SF1RECS = SF1NUM;
+         SF1TOP = 1;
+       endsr;
+
+
+
+
+
+
+
+
+The DDS for the Screen
+
+
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to show a subfile with abilty to                  *
+      *    display images.                                           *
+      *                                                              *
+      *                                                              *
+      *   10/2010                                booth@martinvt.com  *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            REF(*LIBL/SFLIMAGEP)
+                                            PRINT
+                                            ERRSFL
+                                            CA03
+                                            MOUBTN(*ULD CF08)
+      *****************************************************************
+                R SFL1                      SFL
+                  PRODUCTID R        O  9  2
+                  HAVEFILE       1   B   + 1DSPATR(PR UL)
+       N31                                  DSPATR(ND)
+                  DESCRIPT  R        O   + 1
+                  SERVERLOC R        H
+                  FILENAME  R        H
+      *****************************************************************
+                R S1                        SFLCTL(SFL1)
+                                            SFLPAG(0011)
+                                            SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP
+       N50                                  SFLDSPCTL
+       N50                                  SFLEND(*SCRBAR *MORE)
+        50                                  SFLCLR
+                                            SFLCSRRRN(&SF1PICKED)
+                                            RTNCSRLOC(&PM_RCD &PM_FLD)
+                  PM_RCD        10A  H
+                  PM_FLD        10A  H
+                  SF1NUM         4S 0H
+                  SF1RECS        5S 0P
+                  SF1PICKED      5S 0H
+                  SF1TOP         4S 0H      SFLRCDNBR(CURSOR *TOP)
+                                        1  3'  _____       __    _____ __      -
+                                              ____                         '
+                                            COLOR(TRQ)
+                                        2  2'  / ___/__  __/ /_  / __(_) /__   -
+                                              /  _/___ ___  ____ _____ ____ '
+                                            COLOR(TRQ)
+                                        3  2'  \__ \/ / / / __ \/ /_/ / / _ \  -
+                                              / // __ `__ \/ __ `/ __ `/ _ \'
+                                            COLOR(TRQ)
+                                        4  2' ___/ / /_/ / /_/ / __/ / /  __/  -
+                                            _/ // / / / / / /_/ / /_/ /  __/'
+                                            COLOR(TRQ)
+                                        5  2'/____/\__,_/_.___/_/ /_/_/\___/  /-
+                                            ___/_/ /_/ /_/\__,_/\__, /\___/ '
+                                            COLOR(TRQ)
+                                        6  2'                                  -
+                                                               /____/       '
+                                            COLOR(TRQ)
+                                        1 69DATE
+                                            EDTCDE(Y)
+                                        2 69TIME
+                                        3 69'system i'
+                                        4 69USER
+                                        8  2'Product ID     '
+                                            DSPATR(UL)
+                                         + 1'*'
+                                            DSPATR(UL)
+                                         + 1'Description'
+                                            DSPATR(UL)
+      *****************************************************************
+                R S1CMD
+                                       22  2'                                  -
+                                                                               -
+                                                     '
+                                            DSPATR(UL)
+                                            COLOR(BLU)
+                                       23  3'F3=Exit'
+                                            COLOR(BLU)
+                                         + 3'F8=Show Image'
+                                            COLOR(BLU)
+                                       23 60'"*"=Image Available'
+                                            COLOR(BLU)
+
+
+
+
+
+
+
+The DDS for the Data File
+
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A file for the subfile image demo program.                  *
+      *                                                              *
+      *  10/2010                                 booth@martinvt.com  *
+      ****************************************************************
+
+                R RSFLIMAGEP
+                  PRODUCTID     15
+                  DESCRIPT      30
+                  SERVERLOC     70
+                  FILENAME      70
+
+
+
+
+
+
+
+
+The RPG (not free form) for the program
+
+
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to  show a subfile that can link to images.       *
+      *                                                              *
+      *                                                              *
+      *                                                              *
+      *  10/2010                                 booth@martinvt.com  *
+      ****************************************************************
+      * COMMENTS   This program uses MOUBTN() to click F8 to pick    *
+      *            a subfile line for linking to an image.           *
+      *            It uses the PC Client's file extension default    *
+      *            to open the image.                                *
+      *                                                              *
+      *            (I suppose it could open any file.  I know if     *
+      *             one uses a filename of "NOTEPAD" then            *
+      *             NOTEPAD.EXE opens with a blank panel.)           *
+      *                                                              *
+      *  Note:  This program uses STRPCCMD.  STRPCCMD uses a command *
+      *         parm of 132 characters.  This is normally a problem  *
+      *         but solving it is not part of this demo.             *
+      *         -= be warned =-                                      *
+      *                                                              *
+      *--------------------------------------------------------------*
+     H COPYRIGHT('Booth Martin, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*new)
+
+     FSFLIMAGED cf   e             workstn sfile(SFL1 : SF1NUM)
+     FSFLIMAGEP if   e             disk
+
+     D STRPCOflag      s               n
+     D wNdx            s             10i 0
+
+     D QCMDEXC         PR                  ExtPgm('QCMDEXC')
+     D  wCommand                  32702A   const options(*varsize)
+     D  wLength                      15P 5 const
+     D wCmd            s           1000    varying
+
+      *====================================================================*
+      * MAINLINE-BEGIN                                                     *
+      *====================================================================*
+     C                   exsr      S1Fill
+      * Display screen.
+     C                   exsr      S1Main
+      * Exit.
+     C                   exsr      ExitPgm
+      *====================================================================*
+      * MAINLINE-END                                                       *
+      *====================================================================*
+      *-------------------------------*  Sub-Routine  *
+      * *inzsr()                      *---------------*
+      * Initializing sub routine                      *
+      *-----------------------------------------------*
+     C     *inzsr        begsr
+     C                   endsr
+      *-------------------------------*  Sub-Routine  *
+      * ExitPgm()                     *---------------*
+      * end of processing                             *
+      *-----------------------------------------------*
+     C     ExitPgm       begsr
+     C                   eval      *inlr = *on
+     C                   return
+     C                   endsr
+      *-------------------------------*  Sub-Routine  *
+      * S1Main()                      *---------------*
+      * Screen - Main processing.                     *
+      *-----------------------------------------------*
+     C     S1Main        begsr
+      * Loop until exit.
+     C                   dow       *inkc = *off
+      *   Display screen.
+     C                   write     S1CMD
+     C                   exfmt     S1
+
+     C                   select
+      * F3=Exit.
+     C                   when      *inkc = *on
+      * F8 on either by key or by mouseclick, and on a subfile line.
+     C                   when      *inkh and SF1PICKED > 0
+     C                   exsr      SFL1Link
+     C                   endsl
+     C                   enddo
+     C                   endsr
+
+      *-------------------------------*  Sub-Routine  *
+      * SFL1Link()                    *---------------*
+      * Link to the images.                           *
+      *-----------------------------------------------*
+     C     SFL1Link      begsr
+      * Start PC Organizer if not started.
+     C                   if        STRPCOflag = *off
+     C                   eval      wCmd = 'STRPCO PCTA(*NO)'
+     C                   callp(e)  QCmdExc(wCmd: %len(wCmd) )
+     C                   eval      STRPCOflag = *on
+     C                   endif
+
+     C     SF1PICKED     chain     SFL1
+     C                   if        HAVEFILE = '*'
+     C                   eval      wCmd =
+     C                             'STRPCCMD PCCMD('
+     C                               + '''rundll32 shell32,ShellExec_RunDLL '
+     C                               + %trim(SERVERLOC) + %trim(FILENAME)
+     C                               + ''') PAUSE(*NO)'
+     C                   callp     QCmdExc(wCmd: %len(wCmd) )
+     C                   else
+      * do whatever you want to when there is no hit.
+     C                   endif
+     C                   endsr
+      *-------------------------------*  Sub-Routine  *
+      * S1Fill()                      *---------------*
+      * Screen - Fill screen.                         *
+      *-----------------------------------------------*
+     C     S1Fill        begsr
+      * Clear subfile.
+     C                   eval      *in50 = *on
+     C                   write     S1
+     C                   eval      *in50 = *off
+      * Fill SFL.
+     C                   eval      SF1NUM = *zero
+      * Fill the subfile.
+      *   Read the file.
+     C     *start        setll     SFLIMAGEP
+     C                   read(e)   SFLIMAGEP
+     C                   dow       %eof = *off
+     C                   eval      SF1NUM = SF1NUM + 1
+     C                   if        SERVERLOC <> *blanks or FILENAME <> *blanks
+     C                   eval      HAVEFILE = '*'
+     C                   eval      *in31 = *on
+     C                   else
+     C                   eval      HAVEFILE = *blanks
+     C                   eval      *in31 = *off
+     C                   endif
+     C                   write(e)  SFL1
+     C                   read(e)   SFLIMAGEP
+     C                   enddo
+
+      * No records?
+     C                   if        SF1NUM = *zero
+     C                   eval      SF1NUM = 1
+     C                   eval      DESCRIPT = 'No records in file'
+     C                   write(e)  SFL1
+     C                   endif
+
+      * Save values.
+     C                   eval      SF1RECS = SF1NUM
+     C                   eval      SF1TOP = 1
+     C                   endsr
+
+
+The Display file for a simple subfile program.
+       ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to demo a simple subfile program.                 *
+      *   Name: SMPLSFL10D                                           *
+      *                                                              *
+      *   08/2011                                booth@martinvt.com  *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            ERRSFL
+                                            CA03
+                                            MOUBTN(*ULD ENTER)
+      *****************************************************************
+                R SFL1                      SFL
+                  SF1FIELD      23      9  2
+      *****************************************************************
+                R S1                        SFLCTL(SFL1)
+        *DS3                                SFLLIN(0002)
+                                            SFLPAG(0033)
+                                            SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP
+       N50                                  SFLDSPCTL
+       N50                                  SFLEND(*SCRBAR *MORE)
+        50                                  SFLCLR
+                                            SFLCSRRRN(&SF1PICKED)
+                                            RTNCSRLOC(&PM_RCD &PM_FLD)
+                  PM_RCD        10A  H
+                  PM_FLD        10A  H
+                  SF1NUM         4S 0H
+                  SF1RECS        5S 0P
+                  SF1PICKED      5S 0H
+                  SF1TOP         4S 0H      SFLRCDNBR(CURSOR *TOP)
+                                        1 69DATE
+                                            EDTCDE(Y)
+                                        2 69TIME
+                  FIELDUL1      78A  O  8  2DSPATR(UL)
+                                            COLOR(BLU)
+                                        3  3'  __| _)              |           -
+                                            __|        |      _| _)  |      '
+                                            COLOR(YLW)
+                                        4  3'\__ \  |   ` \   _ \  |   -_)   \_-
+                                            _ \  |  |   _ \   _|  |  |   -_)'
+                                            COLOR(YLW)
+                                        5  3'____/ _| _|_|_| .__/ _| \___|   __-
+                                            __/ \_,_| _.__/ _|   _| _| \___|'
+                                            COLOR(YLW)
+                                        6  3'               _|                 -
+                                                                            '
+                                            COLOR(YLW)
+      *****************************************************************
+                R S1CMD
+                  FIELDUL2      78     22  2DSPATR(UL)
+                                            COLOR(BLU)
+                                       23  3'F3=Exit'
+                                            COLOR(BLU)
+                                       23 50'Enter or mouse click'
+                                            COLOR(BLU)
+
+
+
+
+This is the RPGIV for a simple subfile program
+
+       //***************************************************************
+      //   ___             _    _     __ __             _    _        *
+      //  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      //  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      //  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      //                                                              *
+      //  A program to demonstrate a simple subfile program.          *
+      //   Name: SMPLSFL10R                                           *
+      //                                                              *
+      //  08/2011                                 booth@martinvt.com  *
+      //***************************************************************
+      // COMMENTS   This program uses MOUBTN() or the Enter key       *
+      //            to select an item from the subfile.               *
+      //                                                              *
+      //--------------------------------------------------------------*
+     H COPYRIGHT('Booth Martin, All rights reserved.')
+     H option(*nodebugio) dftactgrp(*no) actgrp(*new)
+
+     FSMPLSFL10Dcf   e             workstn sfile(SFL1 : SF1NUM)
+     FCITIES    if   e           k disk
+
+     D CityKey         s                   like(CITY) inz('boston')
+      //====================================================================*
+      // MAINLINE-BEGIN                                                     *
+      //====================================================================*
+      /FREE
+       exsr S1Fill;
+       // Display screen.
+       exsr S1Main;
+       // Exit.
+       exsr ExitPgm;
+       //====================================================================*
+       // MAINLINE-END                                                       *
+       //====================================================================*
+       //-------------------------------*  Sub-Routine  *
+       // *inzsr()                      *---------------*
+       // Initializing sub routine                      *
+       //-----------------------------------------------*
+       begsr *inzsr;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // ExitPgm()                     *---------------*
+       // end of processing                             *
+       //-----------------------------------------------*
+       begsr ExitPgm;
+         *inlr = *on;
+         return;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Main()                      *---------------*
+       // Screen - Main processing.                     *
+       //-----------------------------------------------*
+       begsr S1Main;
+         // Loop until exit.
+         dow *inkc = *off;
+           //   Display screen.
+           write S1CMD;
+           exfmt S1;
+           select;
+             // F3=Exit.
+           when *inkc = *on;
+             exsr ExitPgm;
+           when SF1PICKED > 0;
+             exsr SFL1TASK;
+           endsl;
+         enddo;
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // SFL1TASK()                    *---------------*
+       // Do whatever task is required                  *
+       //-----------------------------------------------*
+       begsr SFL1TASK;
+         SF1TOP = SF1PICKED;  //  for demo purposes
+          //  .........  (ToDo)
+       endsr;
+       //-------------------------------*  Sub-Routine  *
+       // S1Fill()                      *---------------*
+       // Screen - Fill screen.                         *
+       //-----------------------------------------------*
+       begsr S1Fill;
+         // Clear subfile.
+         *in50 = *on;
+         clear SFL1;
+         write S1;
+         *in50 = *off;
+         // Fill the subfile.
+         //   Read the file.
+         setll citykey CITIES;
+         read(e) RCITIES;
+         dow %eof = *off and SF1NUM < 2500;  // limit the subfile size.
+          SF1Field = %trim(accentcity) + ', '
+           + %subst(Region: 1: 2) + ' ' + country;
+           SF1NUM = SF1NUM + 1;
+           write(e) SFL1;
+           read(e) RCITIES;
+         enddo;
+         // Save values.
+         SF1RECS = SF1NUM;
+         SF1TOP = 1;
+       endsr;
+
+
+
+
+The DDS for the Cities file used in this application
+
+(Note:  This file is a million-plus file of cities of the world
+It is easily obtained on the Internet.
+I find it useful for stress testing and for display puposes.)
+
+                R RCITIES
+                  COUNTRY        2
+                  CITY          20
+                  ACCENTCITY    20
+                  REGION        20
+                  POPULATION     9  0
+                  LATITUDE      10S 7
+                  LONGITUDE     10S 7
+                K CITY
+                K COUNTRY
+
+				

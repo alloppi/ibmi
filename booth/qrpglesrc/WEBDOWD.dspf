@@ -1,0 +1,55 @@
+      *  _______________________________________________________________________
+      *   __              _    _     __ __             _    _
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|
+      *
+      *    11/2019                               booth@martinvt.com
+      *  _______________________________________________________________________
+      *    Web demo of get-day-of-week
+      *
+      *  _______________________________________________________________________
+                                            DSPSIZ(*DS3)
+                                            ERRSFL
+                                            CHGINPDFT
+                                            CA03 CF04
+      *  _______________________________________________________________________
+                R FMT01
+                                            RTNCSRLOC(&CSRRCD &CSRFLD)
+                  CSRRCD        10   H
+                  CSRFLD        10   H
+                                        1  2'System i'
+                                        2  2'WEBDOW'
+                  HDG5X40      200   B  1 12CNTFLD(40) CHGINPDFT
+                                            DSPATR(PR)
+        67                                  COLOR(GRN)
+        61                                  COLOR(PNK)
+        62                                  COLOR(TRQ)
+        63                                  COLOR(WHT)
+        64                                  COLOR(BLU)
+        65                                  COLOR(RED)
+        66                                  COLOR(YLW)
+                  HDG7X23      161   B  1 54CNTFLD(23) CHGINPDFT
+                                            DSPATR(PR)
+        61                                  COLOR(GRN)
+        62                                  COLOR(PNK)
+        63                                  COLOR(TRQ)
+        64                                  COLOR(WHT)
+        65                                  COLOR(BLU)
+        66                                  COLOR(RED)
+        67                                  COLOR(YLW)
+                  S1USERNAME    50      6  2COLOR(YLW)
+                  S1HDG         76      8  2DSPATR(UL) COLOR(BLU)
+      *  _______________________________________________________________________
+                                       10  7'Date (mmddyy)'
+                  S1DATE          L  B   + 1COLOR(WHT) DATFMT(*JOB)
+                  POPUP          4   B   + 1COLOR(BLU) DFTVAL('(F4)')
+                                       10 40'Day Name                      '
+                                            DSPATR(UL) COLOR(BLU)
+                  S1DAYNAME     30     11 40COLOR(WHT)
+      *  _______________________________________________________________________
+                  PB2            2Y 0B 23  3PSHBTNFLD((*GUTTER 2))
+                                            PSHBTNCHC(1 'Done' CA03)
+                                            PSHBTNCHC(2 'Calendar' CF04)
+                                            CHCAVAIL((*COLOR PNK))
+

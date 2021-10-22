@@ -1,0 +1,85 @@
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *  A program to show a subfile with abilty to                  *
+      *    display images.                                           *
+      *                                                              *
+      *                                                              *
+      *   10/2010                                booth@martinvt.com  *
+      ****************************************************************
+                                            DSPSIZ(24 80 *DS3)
+                                            REF(*LIBL/SFLIMAGEP)
+                                            PRINT
+                                            ERRSFL
+                                            CA03
+                                            MOUBTN(*ULD CF08)
+      *****************************************************************
+                R SFL1                      SFL
+                  PRODUCTID R        O  9  2
+                  HAVEFILE       1   B   + 1DSPATR(PR UL)
+       N31                                  DSPATR(ND)
+                  DESCRIPT  R        O   + 1
+                  SERVERLOC R        H
+                  FILENAME  R        H
+      *****************************************************************
+                R S1                        SFLCTL(SFL1)
+                                            SFLPAG(0011)
+                                            SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP
+       N50                                  SFLDSPCTL
+       N50                                  SFLEND(*SCRBAR *MORE)
+        50                                  SFLCLR
+                                            SFLCSRRRN(&SF1PICKED)
+                                            RTNCSRLOC(&PM_RCD &PM_FLD)
+                  PM_RCD        10A  H
+                  PM_FLD        10A  H
+                  SF1NUM         4S 0H
+                  SF1RECS        5S 0P
+                  SF1PICKED      5S 0H
+                  SF1TOP         4S 0H      SFLRCDNBR(CURSOR *TOP)
+                                        1  3'  _____       __    _____ __      -
+                                              ____                         '
+                                            COLOR(TRQ)
+                                        2  2'  / ___/__  __/ /_  / __(_) /__   -
+                                              /  _/___ ___  ____ _____ ____ '
+                                            COLOR(TRQ)
+                                        3  2'  \__ \/ / / / __ \/ /_/ / / _ \  -
+                                              / // __ `__ \/ __ `/ __ `/ _ \'
+                                            COLOR(TRQ)
+                                        4  2' ___/ / /_/ / /_/ / __/ / /  __/  -
+                                            _/ // / / / / / /_/ / /_/ /  __/'
+                                            COLOR(TRQ)
+                                        5  2'/____/\__,_/_.___/_/ /_/_/\___/  /-
+                                            ___/_/ /_/ /_/\__,_/\__, /\___/ '
+                                            COLOR(TRQ)
+                                        6  2'                                  -
+                                                               /____/       '
+                                            COLOR(TRQ)
+                                        1 69DATE
+                                            EDTCDE(Y)
+                                        2 69TIME
+                                        3 69'system i'
+                                        4 69USER
+                                        8  2'Product ID     '
+                                            DSPATR(UL)
+                                         + 1'*'
+                                            DSPATR(UL)
+                                         + 1'Description'
+                                            DSPATR(UL)
+      *****************************************************************
+                R S1CMD
+                                       22  2'                                  -
+                                                                               -
+                                                     '
+                                            DSPATR(UL)
+                                            COLOR(BLU)
+                                       23  3'F3=Exit'
+                                            COLOR(BLU)
+                                         + 3'F8=Show Image'
+                                            COLOR(BLU)
+                                       23 60'"*"=Image Available'
+                                            COLOR(BLU)

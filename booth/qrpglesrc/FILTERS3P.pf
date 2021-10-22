@@ -1,0 +1,5 @@
+     A          R FILTERS3PR
+     A            CNTRY          2A         TEXT('CNTRY')
+     A                                      COLHDG('CNTRY')
+     A            COUNTRY       17A         TEXT('COUNTRY')
+     A                                      COLHDG('COUNTRY')

@@ -1,0 +1,65 @@
+      ****************************************************************
+      *   ___             _    _     __ __             _    _        *
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _   *
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |  *
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|  *
+      *                                                              *
+      *                                                              *
+      *                                          booth@martinvt.com  *
+      ****************************************************************
+      * WRITTEN BY    : Booth Martin                                 *
+      * DATE WRITTEN  : 01-2007   Revised 3/2015                     *
+      * COMMENTS      : Screen format simple data editor             *
+      ****************************************************************
+                                            DSPSIZ(*DS4)
+                                            PRINT
+                                            ERRSFL
+                                            CA03
+      *****************************************************************
+                R SFL1                      SFL
+                  DATA         128   B  9  2CHECK(LC)
+        33                                  DSPATR(PC RI) COLOR(TRQ)
+      *****************************************************************
+                R S1                        SFLCTL(SFL1)
+                                            SFLPAG(0016)
+                                            SFLSIZ(&SF1RECS)
+                                            OVERLAY
+       N50                                  SFLDSP
+       N50                                  SFLDSPCTL
+       N50                                  SFLEND(*SCRBAR *MORE)
+        50                                  SFLCLR
+                                            RTNCSRLOC(&PM_RCD &PM_FLD)
+        33                                  SFLMSG('Error Message' 33)
+                  PM_RCD        10A  H
+                  PM_FLD        10A  H
+                  SF1NUM         4S 0H
+                  SF1RECS        5S 0P
+                  SF1TOP         4S 0H      SFLRCDNBR(CURSOR *TOP)
+                  FIGLET       325   B  1 32CNTFLD(65) CHGINPDFT
+                                            DSPATR(PR) COLOR(YLW)
+                                        1123DATE
+                                            EDTCDE(Y)
+                                        2123TIME
+                                        3123'SYSTEM X'
+                                        6  2'                                  -
+                                                                               -
+                                                                          1    -
+                                                 1         1         1'
+                                            COLOR(TRQ)
+                                        7  2'         1         2         3    -
+                                                  4        5         6         -
+                                            7         8         9         0    -
+                                                 1         2         3'
+                                            COLOR(TRQ)
+                                        8  2'1234567890123456789012345678901234-
+                                            56789012345678901234567890123456789-
+                                            01234567890123456789012345678901234-
+                                            56789012345678901234567890'
+                                            COLOR(TRQ)
+                                            DSPATR(UL)
+      *****************************************************************
+                R S1CMD
+                  LINE130      130     26  2DSPATR(UL)
+                                            COLOR(BLU)
+                                       27  3'F3=Exit'
+                                            COLOR(BLU)

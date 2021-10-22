@@ -1,0 +1,68 @@
+      *  _______________________________________________________________________
+      *   ___             _    _     __ __             _    _
+      *  | . > ___  ___ _| |_ | |_  |  \  \ ___  _ _ _| |_ <_>._ _
+      *  | . \/ . \/ . \ | |  | . | |     |<_> || '_> | |  | || ' |
+      *  |___/\___/\___/ |_|  |_|_| |_|_|_|<___||_|   |_|  |_||_|_|
+      *
+      *                                                     booth@martinvt.com
+      *  _______________________________________________________________________
+      *    Web demo of Menu of demos
+      *    Nov, 2019
+      *  _______________________________________________________________________
+                                            DSPSIZ(*DS3)
+                                            REF(WEBMENUP)
+                                            ERRSFL
+                                            CA03 CF15
+      *  _______________________________________________________________________
+                R SFL1                      SFL
+                  SMENUITEM R   +2   O  9  3REFFLD(MENUITEM)
+                  SMENUCMD  R        H      REFFLD(MENUCMD)
+                  SMENUCAT  R        H      REFFLD(MENUCAT)
+      *  _______________________________________________________________________
+                R FMT01                     SFLCTL(SFL1)
+                                            RTNCSRLOC(&REC &FLD)
+                                            OVERLAY
+                                            MOUBTN(*ULP ENTER)
+       N80                                  SFLDSP SFLDSPCTL
+        80                                  SFLCLR
+        81                                  SFLEND(*SCRBAR *MORE)
+                                            SFLSIZ(&NBRREC)
+                                            SFLPAG(0026)
+                                            SFLLIN(4)
+                                            SFLCSRRRN(&SF1PICKED)
+                  SFLTOP1        4S 0H      SFLRCDNBR(CURSOR *TOP)
+                  SFLTOP2        5S 0H      SFLSCROLL
+                  NBRREC         5S 0P
+                  SF1NUM         4S 0H
+                  REC           10   H
+                  FLD           10   H
+                  SF1PICKED      5S 0H
+                                        1  2'WEBMENU'
+                                        2  2'System i'
+                  HDG5X40      200   B  1 12CNTFLD(40) CHGINPDFT
+                                            DSPATR(PR)
+        67                                  COLOR(GRN)
+        61                                  COLOR(PNK)
+        62                                  COLOR(TRQ)
+        63                                  COLOR(WHT)
+        64                                  COLOR(BLU)
+        65                                  COLOR(RED)
+        66                                  COLOR(YLW)
+                  HDG7X23      161   B  1 54CNTFLD(23) CHGINPDFT
+                                            DSPATR(PR)
+        61                                  COLOR(GRN)
+        62                                  COLOR(PNK)
+        63                                  COLOR(TRQ)
+        64                                  COLOR(WHT)
+        65                                  COLOR(BLU)
+        66                                  COLOR(RED)
+        67                                  COLOR(YLW)
+                  S1USERNAME    50      6  2COLOR(YLW)
+                  S1HDG         76      8  2DSPATR(UL) COLOR(BLU)
+      *  _______________________________________________________________________
+                R S1CMD
+                  PB2            2Y 0B 23  3PSHBTNFLD((*GUTTER 2))
+                                            PSHBTNCHC(1 'Done' CA03)
+                                            PSHBTNCHC(2 'Sign-off' CF15)
+                                            CHCAVAIL((*COLOR PNK))
+

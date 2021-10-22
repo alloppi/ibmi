@@ -1,0 +1,5 @@
+     A          R FILTERS1PR
+     A            TYPEID         2A         TEXT('TYPEID')
+     A                                      COLHDG('TYPEID')
+     A            TYPEDS        17A         TEXT('TYPEDS')
+     A                                      COLHDG('TYPEDS')

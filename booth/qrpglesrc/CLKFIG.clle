@@ -1,0 +1,267 @@
+     /*************************************************************           +
+      **                                                                      +
+      ** ???????????????????????????????????????????????????????????????????? +
+      ** ?? FlyByNight Software         AS/400 Technical Specialists       ?? +
+      ** ?? Eclipse the competition - run your business on an IBM AS/400.  ?? +
+      ** ??                                                                ?? +
+      ** ?? Phone: +61 3 9419 0175      Mobile: +61 0411 091 400           ?? +
+      ** ?? Fax:   +61 3 9419 0175      mailto: shc@flybynight.com.au      ?? +
+      ** ??                                                                ?? +
+      ** ???????????????????????????????????????????????????????????????????? +
+      **                                                                      +
+      ** This program started as a copy of Simon's Clock Program **           +
+      **  I appreciate his knowledge and have used it, but if    **           +
+      **  anything does not run right, that's me, not him.       **           +
+      **                    Booth Martin 2/00 booth@Martinvt.com **           +
+      **                                                         **           +
+      *************************************************************          */
+             DCLF       FILE(CLKFIGFM) RCDFMT(*ALL)
+                        /* Display file - digital clock            */
+
+             DCL        VAR(&HR) TYPE(*CHAR) LEN(2)
+                       /* Hour component of the time              */
+             DCL        VAR(&MIN) TYPE(*CHAR) LEN(2)
+                       /* Minute component of the time            */
+             DCL        VAR(&SEC) TYPE(*CHAR) LEN(2)
+                       /* Second component of the time            */
+             DCL        VAR(&DAT6) TYPE(*CHAR) LEN(6)
+                       /* Current Date                            */
+             DCL        VAR(&DOW) TYPE(*CHAR) LEN(4)
+                       /* Current Day of week                     */
+
+             DCL        VAR(&COL1) TYPE(*CHAR) LEN(1)
+                       /* Left component of the hour              */
+             DCL        VAR(&COL2) TYPE(*CHAR) LEN(1)
+                       /* Right component of the hour             */
+             DCL        VAR(&COL3) TYPE(*CHAR) LEN(1)
+                       /* Left component of the minute            */
+             DCL        VAR(&COL4) TYPE(*CHAR) LEN(1)
+                        /* Right component of the minute           */
+             DCL        VAR(&COL5) TYPE(*CHAR) LEN(1)
+                       /* Left component of the second            */
+             DCL        VAR(&COL6) TYPE(*CHAR) LEN(1)
+                        /* Right component of the second           */
+             DCL        VAR(&SYSNAME) TYPE(*CHAR) LEN(8)
+
+             RTVNETA    SYSNAME(&SYSNAME)
+             CHGVAR     VAR(&TITLE) VALUE(' Official System Time +
+                          for' *BCAT &SYSNAME *CAT ' ')
+
+ AGAIN:      /* Get the current time  */
+             RTVSYSVAL  SYSVAL(QHOUR) RTNVAR(&HR)
+             RTVSYSVAL  SYSVAL(QMINUTE) RTNVAR(&MIN)
+             RTVSYSVAL  SYSVAL(QSECOND) RTNVAR(&SEC)
+             RTVSYSVAL  SYSVAL(QDATE) RTNVAR(&DAT6)
+             RTVSYSVAL  SYSVAL(QDAYOFWEEK) RTNVAR(&DOW)
+ /* Display fields: Date, Julian date, and day-of-week */
+             CVTDAT     DATE(&DAT6) TOVAR(&JDAY) TOFMT(*JUL) TOSEP(/)
+             CVTDAT     DATE(&DAT6) TOVAR(&DAT) TOFMT(*MDY) TOSEP(/)
+             IF         COND(&DOW = '*SUN') THEN(CHGVAR VAR(&DOWEEK) +
+                          VALUE('   Sunday'))
+             IF         COND(&DOW = '*MON') THEN(CHGVAR VAR(&DOWEEK) +
+                          VALUE('   Monday'))
+             IF         COND(&DOW = '*TUE') THEN(CHGVAR VAR(&DOWEEK) +
+                          VALUE('  Tuesday'))
+             IF         COND(&DOW = '*WED') THEN(CHGVAR VAR(&DOWEEK) +
+                          VALUE('Wednesday'))
+             IF         COND(&DOW = '*THU') THEN(CHGVAR VAR(&DOWEEK) +
+                          VALUE('Thursday'))
+             IF         COND(&DOW = '*FRI') THEN(CHGVAR VAR(&DOWEEK) +
+                          VALUE('  Friday'))
+             IF         COND(&DOW = '*SAT') THEN(CHGVAR VAR(&DOWEEK) +
+                          VALUE('Saturday'))
+
+             CHGVAR     VAR(&COL1) VALUE(%SST(&HR 1 1))
+             CHGVAR     VAR(&COL2) VALUE(%SST(&HR 2 1))
+
+             CHGVAR     VAR(&COL3) VALUE(%SST(&MIN 1 1))
+             CHGVAR     VAR(&COL4) VALUE(%SST(&MIN 2 1))
+
+             CHGVAR     VAR(&COL5) VALUE(%SST(&SEC 1 1))
+             CHGVAR     VAR(&COL6) VALUE(%SST(&SEC 2 1))
+
+             /* Set the indicators for the left digit of the hour  */
+             /*   -- leading zero is not shown                     */
+             IF         COND(&COL1 *EQ '1') THEN(CHGVAR VAR(&IN11) +
+                          VALUE('1'))
+             IF         COND(&COL1 *EQ '2') THEN(CHGVAR VAR(&IN12) +
+                          VALUE('1'))
+
+             /* Set the indicators for the right digit of the hour */
+             IF         COND(&COL2 *EQ '0') THEN(CHGVAR VAR(&IN20) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '1') THEN(CHGVAR VAR(&IN21) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '2') THEN(CHGVAR VAR(&IN22) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '3') THEN(CHGVAR VAR(&IN23) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '4') THEN(CHGVAR VAR(&IN24) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '5') THEN(CHGVAR VAR(&IN25) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '6') THEN(CHGVAR VAR(&IN26) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '7') THEN(CHGVAR VAR(&IN27) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '8') THEN(CHGVAR VAR(&IN28) +
+                          VALUE('1'))
+             IF         COND(&COL2 *EQ '9') THEN(CHGVAR VAR(&IN29) +
+                          VALUE('1'))
+
+             /* Set the indicators for the left digit of the minute */
+             IF         COND(&COL3 *EQ '0') THEN(CHGVAR VAR(&IN30) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '1') THEN(CHGVAR VAR(&IN31) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '2') THEN(CHGVAR VAR(&IN32) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '3') THEN(CHGVAR VAR(&IN33) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '4') THEN(CHGVAR VAR(&IN34) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '5') THEN(CHGVAR VAR(&IN35) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '6') THEN(CHGVAR VAR(&IN36) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '7') THEN(CHGVAR VAR(&IN37) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '8') THEN(CHGVAR VAR(&IN38) +
+                          VALUE('1'))
+             IF         COND(&COL3 *EQ '9') THEN(CHGVAR VAR(&IN39) +
+                          VALUE('1'))
+
+             /* Set the indicators for the right digit of the minute */
+             IF         COND(&COL4 *EQ '0') THEN(CHGVAR VAR(&IN40) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '1') THEN(CHGVAR VAR(&IN41) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '2') THEN(CHGVAR VAR(&IN42) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '3') THEN(CHGVAR VAR(&IN43) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '4') THEN(CHGVAR VAR(&IN44) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '5') THEN(CHGVAR VAR(&IN45) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '6') THEN(CHGVAR VAR(&IN46) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '7') THEN(CHGVAR VAR(&IN47) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '8') THEN(CHGVAR VAR(&IN48) +
+                          VALUE('1'))
+             IF         COND(&COL4 *EQ '9') THEN(CHGVAR VAR(&IN49) +
+                          VALUE('1'))
+
+             /* Set the indicators for the left digit of the second */
+             IF         COND(&COL5 *EQ '0') THEN(CHGVAR VAR(&IN50) +
+                         VALUE('1'))
+             IF         COND(&COL5 *EQ '1') THEN(CHGVAR VAR(&IN51) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '2') THEN(CHGVAR VAR(&IN52) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '3') THEN(CHGVAR VAR(&IN53) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '4') THEN(CHGVAR VAR(&IN54) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '5') THEN(CHGVAR VAR(&IN55) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '6') THEN(CHGVAR VAR(&IN56) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '7') THEN(CHGVAR VAR(&IN57) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '8') THEN(CHGVAR VAR(&IN58) +
+                          VALUE('1'))
+             IF         COND(&COL5 *EQ '9') THEN(CHGVAR VAR(&IN59) +
+                          VALUE('1'))
+
+             /* Set the indicators for the Right digit of the Second */
+             IF         COND(&COL6 *EQ '0') THEN(CHGVAR VAR(&IN60) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '1') THEN(CHGVAR VAR(&IN61) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '2') THEN(CHGVAR VAR(&IN62) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '3') THEN(CHGVAR VAR(&IN63) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '4') THEN(CHGVAR VAR(&IN64) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '5') THEN(CHGVAR VAR(&IN65) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '6') THEN(CHGVAR VAR(&IN66) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '7') THEN(CHGVAR VAR(&IN67) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '8') THEN(CHGVAR VAR(&IN68) +
+                          VALUE('1'))
+             IF         COND(&COL6 *EQ '9') THEN(CHGVAR VAR(&IN69) +
+                          VALUE('1'))
+
+             /* Display the clock face                             */
+             SNDRCVF    RCDFMT(RFIGLET) WAIT(*NO)
+             MONMSG     MSGID(CPF0887) EXEC(DO)
+             RCVMSG     MSGTYPE(*EXCP)
+             RCVF
+             IF         COND(&PB2 *EQ 01) THEN(WRKMSG MSGQ(*SYSOPR))
+             IF         COND(&PB2 *EQ 02) THEN(GOTO CMDLBL(AGAIN))
+             IF         COND(&PB2 *EQ 03) THEN(GOTO CMDLBL(ENDJOB))
+             IF         COND(&IN03 *EQ '1') THEN(GOTO CMDLBL(ENDJOB))
+             IF         COND(&IN06 *EQ '1') THEN(WRKMSG MSGQ(*SYSOPR))
+             ENDDO
+             DLYJOB     DLY(1)
+
+             CHGVAR     VAR(&IN11) VALUE('0')
+             CHGVAR     VAR(&IN12) VALUE('0')
+             CHGVAR     VAR(&IN20) VALUE('0')
+             CHGVAR     VAR(&IN21) VALUE('0')
+             CHGVAR     VAR(&IN22) VALUE('0')
+             CHGVAR     VAR(&IN23) VALUE('0')
+             CHGVAR     VAR(&IN24) VALUE('0')
+             CHGVAR     VAR(&IN25) VALUE('0')
+             CHGVAR     VAR(&IN26) VALUE('0')
+             CHGVAR     VAR(&IN27) VALUE('0')
+             CHGVAR     VAR(&IN28) VALUE('0')
+             CHGVAR     VAR(&IN29) VALUE('0')
+             CHGVAR     VAR(&IN30) VALUE('0')
+             CHGVAR     VAR(&IN31) VALUE('0')
+             CHGVAR     VAR(&IN32) VALUE('0')
+             CHGVAR     VAR(&IN33) VALUE('0')
+             CHGVAR     VAR(&IN34) VALUE('0')
+             CHGVAR     VAR(&IN35) VALUE('0')
+             CHGVAR     VAR(&IN36) VALUE('0')
+             CHGVAR     VAR(&IN37) VALUE('0')
+             CHGVAR     VAR(&IN38) VALUE('0')
+             CHGVAR     VAR(&IN39) VALUE('0')
+             CHGVAR     VAR(&IN40) VALUE('0')
+             CHGVAR     VAR(&IN41) VALUE('0')
+             CHGVAR     VAR(&IN42) VALUE('0')
+             CHGVAR     VAR(&IN43) VALUE('0')
+             CHGVAR     VAR(&IN44) VALUE('0')
+             CHGVAR     VAR(&IN45) VALUE('0')
+             CHGVAR     VAR(&IN46) VALUE('0')
+             CHGVAR     VAR(&IN47) VALUE('0')
+             CHGVAR     VAR(&IN48) VALUE('0')
+             CHGVAR     VAR(&IN49) VALUE('0')
+             CHGVAR     VAR(&IN50) VALUE('0')
+             CHGVAR     VAR(&IN51) VALUE('0')
+             CHGVAR     VAR(&IN52) VALUE('0')
+             CHGVAR     VAR(&IN53) VALUE('0')
+             CHGVAR     VAR(&IN54) VALUE('0')
+             CHGVAR     VAR(&IN55) VALUE('0')
+             CHGVAR     VAR(&IN56) VALUE('0')
+             CHGVAR     VAR(&IN57) VALUE('0')
+             CHGVAR     VAR(&IN58) VALUE('0')
+             CHGVAR     VAR(&IN59) VALUE('0')
+             CHGVAR     VAR(&IN60) VALUE('0')
+             CHGVAR     VAR(&IN61) VALUE('0')
+             CHGVAR     VAR(&IN62) VALUE('0')
+             CHGVAR     VAR(&IN63) VALUE('0')
+             CHGVAR     VAR(&IN64) VALUE('0')
+             CHGVAR     VAR(&IN65) VALUE('0')
+             CHGVAR     VAR(&IN66) VALUE('0')
+             CHGVAR     VAR(&IN67) VALUE('0')
+             CHGVAR     VAR(&IN68) VALUE('0')
+             CHGVAR     VAR(&IN69) VALUE('0')
+             GOTO       CMDLBL(AGAIN)
+
+ENDJOB:      ENDPGM

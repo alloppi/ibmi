@@ -1,0 +1,16 @@
+     /*                                                            */
+     /*  To compile:                                               */
+     /*                                                            */
+     /*            CRTCLPGM PGM(XXX/SFLDTAQCL) SRCFILE(XXX/QCLSRC) */
+     /*                                                            */
+     /*============================================================*/
+             PGM
+
+             DLTDTAQ    DTAQ(QTEMP/SFLDTAQDQ)
+             MONMSG     MSGID(CPF2105)
+             CRTDTAQ    DTAQ(QTEMP/SFLDTAQDQ) MAXLEN(256) +
+                          SEQ(*KEYED) KEYLEN(9)
+
+             CALL       PGM(*LIBL/SFLDTAQRG)
+
+             ENDPGM

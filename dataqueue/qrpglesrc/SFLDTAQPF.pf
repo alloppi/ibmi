@@ -1,0 +1,11 @@
+      *
+      *  To compile:
+      *
+      *             CRTPF FILE(XXX/SFLDTAQPF) SRCFILE(XXX/QDDSSRC)
+      *
+     A                                      UNIQUE
+     A          R PFR
+     A            DBIDNM         9S 0
+     A            DBFNAM        20
+     A            DBLNAM        20
+     A          K DBIDNM

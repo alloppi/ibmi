@@ -1,0 +1,600 @@
+.*-----------------------------------------------------------------------**
+.*
+.*  Compile options:
+.*
+.*    CrtPnlGrp PnlGrp( CBX165P )
+.*              SrcFile( QPNLSRC )
+.*              SrcMbr( *PNLGRP )
+.*
+.*-----------------------------------------------------------------------**
+:PNLGRP.
+
+:COPYR.
+(C) System iNetwork Programming Tips 2006.
+
+.*-- Import help panel group:
+:IMPORT   NAME='*'        PNLGRP=CBX165H.
+
+.*-- Class definitions:
+:CLASS    NAME=CLTIMZON   BASETYPE='TIME ZONE'.
+:ECLASS.
+
+:CLASS    NAME=CLTIME     BASETYPE='TIME'.
+:ECLASS.
+
+:CLASS    NAME=CLDATE     BASETYPE='DATE 2'.
+:ECLASS.
+
+:CLASS    NAME=CLOBJNAM   BASETYPE='CHAR 10'.
+:ECLASS.
+
+:CLASS    NAME=CLDTQTYP   BASETYPE='CHAR 1'     WIDTH=5.
+:TL.
+:TI  VALUE='"0"'.*STD
+:TI  VALUE='"1"'.*DDM
+:ETL.
+:ECLASS.
+
+:CLASS    NAME=CLMAXELN   BASETYPE='ZONED 5 0'.
+:ECLASS.
+
+:CLASS    NAME=CLFORCE    BASETYPE='CHAR 1'     WIDTH=5.
+:TL.
+:TI  VALUE='"Y"'.*YES
+:TI  VALUE='"N"'.*NO
+:ETL.
+:ECLASS.
+
+:CLASS    NAME=CLQUESEQ   BASETYPE='CHAR 1'     WIDTH=7.
+:TL.
+:TI  VALUE='"F"'.*FIFO
+:TI  VALUE='"L"'.*LIFO
+:TI  VALUE='"K"'.*KEYED
+:ETL.
+:ECLASS.
+
+:CLASS    NAME=CLKEYLEN   BASETYPE='ZONED 3 0'.
+:ECLASS.
+
+:CLASS    NAME=CLINCLID   BASETYPE='CHAR 1'     WIDTH=5.
+:TL.
+:TI  VALUE='"Y"'.*YES
+:TI  VALUE='"N"'.*NO
+:ETL.
+:ECLASS.
+
+:CLASS    NAME=CLMAXENB   BASETYPE='ZONED 10 0'.
+:TL.
+:TI  VALUE='-1'.*MAX16MB
+:TI  VALUE='-2'.*MAX2GB
+:ETL.
+:ECLASS.
+
+:CLASS    NAME=CLINLENB   BASETYPE='ZONED 10 0'.
+:ECLASS.
+
+:CLASS    NAME=CLCURENB   BASETYPE='ZONED 10 0'.
+:ECLASS.
+
+:CLASS    NAME=CLCUREAL   BASETYPE='ZONED 10 0'.
+:ECLASS.
+
+:CLASS    NAME=CLMAXEAL   BASETYPE='ZONED 10 0'.
+:ECLASS.
+
+:CLASS    NAME=CLAUTRCL   BASETYPE='CHAR 1'     WIDTH=5.
+:TL.
+:TI  VALUE='"0"'.*NO
+:TI  VALUE='"1"'.*YES
+:ETL.
+:ECLASS.
+
+:CLASS    NAME=CLENFLCK   BASETYPE='CHAR 1'     WIDTH=5.
+:TL.
+:TI  VALUE='"0"'.*NO
+:TI  VALUE='"1"'.*YES
+:ETL.
+:ECLASS.
+
+:CLASS    NAME=CLRMTLOC   BASETYPE='CHAR 8'.
+:ECLASS.
+
+:CLASS    NAME=CLRDBNAM   BASETYPE='CHAR 18'.
+:ECLASS.
+
+:CLASS    NAME=CLAPPCDV   BASETYPE='CHAR 10'.
+:ECLASS.
+
+:CLASS    NAME=CLLCLLOC   BASETYPE='CHAR 8'.
+:ECLASS.
+
+:CLASS    NAME=CLMODE     BASETYPE='CHAR 8'.
+:ECLASS.
+
+:CLASS    NAME=CLRMTNID   BASETYPE='CHAR 8'.
+:ECLASS.
+
+:CLASS    NAME=CLRCLDTS   BASETYPE='CHAR 26'.
+:ECLASS.
+
+:CLASS    NAME=CLTXTDSC   BASETYPE='IGC 50'     SUBST=QUOTED.
+:ECLASS.
+
+.*-- Variable definitions:
+:VAR      NAME=DATE      CLASS=CLDATE.
+:VAR      NAME=TIMZON    CLASS=CLTIMZON.
+
+:VAR      NAME=DTQNAM    CLASS=CLOBJNAM.
+:VAR      NAME=DTQLIB    CLASS=CLOBJNAM.
+:VAR      NAME=DTQTYP    CLASS=CLDTQTYP.
+
+:VAR      NAME=MAXELN    CLASS=CLMAXELN.
+:VAR      NAME=FORCE     CLASS=CLFORCE.
+:VAR      NAME=QUESEQ    CLASS=CLQUESEQ.
+:VAR      NAME=KEYLEN    CLASS=CLKEYLEN.
+:VAR      NAME=INCLID    CLASS=CLINCLID.
+:VAR      NAME=MAXENB    CLASS=CLMAXENB.
+:VAR      NAME=INLENB    CLASS=CLINLENB.
+:VAR      NAME=CURENB    CLASS=CLCURENB.
+:VAR      NAME=CUREAL    CLASS=CLCUREAL.
+:VAR      NAME=MAXEAL    CLASS=CLMAXEAL.
+:VAR      NAME=AUTRCL    CLASS=CLAUTRCL.
+:VAR      NAME=ENFLCK    CLASS=CLENFLCK.
+:VAR      NAME=DTQRMN    CLASS=CLOBJNAM.
+:VAR      NAME=DTQRML    CLASS=CLOBJNAM.
+:VAR      NAME=RMTLOC    CLASS=CLRMTLOC.
+:VAR      NAME=RDBNAM    CLASS=CLRDBNAM.
+:VAR      NAME=APPCDV    CLASS=CLAPPCDV.
+:VAR      NAME=LCLLOC    CLASS=CLLCLLOC.
+:VAR      NAME=MODE      CLASS=CLMODE.
+:VAR      NAME=RMTNID    CLASS=CLRMTNID.
+:VAR      NAME=TXTDSC    CLASS=CLTXTDSC.
+:VAR      NAME=RCLDTS    CLASS=CLRCLDTS.
+
+.*-- Variable record definitions:
+:VARRCD   NAME=HDRRCD
+          VARS='DATE TIMZON DTQNAM DTQLIB DTQTYP'.
+
+:VARRCD   NAME=DTLRCD
+          VARS='MAXELN FORCE  QUESEQ KEYLEN INCLID MAXENB INLENB'
+          VARS='CURENB CUREAL MAXEAL AUTRCL ENFLCK DTQRMN DTQRML'
+          VARS='RMTLOC RDBNAM APPCDV LCLLOC MODE   RMTNID TXTDSC'
+          VARS='RCLDTS'.
+
+.*-- Conditions:
+:COND     NAME=STDQ       EXPR='DTQTYP="0"'.
+:COND     NAME=DDMQ       EXPR='DTQTYP="1"'.
+:COND     NAME=KEYSEQ     EXPR='QUESEQ="K"'.
+:COND     NAME=DDMRDB     EXPR='RMTLOC="*RDB"'.
+:COND     NAME=DDMLOC     EXPR='*NOT (RMTLOC="*RDB") '
+                          EXPR='*AND (DTQTYP="1")'.
+
+.*-- Key definitions - main panel:
+:KEYL     NAME=FKEYS
+          HELP=HLPFKEYS.
+
+:KEYI     KEY=ENTER
+          HELP=HLPENT
+          ACTION=ENTER.
+
+:KEYI     KEY=F1
+          HELP=HLPF1
+          ACTION=HELP.
+
+:KEYI     KEY=F3
+          HELP=HLPF3
+          ACTION='EXIT SET'
+          VARUPD=NO
+          .F3=Exit
+
+:KEYI     KEY=F5
+          HELP=HLPF5
+          PRIORITY=20
+          ACTION='RETURN 5'
+          .F5=Refresh
+
+:KEYI     KEY=F8
+          HELP=HLPF8WRD
+          ACTION='CMD WRKRDBDIRE RDB(&RDBNAM)'
+          COND=DDMRDB
+          PRIORITY=20
+          .F8=Work with RDB directory entry
+
+:KEYI     KEY=F8
+          HELP=HLPF8WCS
+          ACTION='CMD WRKCFGSTS CFGTYPE(*DEV) CFGD(*LOC) '
+          ACTION='RMTLOCNAME(&RMTLOC)'
+          COND=DDMLOC
+          PRIORITY=20
+          .F8=Work with configuration status
+
+:KEYI     KEY=F12
+          HELP=HLPF12
+          ACTION='CANCEL SET'
+          VARUPD=NO
+          .F12=Cancel
+
+:KEYI     KEY=F24
+          HELP=HLPF24
+          ACTION=MOREKEYS
+          .F24=More keys
+
+:KEYI     KEY=PAGEDOWN
+          HELP=HLPPGD
+          ACTION=PAGEDOWN.
+
+:KEYI     KEY=PAGEUP
+          HELP=HLPPGU
+          ACTION=PAGEUP.
+
+:KEYI     KEY=HELP
+          HELP=HLPHLP
+          ACTION=HELP.
+
+:KEYI     KEY=PRINT
+          HELP=HLPPRT
+          ACTION=PRINT.
+:EKEYL.
+
+.*-- Panel definition:
+:PANEL    NAME=CBX165P
+          KEYL=FKEYS
+          ENTER='RETURN 500'
+          HELP='DSPDTAQD/'
+          TOPSEP=DATETIME
+          DATE=DATE
+          TIME=TIMZON
+          .Display Data Queue Description
+
+.*-- Data presentation area:
+
+:DATA     DEPTH=3
+          SCROLL=NO
+          LAYOUT=2
+          BOTSEP=SPACE
+          COMPACT.
+
+:DATACOL  WIDTH=22.
+:DATACOL  WIDTH='*'.
+
+:DATAGRP  GRPSEP=QINDENT
+          COMPACT.
+
+:DATAI    VAR=DTQNAM
+          USAGE=OUT
+          HELP='DSPDTAQD/DTQNAM'
+          .Data queue
+
+:DATAI    VAR=DTQLIB
+          USAGE=OUT
+          HELP='DSPDTAQD/DTQLIB'
+          .Library
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT.
+
+:DATAI    VAR=DTQTYP
+          USAGE=OUT
+          HELP='DSPDTAQD/DTQTYP'
+          .Type
+:EDATAGRP.
+:EDATA.
+
+:DATA     DEPTH='*'
+          SCROLL=YES
+          LAYOUT=1
+          BOTSEP=SPACE.
+
+:DATACOL  WIDTH=35.
+:DATACOL  WIDTH='*'.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT
+          COND=STDQ.
+
+:DATAI    VAR=MAXELN
+          HELP='DSPDTAQD/MAXELN'
+          USAGE=OUT
+          .Maximum entry length
+
+:DATAI    VAR=FORCE
+          HELP='DSPDTAQD/FORCE'
+          USAGE=OUT
+          .Force to auxiliary storage
+
+:DATAI    VAR=QUESEQ
+          HELP='DSPDTAQD/QUESEQ'
+          USAGE=OUT
+          .Sequence
+
+:DATAI    VAR=KEYLEN
+          COND=KEYSEQ
+          HELP='DSPDTAQD/KEYLEN'
+          USAGE=OUT
+          .Key length
+
+:DATAI    VAR=INCLID
+          HELP='DSPDTAQD/INCLID'
+          USAGE=OUT
+          .Include sender ID
+
+:DATAI    VAR=AUTRCL
+          HELP='DSPDTAQD/AUTRCL'
+          USAGE=OUT
+          .Automatic reclaim
+
+:DATAIX   VAR=RCLDTS
+          HELP='DSPDTAQD/RCLDTS'
+          USAGE=OUT
+          ITEMSEP=5.
+
+:DATAI    VAR=ENFLCK
+          HELP='DSPDTAQD/ENFLCK'
+          USAGE=OUT
+          .Enforce data queue locks
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=INDENT
+          COMPACT
+          COND=STDQ
+          .Queue size
+
+:DATAI    VAR=MAXENB
+          HELP='DSPDTAQD/MAXENB'
+          USAGE=OUT
+          .Maximum number of entries
+
+:DATAI    VAR=INLENB
+          HELP='DSPDTAQD/INLENB'
+          USAGE=OUT
+          .Initial number of entries
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=INDENT
+          COMPACT
+          COND=STDQ
+          .Queue entries
+
+:DATAI    VAR=CURENB
+          HELP='DSPDTAQD/CURENB'
+          USAGE=OUT
+          .Current number
+
+:DATAI    VAR=CUREAL
+          HELP='DSPDTAQD/CUREAL'
+          USAGE=OUT
+          .Current allocated
+
+:DATAI    VAR=MAXEAL
+          HELP='DSPDTAQD/MAXEAL'
+          USAGE=OUT
+          .Maximum allowed
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=QINDENT
+          COND=DDMQ
+          COMPACT.
+
+:DATAI    VAR=DTQRMN
+          USAGE=OUT
+          HELP='DSPDTAQD/DTQRMN'
+          .Remote data queue
+
+:DATAI    VAR=DTQRML
+          USAGE=OUT
+          HELP='DSPDTAQD/DTQRML'
+          .Library
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT
+          COND=DDMQ.
+
+:DATAI    VAR=RMTLOC
+          HELP='DSPDTAQD/RMTLOC'
+          USAGE=OUT
+          .Remote location
+
+:DATAI    VAR=RDBNAM
+          HELP='DSPDTAQD/RDBNAM'
+          USAGE=OUT
+          .Relational database
+
+:DATAI    VAR=APPCDV
+          HELP='DSPDTAQD/APPCDV'
+          USAGE=OUT
+          .APPC device description
+
+:DATAI    VAR=LCLLOC
+          HELP='DSPDTAQD/LCLLOC'
+          USAGE=OUT
+          .Local location
+
+:DATAI    VAR=MODE
+          HELP='DSPDTAQD/MODE'
+          USAGE=OUT
+          .Mode
+
+:DATAI    VAR=RMTNID
+          HELP='DSPDTAQD/RMTNID'
+          USAGE=OUT
+          .Remote network identifier
+:EDATAGRP.
+
+:DATAI    VAR=TXTDSC
+          HELP='DSPDTAQD/TXTDSC'
+          USAGE=OUT
+          .Text 'description'
+
+:EDATA.
+:EPANEL.
+
+.*-- Print panel header definition:
+:PRTHEAD  NAME=PRTHDR
+          WIDTH=132
+          .Display Data Queue Description
+
+:PRTTRAIL .E N D   O F   L I S T I N G
+
+:EPRTHEAD.
+
+.*-- Print panel detail definition:
+
+:PRTPNL   NAME=PRTDTL
+          WIDTH=132.
+
+:DATA     LAYOUT=2
+          BOTSEP=SPACE.
+
+:DATACOL  WIDTH=24.
+:DATACOL  WIDTH='*'.
+
+:DATAGRP  GRPSEP=QINDENT
+          COMPACT.
+
+:DATAI    VAR=DTQNAM
+          USAGE=OUT
+          .Data queue
+
+:DATAI    VAR=DTQLIB
+          USAGE=OUT
+          .Library
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT.
+
+:DATAI    VAR=DTQTYP
+          USAGE=OUT
+          .Type
+:EDATAGRP.
+:EDATA.
+
+:DATA     LAYOUT=1
+          BOTSEP=SPACE.
+
+:DATACOL  WIDTH=35.
+:DATACOL  WIDTH='*'.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT
+          COND=STDQ.
+
+:DATAI    VAR=MAXELN
+          USAGE=OUT
+          .Maximum entry length
+
+:DATAI    VAR=FORCE
+          USAGE=OUT
+          .Force to auxiliary storage
+
+:DATAI    VAR=QUESEQ
+          USAGE=OUT
+          .Sequence
+
+:DATAI    VAR=KEYLEN
+          COND=KEYSEQ
+          USAGE=OUT
+          .Key length
+
+:DATAI    VAR=INCLID
+          USAGE=OUT
+          .Include sender ID
+
+:DATAI    VAR=AUTRCL
+          USAGE=OUT
+          .Automatic reclaim
+
+:DATAIX   VAR=RCLDTS
+          HELP='DSPDTAQD/RCLDTS'
+          USAGE=OUT
+          ITEMSEP=5.
+
+:DATAI    VAR=ENFLCK
+          USAGE=OUT
+          .Enforce data queue locks
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=INDENT
+          COMPACT
+          COND=STDQ
+          .Queue size
+
+:DATAI    VAR=MAXENB
+          USAGE=OUT
+          .Maximum number of entries
+
+:DATAI    VAR=INLENB
+          USAGE=OUT
+          .Initial number of entries
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=INDENT
+          COMPACT
+          COND=STDQ
+          .Queue entries
+
+:DATAI    VAR=CURENB
+          USAGE=OUT
+          .Current number
+
+:DATAI    VAR=CUREAL
+          USAGE=OUT
+          .Current allocated
+
+:DATAI    VAR=MAXEAL
+          USAGE=OUT
+          .Maximum allowed
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=QINDENT
+          COND=DDMQ
+          COMPACT.
+
+:DATAI    VAR=DTQRMN
+          USAGE=OUT
+          .Remote data queue
+
+:DATAI    VAR=DTQRML
+          USAGE=OUT
+          .Library
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT
+          COND=DDMQ.
+
+:DATAI    VAR=RMTLOC
+          USAGE=OUT
+          .Remote location
+
+:DATAI    VAR=RDBNAM
+          USAGE=OUT
+          .Relational database
+
+:DATAI    VAR=APPCDV
+          USAGE=OUT
+          .APPC device description
+
+:DATAI    VAR=LCLLOC
+          USAGE=OUT
+          .Local location
+
+:DATAI    VAR=MODE
+          USAGE=OUT
+          .Mode
+
+:DATAI    VAR=RMTNID
+          USAGE=OUT
+          .Remote network identifier
+:EDATAGRP.
+
+:DATAI    VAR=TXTDSC
+          USAGE=OUT
+          .Text 'description'
+
+:EDATA.
+
+:EPRTPNL.
+:EPNLGRP.

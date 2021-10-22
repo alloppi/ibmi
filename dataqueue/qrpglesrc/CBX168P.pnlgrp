@@ -1,0 +1,476 @@
+.*-----------------------------------------------------------------------**
+.*
+.*  Compile options:
+.*
+.*    CrtPnlGrp PnlGrp( CBX168P )
+.*              SrcFile( QPNLSRC )
+.*              SrcMbr( *PNLGRP )
+.*
+.*-----------------------------------------------------------------------**
+:PNLGRP.
+
+:COPYR.
+(C) System iNetwork Programming Tips 2007.
+
+.*-- Import help panel group:
+:IMPORT   NAME='*'        PNLGRP=CBX168H.
+
+.*-- Class definitions:
+:CLASS    NAME=CLACTION   BASETYPE=ACTION       WIDTH=2.
+:ECLASS.
+:CLASS    NAME=CLEXITPG   BASETYPE='CHAR 20'.
+:ECLASS.
+:CLASS    NAME=CLOBJNAM   BASETYPE='CHAR 10'.
+:ECLASS.
+:CLASS    NAME=CLALTVIEW  BASETYPE='BIN 15'.
+:ECLASS.
+:CLASS    NAME=CLTIMZON   BASETYPE='TIME ZONE'.
+:ECLASS.
+:CLASS    NAME=CLTIME     BASETYPE='TIME'.
+:ECLASS.
+:CLASS    NAME=CLDATE     BASETYPE='DATE 2'.
+:ECLASS.
+:CLASS    NAME=CLCMDPRM   BASETYPE='CHAR 255'.
+:ECLASS.
+:CLASS    NAME=CLDTQPOS   BASETYPE='CHAR 20'.
+:ECLASS.
+:CLASS    NAME=CLTXTDSC   BASETYPE='IGC 50'     SUBST=QUOTED.
+:ECLASS.
+:CLASS    NAME=CLOBJTYP   BASETYPE='CHAR 10'.
+:ECLASS.
+
+:CLASS    NAME=CLDTQTYP   BASETYPE='CHAR 10'.
+:TL.
+:TI  VALUE='"DDMDTAQUE"'.*DDM
+:TI  VALUE='"         "'.*STD
+:ETL.
+:ECLASS.
+
+.*-- Variable definitions:
+:VAR      NAME=OPTION    CLASS=CLACTION.
+:VAR      NAME=EXITPG    CLASS=CLEXITPG.
+:VAR      NAME=DATE      CLASS=CLDATE.
+:VAR      NAME=TIMZON    CLASS=CLTIMZON.
+:VAR      NAME=CMDPRM    CLASS=CLCMDPRM.
+:VAR      NAME=ALTVIEW   CLASS=CLALTVIEW.
+
+:VAR      NAME=WRKNAM    CLASS=CLOBJNAM.
+:VAR      NAME=WRKLIB    CLASS=CLOBJNAM.
+:VAR      NAME=WRKTYP    CLASS=CLOBJTYP.
+
+:VAR      NAME=DTQNAM    CLASS=CLOBJNAM.
+:VAR      NAME=DTQLIB    CLASS=CLOBJNAM.
+:VAR      NAME=DTQPOS    CLASS=CLDTQPOS.
+:VAR      NAME=DTQTYP    CLASS=CLDTQTYP.
+:VAR      NAME=DTQTXT    CLASS=CLTXTDSC.
+
+.*-- Variable record definitions:
+:VARRCD   NAME=EXPRCD
+          VARS='EXITPG'.
+
+:VARRCD   NAME=HDRRCD
+          VARS='DATE TIMZON WRKNAM WRKLIB WRKLIB'.
+
+:VARRCD   NAME=DTLRCD
+          VARS='OPTION DTQPOS DTQNAM DTQLIB DTQTYP DTQTXT'.
+
+.*-- List definition:
+:LISTDEF  NAME=DTLLST
+          VARS='OPTION DTQPOS DTQNAM DTQLIB DTQTYP DTQTXT'
+          MSGID=CPI1EBB
+          MSGF='QCPFMSG'.
+
+:LISTDEF  NAME=CNFLST
+          VARS='OPTION DTQNAM DTQLIB DTQTYP DTQTXT'.
+
+.*-- Conditions:
+:COND     NAME=VIEW1      EXPR='ALTVIEW = 0'.
+:COND     NAME=VIEW2      EXPR='ALTVIEW = 1'.
+
+:TT       NAME=PNLTT
+          CONDS= 'VIEW1   VIEW2'.
+:TTROW    VALUES='  1       0  '.
+:TTROW    VALUES='  0       1  '.
+:ETT.
+
+.*-- Key definitions - main panel:
+:KEYL     NAME=FKEYS
+          HELP=HLPFKEYS.
+
+:KEYI     KEY=ENTER
+          HELP=HLPENT
+          ACTION=ENTER.
+
+:KEYI     KEY=F1
+          HELP=HLPF1
+          ACTION=HELP.
+
+:KEYI     KEY=F3
+          HELP=HLPF3
+          ACTION='EXIT SET'
+          VARUPD=NO
+          .F3=Exit
+
+:KEYI     KEY=F4
+          HELP=HLPF4
+          PRIORITY=30
+          ACTION=PROMPT
+          .F4=Prompt
+
+:KEYI     KEY=F5
+          HELP=HLPF5
+          PRIORITY=20
+          ACTION='RETURN 5'
+          .F5=Refresh
+
+:KEYI     KEY=F6
+          HELP=HLPF6
+          ACTION='CMD ?CRTDTAQ'
+          PRIORITY=20
+          .F6=Create data queue
+
+:KEYI     KEY=F9
+          HELP=HLPF9
+          PRIORITY=30
+          ACTION=RETRIEVE
+          .F9=Retrieve
+
+:KEYI     KEY=F11
+          HELP='HLPF11/VIEW1'
+          ACTION=CHGVIEW
+          COND=VIEW1
+          PRIORITY=20
+          .F11=Display full text
+
+:KEYI     KEY=F11
+          HELP='HLPF11/VIEW2'
+          ACTION=CHGVIEW
+          COND=VIEW2
+          PRIORITY=20
+          .F11=Display type
+
+:KEYI     KEY=F12
+          HELP=HLPF12
+          ACTION='CANCEL SET'
+          VARUPD=NO
+          .F12=Cancel
+
+:KEYI     KEY=F17
+          HELP=HLPF17
+          PRIORITY=40
+          ACTION='RETURN 17'
+          VARUPD=NO
+          .F17=Top
+
+:KEYI     KEY=F18
+          HELP=HLPF18
+          PRIORITY=40
+          ACTION='RETURN 18'
+          VARUPD=NO
+          .F18=Bottom
+
+
+:KEYI     KEY=F24
+          HELP=HLPF24
+          ACTION=MOREKEYS
+          .F24=More keys
+
+:KEYI     KEY=HELP
+          HELP=HLPHLP
+          ACTION=HELP.
+
+:KEYI     KEY=PAGEDOWN
+          HELP=HLPPGD
+          ACTION=PAGEDOWN.
+
+:KEYI     KEY=PAGEUP
+          HELP=HLPPGU
+          ACTION=PAGEUP.
+
+:KEYI     KEY=PRINT
+          HELP=HLPPRT
+          ACTION=PRINT.
+:EKEYL.
+
+.*-- Key definitions - confirmation panel:
+:KEYL     NAME=CNFKEYS
+          HELP=HLPFKEYS.
+
+:KEYI     KEY=ENTER
+          HELP=HLPENT
+          ACTION=ENTER.
+
+:KEYI     KEY=F1
+          HELP=HLPF1
+          ACTION=HELP.
+
+:KEYI     KEY=F11
+          HELP='F11/VIEW1'
+          ACTION=CHGVIEW
+          COND=VIEW1
+          PRIORITY=30
+          .F11=Display full text
+
+:KEYI     KEY=F11
+          HELP='F11/VIEW2'
+          ACTION=CHGVIEW
+          COND=VIEW2
+          PRIORITY=30
+          .F11=Display type
+
+:KEYI     KEY=F12
+          HELP=HLPF12
+          ACTION='CANCEL SET'
+          VARUPD=NO
+          .F12=Cancel
+
+:KEYI     KEY=HELP
+          HELP=HLPHLP
+          ACTION=HELP.
+
+:KEYI     KEY=PAGEDOWN
+          HELP=HLPPGD
+          ACTION=PAGEDOWN.
+
+:KEYI     KEY=PAGEUP
+          HELP=HLPPGU
+          ACTION=PAGEUP.
+
+:KEYI     KEY=PRINT
+          HELP=HLPPRT
+          ACTION=PRINT.
+:EKEYL.
+
+.*-- Panel definition:
+:PANEL    NAME=CBX168P
+          KEYL=FKEYS
+          ENTER='RETURN 500'
+          HELP='WRKDTAQ/'
+          TT=PNLTT
+          TOPSEP=DATETIME
+          DATE=DATE
+          TIME=TIMZON
+          .Work with Data Queues
+
+.*-- List presentation area:
+:LIST     DEPTH='*'
+          LISTDEF=DTLLST
+          MAXHEAD=2
+          VIEW=ALTVIEW
+          ACTOR=UIM
+          SCROLL=YES
+          PARMS=CMDPRM.
+
+:TOPINST .Type options, press Enter.
+
+:LISTACT  ENTER='CMD ?SNDDTAQE ?*DTAQ(&DTQNAM) ?*DTAQLIB(&DTQLIB) '
+          ENTER='&CMDPRM'
+          PROMPT='CMD ?SNDDTAQE ?*DTAQ(&DTQNAM) ?*DTAQLIB(&DTQLIB) '
+          PROMPT='&CMDPRM'
+          HELP='WRKDTAQ/OPTSNDE'
+          OPTION=1
+          .1=Send entry
+
+:LISTACT  ENTER='CMD CHGDTAQ DTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          PROMPT='CMD ?CHGDTAQ ?*DTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          HELP='WRKDTAQ/OPTCHG'
+          NOCMD=PROMPT
+          OPTION=2
+          .2=Change
+
+:LISTACT  ENTER='CMD ?CPYDTAQD ?*FROMDTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          PROMPT='CMD ?CPYDTAQD ?*FROMDTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          HELP='WRKDTAQ/OPTCPY'
+          OPTION=3
+          .3=Copy
+
+:LISTACT  ENTER='CMD DLTDTAQ DTAQ(&DTQLIB/&DTQNAM)'
+          PROMPT='CMD ?DLTDTAQ ?*DTAQ(&DTQLIB/&DTQNAM)'
+          HELP='WRKDTAQ/OPTDLT'
+          CONFIRM=CNFPNL
+          USREXIT='CALL EXITPG'
+          OPTION=4
+          .4=Delete
+
+:LISTACT  ENTER='CMD DSPDTAQD DTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          PROMPT='CMD ?DSPDTAQD ?*DTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          HELP='WRKDTAQ/OPTDSPD'
+          OPTION=5
+          .5=Display description
+
+:LISTACT  ENTER='CMD DSPDTAQE DTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          PROMPT='CMD ?DSPDTAQE ?*DTAQ(&DTQLIB/&DTQNAM) &CMDPRM'
+          HELP='WRKDTAQ/OPTDSPE'
+          OPTION=8
+          .8=Display entries
+
+:LISTACT  ENTER='CMD ?CHGOBJD ?*OBJ(&DTQLIB/&DTQNAM) ?*OBJTYPE(*DTAQ) '
+          ENTER='&CMDPRM'
+          PROMPT='CMD ?CHGOBJD ?*OBJ(&DTQLIB/&DTQNAM) ?*OBJTYPE(*DTAQ) '
+          PROMPT='&CMDPRM'
+          HELP='WRKDTAQ/OPTCOD'
+          USREXIT='CALL EXITPG'
+          NOCMD=PROMPT
+          OPTION=13
+          .13=Change description
+
+:LISTACT  ENTER='CMD CLRDTAQ DTAQ(&DTQNAM) DTAQLIB(&DTQLIB)'
+          ENTER='&CMDPRM'
+          PROMPT='CMD ?CLRDTAQ ?*DTAQ(&DTQNAM) ?*DTAQLIB(&DTQLIB)'
+          PROMPT='&CMDPRM'
+          HELP='WRKDTAQ/OPTCLR'
+          OPTION=14
+          CONFIRM=CNFPNL2
+          .14=Clear
+
+:LISTCOL  VAR=OPTION
+          USAGE=INOUT
+          MAXWIDTH=3
+          HELP='WRKDTAQ/OPTION'
+          .Opt
+
+:LISTCOL  VAR=DTQNAM
+          USAGE=OUT
+          MAXWIDTH=10
+          HELP='WRKDTAQ/DTQNAM'
+          .'Data queue'
+
+:LISTCOL  VAR=DTQLIB
+          USAGE=OUT
+          MAXWIDTH=10
+          HELP='WRKDTAQ/DTQLIB'
+          .Library
+
+:LISTCOL  VAR=DTQTYP
+          USAGE=OUT
+          MAXWIDTH=5
+          HELP='WRKDTAQ/DTQTYP'
+          .Type
+
+:LISTCOL  VAR=DTQTXT
+          USAGE=OUT
+          MAXWIDTH='*'
+          HELP='WRKDTAQ/DTQTXT'
+          .Text
+
+:LISTVIEW COLS='OPTION DTQNAM DTQLIB DTQTYP DTQTXT'.
+:LISTVIEW COLS='OPTION DTQNAM DTQLIB DTQTXT'.
+:ELIST.
+
+:CMDLINE  SIZE=SHORT
+          .Parameters or command
+:EPANEL.
+
+.*-- Panel definition:
+:PANEL    NAME=CNFPNL
+          KEYL=CNFKEYS
+          ENTER='RETURN 100'
+          HELP='CNFPNL/'
+          TOPSEP=DATETIME
+          DATE=DATE
+          TIME=TIMZON
+          .Confirm Delete of Data Queue
+
+.*-- List presentation area:
+:LIST     DEPTH='*'
+          LISTDEF=CNFLST
+          MAXHEAD=2
+          VIEW=ALTVIEW
+          SCROLL=YES.
+
+:TOPINST.Press Enter to confirm your choices of 4=Delete.
+:TOPINST.Press F12 to return to change your choices.
+
+:LISTCOL  VAR=OPTION
+          USAGE=OUT
+          MAXWIDTH=3
+          HELP='CNFPNL/OPTION'
+          .Opt
+
+:LISTCOL  VAR=DTQNAM
+          USAGE=OUT
+          MAXWIDTH=10
+          HELP='WRKDTAQ/DTQNAM'
+          .'Data Queue'
+
+:LISTCOL  VAR=DTQLIB
+          USAGE=OUT
+          MAXWIDTH=10
+          HELP='WRKDTAQ/DTQLIB'
+          .Library
+
+:LISTCOL  VAR=DTQTYP
+          USAGE=OUT
+          MAXWIDTH=5
+          HELP='WRKDTAQ/DTQTYP'
+          .Type
+
+:LISTCOL  VAR=DTQTXT
+          USAGE=OUT
+          MAXWIDTH='*'
+          HELP='WRKDTAQ/DTQTXT'
+          .'Text'
+
+:LISTVIEW COLS='OPTION DTQNAM DTQLIB DTQTYP DTQTXT'.
+:LISTVIEW COLS='OPTION DTQNAM DTQLIB DTQTXT'.
+
+:ELIST.
+:EPANEL.
+
+.*-- Panel definition:
+:PANEL    NAME=CNFPNL2
+          KEYL=CNFKEYS
+          ENTER='RETURN 100'
+          HELP='CNFPNL2/'
+          TOPSEP=DATETIME
+          DATE=DATE
+          TIME=TIMZON
+          .Confirm Clearing of Data Queue
+
+.*-- List presentation area:
+:LIST     DEPTH='*'
+          LISTDEF=CNFLST
+          MAXHEAD=2
+          VIEW=ALTVIEW
+          SCROLL=YES.
+
+:TOPINST.Press Enter to confirm your choices of 14=Clear.
+:TOPINST.Press F12 to return to change your choices.
+
+:LISTCOL  VAR=OPTION
+          USAGE=OUT
+          MAXWIDTH=3
+          HELP='CNFPNL2/OPTION'
+          .Opt
+
+:LISTCOL  VAR=DTQNAM
+          USAGE=OUT
+          MAXWIDTH=10
+          HELP='WRKDTAQ/DTQNAM'
+          .'Data Queue'
+
+:LISTCOL  VAR=DTQLIB
+          USAGE=OUT
+          MAXWIDTH=10
+          HELP='WRKDTAQ/DTQLIB'
+          .Library
+
+:LISTCOL  VAR=DTQTYP
+          USAGE=OUT
+          MAXWIDTH=5
+          HELP='WRKDTAQ/DTQTYP'
+          .Type
+
+:LISTCOL  VAR=DTQTXT
+          USAGE=OUT
+          MAXWIDTH='*'
+          HELP='WRKDTAQ/DTQTXT'
+          .'Text'
+
+:LISTVIEW COLS='OPTION DTQNAM DTQLIB DTQTYP DTQTXT'.
+:LISTVIEW COLS='OPTION DTQNAM DTQLIB DTQTXT'.
+
+:ELIST.
+:EPANEL.
+
+:EPNLGRP.

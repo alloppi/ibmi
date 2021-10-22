@@ -1,0 +1,522 @@
+.*-----------------------------------------------------------------------**
+.*
+.*  Compile options:
+.*
+.*    CrtPnlGrp PnlGrp( cbx167H )
+.*              SrcFile( QPNLSRC )
+.*              SrcMbr( cbx167H )
+.*
+.*-----------------------------------------------------------------------**
+:PNLGRP.
+
+.* Command help section:
+:HELP NAME='DSPDTAQE'.Display Data Queue Entries - Help
+:P.
+The Display Data Queue Entries (DSPDTAQE) command allows you to
+display a list of all entries currently in the specified data queue.
+:P.
+The information includes key data for keyed data queues, provided that
+the sequence parameter special value *BYKEY is specified.  For data
+queues that were created with the SENDERID(*YES) parameter, the sender
+information is also displayed.
+:EHELP.
+
+:HELP NAME='DSPDTAQE/DTAQ'.Data queue (DTAQ) - Help
+:XH3.Data queue (DTAQ)
+:P.
+Specifies the data queue for which to display the current data queue
+entries.
+:P.
+This is a required parameter.
+:P.
+:XH3.Library
+:P.
+Specifies the name of the library where the data queue is located.
+:P.
+The possible values are:
+:P.
+:PARML.
+:PT.:PK DEF.*LIBL:EPK.
+:PD.
+All libraries in the user and system portions of the job's library
+list are searched until the first match is found.
+:PT.:PK.*CURLIB:EPK.
+:PD.
+The current library for the job is used to locate the data queue.  If
+no library is specified as the current library for the job, the QGPL
+library is used.
+:PT.:PV.library-name:EPV.
+:PD.
+Specify the library where the data queue is located.
+:EPARML.
+:EHELP.
+
+:HELP NAME='DSPDTAQE/SEQ'.Sequence (SEQ) - Help
+:XH3.Sequence (SEQ)
+:P.
+The sequence parameter defining the display order and extent of the
+data queue entry list.
+:P.
+The possible values are:
+:P.
+:PARML.
+:PT.:PK DEF.*DTAQDFN:EPK.
+:PD.
+All messages are to be returned in the order based on the type of data
+queue.  FIFO queues are returned in FIFO order, LIFO queues are
+returned in LIFO order and keyed queues are returned in ascending key
+order.
+:PT.:PK.*DTAQREV:EPK.
+:PD.
+All messages are to be returned in reverse order of the type of data
+queue.  For example, LIFO queues are returned in FIFO order.
+:PT.:PK.*BYKEY:EPK.
+:PD.
+Messages meeting the
+:LINK PERFORM='DSPHELP DSPDTAQE/SELECT'.
+SELECT
+:ELINK.
+parameter are to be returned.
+:PT.:PK.*FIRST:EPK.
+:PD.
+The first message is to be returned only.
+:PT.:PK.*LAST:EPK.
+:PD.
+The last message is to be returned only.
+:EPARML.
+:EHELP.
+
+:HELP NAME='DSPDTAQE/SELECT'.Select queue entries (SELECT) - Help
+:XH3.Select queue entries (SELECT)
+:P.
+Specifies the subset of data queue entries to list for a keyed data
+queue.
+:P.
+:XH3.Relational operator
+:P.
+A relational operator specifying the comparison criteria between the
+message key specified and the actual keys of the messages in the data
+queue.
+:P.
+The possible values are:
+:P.
+:PARML.
+:PT.:PK.*GT:EPK.
+:PD.
+All messages with a key greater than that specified in the key field
+are to be returned.
+:PT.:PK.*LT:EPK.
+:PD.
+All messages with a key less than that specified in the key field are
+to be returned.
+:PT.:PK.*NE:EPK.
+:PD.
+All messages with a key not equal to that specified in the key field
+are to be returned.
+:PT.:PK.*EQ:EPK.
+:PD.
+All messages with a key equal to that specified in the key field are to
+be returned.
+:PT.:PK.*GE:EPK.
+:PD.
+All messages with a key greater than or equal to that specified in the
+key field are to be returned.
+:PT.:PK.*LE:EPK.
+:PD.
+All messages with a key less than or equal to that specified in the key
+field are to be returned.
+:EPARML.
+:XH3.Key value
+:P.
+The key field value to be compared with the actual keys of the messages
+on the data queue.
+:P.
+The possible values are:
+:P.
+:PARML.
+:PT.:PK.*BLANK:EPK.
+:PD.
+A key value of blanks is used in the key comparison process.
+:PT.:PV.key-value:EPV.
+:PD.
+Specifies the key value to be used in the key comparison process.
+:EPARML.
+:XH3.Key length
+:P.
+The length of the data provided in the key field.
+:P.
+The possible values are:
+:P.
+:PARML.
+:PT.:PK DEF.*DTAQDFN:EPK.
+:PD.
+A key value length equal to key length specified in the data queue
+description is assumed.
+:PT.:PV.key-length:EPV.
+:PD.
+Specifies the length of the key value entered.
+:EPARML.
+:EHELP.
+
+.* Panel help section:
+:HELP NAME=HLPFKEYS.
+Function Keys - Help
+:XH3.Function keys
+:EHELP.
+
+:HELP NAME=HLPENT.
+:PARML.
+:PT.Enter
+:PD.Submits information on the display for processing.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF1.
+:PARML.
+:PT.F1=Help
+:PD.Provides additional information about using the display.
+:EPARML.
+:EHELP.
+
+:HELP     NAME=HLPF3.
+:PARML.
+:PT.F3=Exit
+:PD.Ends the current task and returns you to the display from which
+the task was started.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF4.
+:PARML.
+:PT.F4=Prompt
+:PD.Provides assistance in entering or selecting a command.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF5.
+:PARML.
+:PT.F5=Refresh
+:PD.Shows the display you are viewing with updated information.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF9.
+:PARML.
+:PT.F9=Retrieve
+:PD.Displays the last command you entered on the command line and any
+parameters you included.  Pressing this key once, shows the last
+command you ran.  Pressing this key twice, shows the command you ran
+before that and so on.
+:EPARML.
+:EHELP.
+
+:HELP NAME='HLPF11/VIEW1'.
+:PARML.
+:PT.F11=View 2
+:PD.Shows the list again displaying the data queue entry key value.
+:EPARML.
+:EHELP.
+
+:HELP NAME='HLPF11/VIEW2'.
+:PARML.
+:PT.F11=View 3
+:PD.Shows the list again displaying information about the data queue
+entry.
+:EPARML.
+:EHELP.
+
+:HELP NAME='HLPF11/VIEW3'.
+:PARML.
+:PT.F11=View 1
+:PD.Shows the list again displaying the data queue entry data.
+:EPARML.
+:EHELP.
+
+:HELP NAME='HLPF11/VIEW21'.
+:PARML.
+:PT.F11=View 2
+:PD.Shows the entry or key data again in hexadecimal form.
+:EPARML.
+:EHELP.
+
+:HELP NAME='HLPF11/VIEW22'.
+:PARML.
+:PT.F11=View 3
+:PD.Shows the entry or key data again in character form.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF12.
+:PARML.
+:PT.F12=Cancel
+:PD.Cancels processing of any options or changes you have made to the
+current display and returns you to the previous menu or display.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF17.
+:PARML.
+:PT.F17=Top
+:PD.Positions the display to the top of the list.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF18.
+:PARML.
+:PT.F18=Bottom
+:PD.Positions the display to the bottom of the list.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF24.
+:PARML.
+:PT.F24=More keys
+:PD.Changes the keys shown at the bottom of the display.  When you
+press this key, additional function keys are displayed at the bottom
+of the display.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPHLP.
+:PARML.
+:PT.Help
+:PD.Provides additional information about using the display.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPPGD.
+:PARML.
+:PT.Page Down (Roll Up)
+:PD.Moves the information displayed forward to show additional
+information.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPPGU.
+:PARML.
+:PT.Page Up (Roll Down)
+:PD.Moves the information displayed backward to show additional
+information.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPPRT.
+:PARML.
+:PT.Print
+:PD.Prints information currently shown on the display.
+:EPARML.
+:EHELP.
+
+:HELP NAME='DSPDTAQE/'.Display Data Queue Entry - Help
+:P.
+The display data queue entry display shows information about the data
+queue entries in the specified data queue.
+:P.
+You can type an option next to one or more entries.  Then, when the
+Enter key is pressed, the function associated with the number you typed
+is performed for that entry.
+:P.
+If you press the Enter key without typing any other data, you are
+returned to the previous menu or display.
+:P.
+To run a command, type the command and press the Enter key.  For
+assistance in typing the command, type the command and press F4.  For
+assistance in selecting a command, press F4 without typing anything.
+:P.
+If you see More ... on the lower right side of your display, there is
+more information to view.  Press Page Down (Roll Up) to move toward the
+end of the information.  Press Page Up (Roll Down) to move toward the
+beginning of the information.
+:P.
+If you see Bottom instead of More ..., you are at the end of the list.
+:P.
+:EHELP.
+
+:HELP NAME='DSPDTAQE/OPTDTA'.
+:PARML.
+:PT.5=Display entry data
+:PD.Use this option display all entry data for the selected data queue
+entry.
+:EPARML.
+:EHELP.
+
+:HELP NAME='DSPDTAQE/OPTKEY'.
+:PARML.
+:PT.6=Display entry key
+:PD.Use this option display the full entry key value for the selected
+data queue entry.
+:EPARML.
+:EHELP.
+
+:HELP NAME='DSPDTAQE/OPTION'.
+Option - Help
+:XH3.Opt
+:P.
+Type the number of the option you want to specify.
+:EHELP.
+
+:HELP name='DSPDTAQE/DTQENT'.
+Entry data - Help
+:XH3.Entry data
+:P.
+The data queue entry data.
+:EHELP.
+
+:HELP name='DSPDTAQE/DTQKEY'.
+Entry key - Help
+:XH3.Entry key
+:P.
+The data queue entry key value.
+:EHELP.
+
+:HELP name='DSPDTAQE/ENQDAT'.
+Date - Help
+:XH3.Date
+:P.
+The enqueue date of the data queue entry.
+:EHELP.
+
+:HELP name='DSPDTAQE/ENQTIM'.
+Time - Help
+:XH3.Time
+:P.
+The enqueue time of the data queue entry.
+:EHELP.
+
+:HELP name='DSPDTAQE/SNDINF'.
+Sender information - Help
+:XH3.Sender information
+:P.
+The sender information of the data queue entry.
+:P.
+The sender information field has the following format:
+:P.
+:HP2.Offset&COLON.   Length&COLON.   Description&COLON.:EHP2.
+:LINES.
+     1        10    Job name
+    11        10    Job user profile
+    21         6    Job number
+    27        10    Current user profile
+:ELINES.
+:P.
+If no sender information is associated with the data queue entry, the
+special value *NONE is displayed.
+:EHELP.
+
+:HELP name='DSPDTAQE/ENTID'.
+Entry number - Help
+:XH3.Entry number
+:P.
+The temporary data queue entry number assigned in the order the data
+queue entries are retrieved and listed.
+:EHELP.
+
+:HELP name='DSPDTAQE/DTQNAM'.
+Data queue - Help
+:XH3.Data queue
+:P.
+The name of the data queue whose entries are displayed.
+:EHELP.
+
+:HELP name='DSPDTAQE/DTQLIB'.
+Library - Help
+:XH3.Library
+:P.
+The library where the data queue is located.
+:EHELP.
+
+:HELP name='DSPDTAQE/DTQSEQ'.
+Sequence - Help
+:XH3.Sequence
+:P.
+The sequence attribute of the data queue.  The possible values are:
+:UL COMPACT.
+:LI.*FIFO : First-in first-out sequence
+:LI.*LIFO : Last-in first-out sequence
+:LI.*KEYED: Keyed sequence
+:EUL.
+:EHELP.
+
+:HELP name='DSPDTAQE/CURENT'.
+Entry count - Help
+:XH3.Entry count
+:P.
+The number of data queue entries current existing in the data queue.
+:EHELP.
+
+:HELP NAME='DSPDTA/'.Display Data Panel - Help
+:P.
+The display data panel shows the data queue entry data or data queue
+entry key value of the selected data queue entry.
+:P.
+If you see More ... on the lower right side of your display, there is
+more information to view.  Press Page Down (Roll Up) to move toward the
+end of the information.  Press Page Up (Roll Down) to move toward the
+beginning of the information.
+:P.
+If you see Bottom instead of More ..., you are at the end of the list.
+:P.
+:EHELP.
+
+:HELP name='DSPDTA/ENTID2'.
+Entry number - Help
+:XH3.Entry number
+:P.
+The temporary data queue entry number assigned in the order the data
+queue entries are retrieved and listed.
+:EHELP.
+
+:HELP name='DSPDTA/KEYLEN2'.
+Key length - Help
+:XH3.Key length
+:P.
+The length of the key data retrieved from the data queue entry.
+:EHELP.
+
+:HELP name='DSPDTA/ENTLEN2'.
+Entry length - Help
+:XH3.Entry length
+:P.
+The length of the entry data retrieved from the data queue entry.
+:EHELP.
+
+:HELP name='DSPDTA/CHROFS'.
+Offset - Help
+:XH3.Offset
+:P.
+The decimal offset of the block of character data displayed.  This is
+the starting position of the character data displayed in the next
+column.
+:EHELP.
+
+:HELP name='DSPDTA/HEXOFS'.
+Offset - Help
+:XH3.Offset
+:P.
+The decimal offset of the block of hexadecimal data displayed.  This is
+the starting position of the hexadecimal data displayed in the next
+column.
+:EHELP.
+
+:HELP name='DSPDTA/CHRDTA'.
+Character data - Help
+:XH3.Character data
+:P.
+The data in character format.  A blank line is inserted between each
+line of data to align the character data with the hexadecimal data.
+This ensures an exact overlay of the two different formats if you use
+function key F11 to toggle between character and hexadecimal format.
+:EHELP.
+
+:HELP name='DSPDTA/HEXDTA'.
+Hexadecimal data - Help
+:XH3.Hexadecimal data
+:P.
+The data in hexadecimal format.  The hexadecimal nibbles are displayed
+on top of each other to align each hexadecimal byte with its equivalent
+character byte.  This ensures an exact overlay of the two different
+formats if you use function key F11 to toggle between character and
+hexadecimal format.
+:EHELP.
+
+:EPNLGRP.

@@ -1,0 +1,8 @@
+      *
+      *  To compile:
+      *
+      *             CRTPF FILE(XXX/SFLDTAQLF) SRCFILE(XXX/QDDSSRC)
+      *
+     A          R PFR                       PFILE(SFLDTAQPF)
+     A          K DBLNAM
+     A          K DBFNAM

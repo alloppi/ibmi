@@ -1,0 +1,143 @@
+      *
+      *  To compile:
+      *
+      *             CRTDSPF FILE(XXX/SFLDTAQDF) SRCFILE(XXX/QDDSSRC)
+      *
+      *=======================================================================
+     A*
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      ERRSFL
+     A                                      CA03
+     A                                      CA12
+     A*
+     A          R SFL1                      SFL
+     A*
+     A  74                                  SFLNXTCHG
+     A            DBIDNM    R        H      REFFLD(PFR/DBIDNM *LIBL/SFLDTAQPF)
+     A            OPTION         1A  B 10  3VALUES(' ' '2' '4' '5')
+     A            DBLNAM    R        O 10  7REFFLD(PFR/DBLNAM *LIBL/SFLDTAQPF)
+     A            DBFNAM    R        O 10 31REFFLD(PFR/DBFNAM *LIBL/SFLDTAQPF)
+     A*
+     A          R SF1CTL                    SFLCTL(SFL1)
+     A*%%TS  SD  20020520  173810  I013KMV     REL-V5R1M0  5722-WDS
+     A                                      SFLSIZ(0012)
+     A                                      SFLPAG(0012)
+     A                                      CF06
+     A                                      ROLLUP
+     A                                      ROLLDOWN
+     A                                      OVERLAY
+     A N32                                  SFLDSP
+     A N31                                  SFLDSPCTL
+     A  31                                  SFLCLR
+     A  90                                  SFLEND(*MORE)
+     A            RRN1           4S 0H      SFLRCDNBR
+     A                                  9  7'Last Name'
+     A                                      DSPATR(HI)
+     A                                  9 31'First Name'
+     A                                      DSPATR(HI)
+     A                                  1  2'SFLD04RG'
+     A                                  1 71DATE
+     A                                      EDTCDE(Y)
+     A                                  2 71TIME
+     A                                  1 24'Subfile Program with Update     '
+     A                                      DSPATR(HI)
+     A                                  4  2'Position to Last Name . . .'
+     A            PTNAME        20A  B  4 30
+     A                                  9  2'Opt'
+     A                                      DSPATR(HI)
+     A                                  6  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  7  4'2=Change'
+     A                                      COLOR(BLU)
+     A                                  7 19'4=Delete'
+     A                                      COLOR(BLU)
+     A                                  7 34'5=Display'
+     A                                      COLOR(BLU)
+     A*
+     A          R PANEL1
+     A*%%TS  SD  20020520  173810  I013KMV     REL-V5R1M0  5722-WDS
+     A                                  1  2'SFL004RG'
+     A            MODE           6A  O  2  2DSPATR(HI)
+     A                                  1 24'Subfile Program with Update     '
+     A                                      DSPATR(HI)
+     A                                  1 71DATE
+     A                                      EDTCDE(Y)
+     A                                  2 71TIME
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 12'F12=Cancel'
+     A                                      COLOR(BLU)
+     A                                  4  3'Customer Number . :'
+     A                                  6  3'First Name. . . . .'
+     A                                  8  3'Last Name . . . . .'
+     A            DBIDNM    R        O  4 20REFFLD(PFR/DBIDNM *LIBL/SFLDTAQPF)
+     A            DBFNAM    R        B  6 23REFFLD(PFR/DBFNAM *LIBL/SFLDTAQPF)
+     A            DBLNAM    R        B  8 23REFFLD(PFR/DBLNAM *LIBL/SFLDTAQPF)
+     A          R PANEL2
+     A*
+     A                                  1  2'SFLDTAQRG'
+     A            MODE           6   O  2  2DSPATR(HI)
+     A                                  1 24'Subfile Program with Update     '
+     A                                      DSPATR(HI)
+     A                                  1 71DATE
+     A                                      EDTCDE(Y)
+     A                                  2 71TIME
+     A            DBIDNM    R        O  4 20REFFLD(PFR/DBIDNM *LIBL/SFLDTAQPF)
+     A                                      DSPATR(HI)
+     A            DBFNAM    R        O  6 20REFFLD(PFR/DBFNAM *LIBL/SFLDTAQPF)
+     A                                      DSPATR(HI)
+     A            DBLNAM    R        O  8 20REFFLD(PFR/DBLNAM *LIBL/SFLDTAQPF)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 12'F12=Cancel'
+     A                                      COLOR(BLU)
+     A                                  4  3'Customer Number:'
+     A                                  6  3'First Name . . :'
+     A                                  8  3'Last Name. . . :'
+     A*
+     A*
+     A          R WINDOW1                   SFL
+     A*
+     A            DBIDNM    R        H      REFFLD(PFR/DBIDNM *LIBL/SFLDTAQPF)
+     A            DBLNAM    R        O  6  2REFFLD(PFR/DBLNAM *LIBL/SFLDTAQPF)
+     A            DBFNAM    R        O  6 26REFFLD(PFR/DBFNAM *LIBL/SFLDTAQPF)
+     A*
+     A          R SF2CTL                    SFLCTL(WINDOW1)
+     A*
+     A                                      SFLDSP
+     A N41                                  SFLDSPCTL
+     A  41                                  SFLCLR
+     A N41                                  SFLEND(*MORE)
+     A                                      SFLSIZ(0009)
+     A                                      SFLPAG(0008)
+     A                                      WINDOW(4 10 16 52)
+     A            RRN2           4S 0H
+     A                                  5  2'Last Name'
+     A                                      DSPATR(HI)
+     A                                  5 26'First Name'
+     A                                      DSPATR(HI)
+     A                                  2  2'Press ENTER to confirm your choice-
+     A                                      s for delete.'
+     A                                      COLOR(BLU)
+     A                                  3  2'Press F12=Cancel to return to chan-
+     A                                      ge your choices.'
+     A                                      COLOR(BLU)
+     A*
+     A          R FKEY1
+     A*
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                    +3'F6=Add'
+     A                                      COLOR(BLU)
+     A                                    +3'F12=Cancel'
+     A                                      COLOR(BLU)
+     A*
+     A          R FKEY2
+     A*
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                    +3'F12=Cancel'
+     A                                      COLOR(BLU)

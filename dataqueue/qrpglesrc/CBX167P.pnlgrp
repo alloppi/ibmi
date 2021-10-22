@@ -1,0 +1,547 @@
+.*-----------------------------------------------------------------------**
+.*
+.*  Compile options:
+.*
+.*    CrtPnlGrp PnlGrp( CBX167P )
+.*              SrcFile( QPNLSRC )
+.*              SrcMbr( *PNLGRP )
+.*
+.*
+.*-----------------------------------------------------------------------**
+:PNLGRP.
+
+:COPYR.
+(C) System iNetwork Programming Tips 2007.
+
+.*-- Import help panel group:
+:IMPORT   NAME='*'        PNLGRP=CBX167H.
+.*-- Class definitions:
+:CLASS    NAME=CLACTION   BASETYPE=ACTION      WIDTH=1.
+:ECLASS.
+:CLASS    NAME=CLEXITPG   BASETYPE='CHAR 20'.
+:ECLASS.
+:CLASS    NAME=CLCSREID   BASETYPE='CHAR 4'.
+:ECLASS.
+:CLASS    NAME=CLCSRVAL   BASETYPE='CHAR 10'.
+:ECLASS.
+:CLASS    NAME=CLALTVIEW  BASETYPE='BIN 15'.
+:ECLASS.
+:CLASS    NAME=CLCTLDTA   BASETYPE='CHAR 8'.
+:ECLASS.
+:CLASS    NAME=CLTIMZON   BASETYPE='TIME ZONE'.
+:ECLASS.
+:CLASS    NAME=CLDATE     BASETYPE='DATE 2'.
+:ECLASS.
+:CLASS    NAME=CLTIME     BASETYPE='TIME'.
+:ECLASS.
+:CLASS    NAME=CLPRMDTA   BASETYPE='CHAR 307'.
+:ECLASS.
+:CLASS    NAME=CLOBJNAM   BASETYPE='OBJNAME 10'.
+:ECLASS.
+:CLASS    NAME=CLDTQSEQ   BASETYPE='CHAR 1'    WIDTH=6.
+:TL.
+:TI  VALUE='"F"'.*FIFO
+:TI  VALUE='"L"'.*LIFO
+:TI  VALUE='"K"'.*KEYED
+:ETL.
+:ECLASS.
+:CLASS    NAME=CLLSTSEQ   BASETYPE='CHAR 1'.
+:ECLASS.
+:CLASS    NAME=CLCURENT   BASETYPE='BIN 31'.
+:ECLASS.
+:CLASS    NAME=CLENTID    BASETYPE='BIN 31'.
+:ECLASS.
+:CLASS    NAME=CLDTQENT   BASETYPE='CHAR 256'.
+:ECLASS.
+:CLASS    NAME=CLDTQKEY   BASETYPE='CHAR 256'.
+:ECLASS.
+:CLASS    NAME=CLSNDINF   BASETYPE='CHAR 36'.
+:ECLASS.
+:CLASS    NAME=CLENTLEN   BASETYPE='BIN 31'.
+:ECLASS.
+:CLASS    NAME=CLKEYLEN   BASETYPE='BIN 31'.
+:ECLASS.
+
+:CLASS    NAME=CLDSPTYP   BASETYPE='CHAR 1'    WIDTH=32.
+:TL.
+:TI  VALUE='"E"'.Display data queue entry
+:TI  VALUE='"K"'. Display data queue key
+:ETL.
+:ECLASS.
+:CLASS    NAME=CLOFFSET   BASETYPE='BIN 15'.
+:TL.
+:TI  VALUE='0'.
+:ETL.
+:ECLASS.
+:CLASS    NAME=CLDTASTR   BASETYPE='CHAR 66'.
+:ECLASS.
+
+.*-- Variable definitions:
+:VAR      NAME=OPTION    CLASS=CLACTION.
+:VAR      NAME=CSREID    CLASS=CLCSREID.
+:VAR      NAME=CSRVAR    CLASS=CLCSRVAL.
+:VAR      NAME=EXITPG    CLASS=CLEXITPG.
+:VAR      NAME=LISTPG    CLASS=CLEXITPG.
+:VAR      NAME=DATE      CLASS=CLDATE.
+:VAR      NAME=TIMZON    CLASS=CLTIMZON.
+:VAR      NAME=ALTVIEW   CLASS=CLALTVIEW.
+:VAR      NAME=ALTVIEW2  CLASS=CLALTVIEW.
+:VAR      NAME=CTLDTA    CLASS=CLCTLDTA.
+:VAR      NAME=PRMDTA    CLASS=CLPRMDTA.
+
+:VAR      NAME=DTQNAM    CLASS=CLOBJNAM.
+:VAR      NAME=DTQLIB    CLASS=CLOBJNAM.
+:VAR      NAME=DTQSEQ    CLASS=CLDTQSEQ.
+:VAR      NAME=CURENT    CLASS=CLCURENT.
+:VAR      NAME=LSTSEQ    CLASS=CLLSTSEQ.
+
+:VAR      NAME=ENTID     CLASS=CLENTID.
+:VAR      NAME=DTQENT    CLASS=CLDTQENT.
+:VAR      NAME=DTQKEY    CLASS=CLDTQKEY.
+:VAR      NAME=SNDINF    CLASS=CLSNDINF.
+:VAR      NAME=ENQDAT    CLASS=CLDATE.
+:VAR      NAME=ENQTIM    CLASS=CLTIME.
+:VAR      NAME=ENTLEN    CLASS=CLENTLEN.
+:VAR      NAME=KEYLEN    CLASS=CLKEYLEN.
+
+:VAR      NAME=DSPTYP    CLASS=CLDSPTYP.
+:VAR      NAME=ENTLEN2   CLASS=CLENTLEN.
+:VAR      NAME=KEYLEN2   CLASS=CLKEYLEN.
+:VAR      NAME=ENTID2    CLASS=CLENTID.
+:VAR      NAME=CHROFS    CLASS=CLOFFSET.
+:VAR      NAME=HEXOFS    CLASS=CLOFFSET.
+:VAR      NAME=CHRDTA    CLASS=CLDTASTR.
+:VAR      NAME=HEXDTA    CLASS=CLDTASTR.
+
+.*-- Variable record definitions:
+:VARRCD   NAME=EXPRCD
+          VARS='EXITPG LISTPG'.
+
+:VARRCD   NAME=CTLRCD
+          VARS='CTLDTA'.
+
+:VARRCD   NAME=PRMRCD
+          VARS='PRMDTA'.
+
+:VARRCD   NAME=CSRRCD
+          VARS='CSREID CSRVAR'.
+
+:VARRCD   NAME=HDRRCD
+          VARS='DATE TIMZON DTQNAM DTQLIB DTQSEQ CURENT LSTSEQ'.
+
+:VARRCD   NAME=DTLRCD
+          VARS='OPTION ENTID DTQENT DTQKEY SNDINF ENQDAT ENQTIM'
+          VARS='ENTLEN KEYLEN'.
+
+:VARRCD   NAME=HDRRCD2
+          VARS='DSPTYP ENTID2 ENTLEN2 KEYLEN2'.
+
+:VARRCD   NAME=DTARCD
+          VARS='CHROFS HEXOFS CHRDTA HEXDTA'.
+
+.*-- List definition:
+:LISTDEF  NAME=DTLLST
+          VARS='OPTION ENTID DTQENT DTQKEY SNDINF ENQDAT ENQTIM'
+          VARS='ENTLEN KEYLEN'
+          MSGID=CBX1001
+          MSGF='CBX167M'.
+
+.*-- List definition:
+:LISTDEF  NAME=DTALST
+          VARS='CHROFS HEXOFS CHRDTA HEXDTA'.
+
+.*-- Conditions:
+:COND     NAME=SEQKEY     EXPR='LSTSEQ *EQ "K"'.
+
+:COND     NAME=DSPENT     EXPR='DSPTYP *EQ "E"'.
+:COND     NAME=DSPKEY     EXPR='DSPTYP *EQ "K"'.
+
+:COND     NAME=VIEW1      EXPR='ALTVIEW = 0'.
+:COND     NAME=VIEW2      EXPR='ALTVIEW = 1'.
+:COND     NAME=VIEW3      EXPR='ALTVIEW = 2'.
+
+:COND     NAME=VIEW21     EXPR='ALTVIEW2 = 0'.
+:COND     NAME=VIEW22     EXPR='ALTVIEW2 = 1'.
+
+:TT       NAME=PNLTT1
+          CONDS= 'VIEW1   VIEW2   VIEW3'.
+:TTROW    VALUES='  1       0       0  '.
+:TTROW    VALUES='  0       1       0  '.
+:TTROW    VALUES='  0       0       1  '.
+:ETT.
+
+:TT       NAME=PNLTT2
+          CONDS= 'VIEW21  VIEW22  DSPKEY  DSPENT'.
+:TTROW    VALUES='  1       0       1       0   '.
+:TTROW    VALUES='  0       1       1       0   '.
+:TTROW    VALUES='  1       0       0       1   '.
+:TTROW    VALUES='  0       1       0       1   '.
+:ETT.
+
+.*-- Key definitions - main panel:
+:KEYL     NAME=FKEYS
+          HELP=HLPFKEYS.
+
+:KEYI     KEY=ENTER
+          HELP=HLPENT
+          ACTION=ENTER.
+
+:KEYI     KEY=F1
+          HELP=HLPF1
+          ACTION=HELP.
+
+:KEYI     KEY=F3
+          HELP=HLPF3
+          ACTION='EXIT SET'
+          VARUPD=NO
+          .F3=Exit
+
+:KEYI     KEY=F4
+          HELP=HLPF4
+          PRIORITY=30
+          ACTION=PROMPT
+          .F4=Prompt
+
+:KEYI     KEY=F5
+          HELP=HLPF5
+          PRIORITY=20
+          ACTION='RETURN 5'
+          .F5=Refresh
+
+:KEYI     KEY=F9
+          HELP=HLPF9
+          PRIORITY=30
+          ACTION=RETRIEVE
+          .F9=Retrieve
+
+:KEYI     KEY=F11
+          HELP='HLPF11/VIEW1'
+          ACTION=CHGVIEW
+          COND=VIEW1
+          PRIORITY=20
+          .F11=Entry key
+
+:KEYI     KEY=F11
+          HELP='HLPF11/VIEW2'
+          ACTION=CHGVIEW
+          COND=VIEW2
+          PRIORITY=20
+          .F11=Entry information
+
+:KEYI     KEY=F11
+          HELP='HLPF11/VIEW3'
+          ACTION=CHGVIEW
+          COND=VIEW3
+          PRIORITY=20
+          .F11=Entry data
+
+:KEYI     KEY=F12
+          HELP=HLPF12
+          ACTION='CANCEL SET'
+          VARUPD=NO
+          .F12=Cancel
+
+:KEYI     KEY=F17
+          HELP=HLPF17
+          PRIORITY=40
+          ACTION='RETURN 17'
+          VARUPD=NO
+          .F17=Top
+
+:KEYI     KEY=F18
+          HELP=HLPF18
+          PRIORITY=40
+          ACTION='RETURN 18'
+          VARUPD=NO
+          .F18=Bottom
+
+:KEYI     KEY=F24
+          HELP=HLPF24
+          ACTION=MOREKEYS
+          .F24=More keys
+
+:KEYI     KEY=HELP
+          HELP=HLPHLP
+          ACTION=HELP.
+
+:KEYI     KEY=PAGEDOWN
+          HELP=HLPPGD
+          ACTION=PAGEDOWN.
+
+:KEYI     KEY=PAGEUP
+          HELP=HLPPGU
+          ACTION=PAGEUP.
+
+:KEYI     KEY=PRINT
+          HELP=HLPPRT
+          ACTION=PRINT.
+:EKEYL.
+
+.*-- Key definitions - display panel:
+:KEYL     NAME=FKEYS2
+          HELP=HLPFKEYS.
+
+:KEYI     KEY=ENTER
+          HELP=HLPENT
+          ACTION=ENTER.
+
+:KEYI     KEY=F1
+          HELP=HLPF1
+          ACTION=HELP.
+
+:KEYI     KEY=F3
+          HELP=HLPF3
+          ACTION='EXIT SET'
+          VARUPD=NO
+          .F3=Exit
+
+:KEYI     KEY=F11
+          HELP='HLPF11/VIEW21'
+          ACTION=CHGVIEW
+          COND=VIEW21
+          PRIORITY=20
+          .F11=Hexadecimal
+
+:KEYI     KEY=F11
+          HELP='HLPF11/VIEW22'
+          ACTION=CHGVIEW
+          COND=VIEW22
+          PRIORITY=20
+          .F11=Character
+
+:KEYI     KEY=F12
+          HELP=HLPF12
+          ACTION='CANCEL SET'
+          VARUPD=NO
+          .F12=Cancel
+
+:KEYI     KEY=F24
+          HELP=HLPF24
+          ACTION=MOREKEYS
+          .F24=More keys
+
+:KEYI     KEY=HELP
+          HELP=HLPHLP
+          ACTION=HELP.
+
+:KEYI     KEY=PAGEDOWN
+          HELP=HLPPGD
+          ACTION=PAGEDOWN.
+
+:KEYI     KEY=PAGEUP
+          HELP=HLPPGU
+          ACTION=PAGEUP.
+
+:KEYI     KEY=PRINT
+          HELP=HLPPRT
+          ACTION=PRINT.
+:EKEYL.
+
+.*-- Panel definition:
+:PANEL    NAME=CBX167P
+          KEYL=FKEYS
+          CSREID=CSREID
+          CSRVAR=CSRVAR
+          ENTER='RETURN 500'
+          HELP='DSPDTAQE/'
+          TT=PNLTT1
+          TOPSEP=DATETIME
+          DATE=DATE
+          TIME=TIMZON
+          .Display Data Queue Entries
+
+.*-- Data presentation area:
+
+:DATA     DEPTH=3
+          LAYOUT=2
+          BOTSEP=SPACE.
+
+:DATACOL  WIDTH=18.
+:DATACOL  WIDTH='*'.
+
+:DATAGRP  GRPSEP=QINDENT
+          COMPACT.
+
+:DATAI    VAR=DTQNAM
+          USAGE=OUT
+          HELP='DSPDTAQE/DTQNAM'
+          .Data queue
+
+:DATAI    VAR=DTQLIB
+          USAGE=OUT
+          HELP='DSPDTAQE/DTQLIB'
+          .Library
+:EDATAGRP.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT.
+
+:DATAI    VAR=DTQSEQ
+          USAGE=OUT
+          HELP='DSPDTAQE/DTQSEQ'
+          .Sequence
+
+:DATAI    VAR=CURENT
+          USAGE=OUT
+          HELP='DSPDTAQE/CURENT'
+          .Entry count
+:EDATAGRP.
+:EDATA.
+
+.*-- List presentation area:
+:LIST     DEPTH='*'
+          LISTDEF=DTLLST
+          MAXHEAD=2
+          VIEW=ALTVIEW
+          ACTOR=UIM
+          SCROLL=YES.
+
+:TOPINST .Type options, press Enter.
+
+:LISTACT  ENTER='CALL EXITPG'
+          HELP='DSPDTAQE/OPTDTA'
+          OPTION=5
+          .5=Display entry data
+
+:LISTACT  ENTER='CALL EXITPG'
+          HELP='DSPDTAQE/OPTKEY'
+          COND=SEQKEY
+          OPTION=6
+          .6=Display entry key
+
+:LISTCOL  VAR=OPTION
+          USAGE=INOUT
+          MAXWIDTH=3
+          HELP='DSPDTAQE/OPTION'
+          .Opt
+
+:LISTCOL  VAR=DTQENT
+          USAGE=OUT
+          MAXWIDTH=72
+          HELP='DSPDTAQE/DTQENT'
+          .'Entry data'
+
+:LISTCOL  VAR=DTQKEY
+          USAGE=OUT
+          MAXWIDTH=72
+          HELP='DSPDTAQE/DTQKEY'
+          .'Entry key'
+
+:LISTCOL  VAR=ENQDAT
+          USAGE=OUT
+          HELP='DSPDTAQE/ENQDAT'
+          MAXWIDTH=8
+          .Date
+
+:LISTCOL  VAR=ENQTIM
+          USAGE=OUT
+          HELP='DSPDTAQE/ENQTIM'
+          MAXWIDTH=8
+          .Time
+
+:LISTCOL  VAR=SNDINF
+          USAGE=OUT
+          MAXWIDTH=36
+          HELP='DSPDTAQE/SNDINF'
+          .'Sender information'
+
+:LISTCOL  VAR=ENTID
+          USAGE=OUT
+          MAXWIDTH=12
+          HELP='DSPDTAQE/ENTID'
+          .'Entry number'
+
+:LISTVIEW COLS='OPTION DTQENT'.
+:LISTVIEW COLS='OPTION DTQKEY'.
+:LISTVIEW COLS='OPTION SNDINF ENQDAT ENQTIM ENTID'.
+:ELIST.
+
+:CMDLINE  SIZE=SHORT
+          .Command
+
+:EPANEL.
+
+.*-- Panel definition:
+:PANEL    NAME=CBX167P2
+          KEYL=FKEYS2
+          TITLE=DSPTYP
+          ENTER='RETURN 500'
+          HELP='DSPDTA/'
+          TT=PNLTT2
+          TOPSEP=DATETIME
+          DATE=DATE
+          TIME=TIMZON.
+
+.*-- Data presentation area:
+
+:DATA     DEPTH=3
+          LAYOUT=2
+          BOTSEP=SPACE.
+
+:DATACOL  WIDTH=20.
+:DATACOL  WIDTH='*'.
+
+:DATAGRP  GRPSEP=NONE
+          COMPACT.
+
+:DATAI    VAR=ENTID2
+          USAGE=OUT
+          HELP='DSPDTA/ENTID2'
+          .Entry number
+
+:DATAI    VAR=KEYLEN2
+          USAGE=OUT
+          COND=DSPKEY
+          HELP='DSPDTA/KEYLEN2'
+          .Key length
+
+:DATAI    VAR=ENTLEN2
+          USAGE=OUT
+          COND=DSPENT
+          HELP='DSPDTA/ENTLEN2'
+          .Entry length
+:EDATAGRP.
+:EDATA.
+
+.*-- List presentation area:
+:LIST     DEPTH='*'
+          LISTDEF=DTALST
+          MAXHEAD=2
+          VIEW=ALTVIEW2
+          ACTOR=NONE
+          SCROLL=YES.
+
+:TOPINST .Press Enter to continue.
+
+:LISTCOL  VAR=CHROFS
+          USAGE=OUT
+          MAXWIDTH=6
+          HELP='DSPDTA/CHROFS'
+          .Offset
+
+:LISTCOL  VAR=CHRDTA
+          USAGE=OUT
+          MAXWIDTH=66
+          HELP='DSPDTA/CHRDTA'
+          .' Character data'
+           ' *...+....1....+....2....+....3....+....4....+....5....+....6....'
+
+:LISTCOL  VAR=HEXOFS
+          USAGE=OUT
+          MAXWIDTH=6
+          HELP='DSPDTA/CHROFS'
+          .Offset
+
+:LISTCOL  VAR=HEXDTA
+          USAGE=OUT
+          MAXWIDTH=66
+          HELP='DSPDTA/HEXDTA'
+          .' Hexadecimal data'
+           ' *...+....1....+....2....+....3....+....4....+....5....+....6....'
+
+:LISTVIEW COLS='CHROFS CHRDTA'.
+:LISTVIEW COLS='HEXOFS HEXDTA'.
+:ELIST.
+
+:EPANEL.
+:EPNLGRP.

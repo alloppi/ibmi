@@ -1,0 +1,454 @@
+.*-----------------------------------------------------------------------**
+.*
+.*  Compile options:
+.*
+.*    CrtPnlGrp PnlGrp( CBX165H )
+.*              SrcFile( QPNLSRC )
+.*              SrcMbr( CBX165H )
+.*
+.*-----------------------------------------------------------------------**
+:PNLGRP.
+
+:HELP NAME='DSPDTAQD'.Display Data Queue Description - Help
+:P.
+The Display Data Queue Description (DSPDTAQD) command displays
+information about the specified data queue.  The type of information
+varies depending on the type of data queue.
+:P.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/DTAQ'.Data queue (DTAQ) - Help
+:XH3.Data queue (DTAQ)
+:P.
+Specifies the data queue whose description should be displayed.
+:P.
+This is a required parameter.
+:P.
+:XH3.Library
+:P.
+The library containing the specified data queue.
+:P.
+The possible values are:
+:P.
+:PARML.
+:PT.:PK DEF.*LIBL:EPK.
+:PD.
+All libraries in the library list for the current thread are searched.
+All objects in these libraries with the specified object name are
+shown.
+:PT.:PK.*CURLIB:EPK.
+:PD.
+The current library for the thread is searched.  If no library is
+specified as the current library for the thread, the QGPL library is
+is searched.
+:PT.:PV.library-name:EPV.
+:PD.
+Specify the name of the library to be searched.
+:EPARML.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/OUTPUT'.Output (OUTPUT) - Help
+:XH3.Output (OUTPUT)
+:P.
+Specifies where the output from the command is sent.
+:P.
+The possible values are:
+:P.
+:PARML.
+:PT.:PK DEF.*:EPK.
+:PD.
+The output is displayed (if requested by an interactive job) or printed
+with the job's spooled output (if requested by a batch job).
+:PT.:PK.*PRINT:EPK.
+:PD.
+The output is printed with the job's spooled output.
+:EPARML.
+:EHELP.
+
+.* Panel help section:
+:HELP NAME=HLPFKEYS.
+Function Keys - Help
+:XH3.Function keys
+:EHELP.
+
+:HELP NAME=HLPENT.
+:PARML.
+:PT.Enter
+:PD.Returns to previous menu or display.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF1.
+:PARML.
+:PT.F1=Help
+:PD.Provides additional information about using the display.
+:EPARML.
+:EHELP.
+
+:HELP     NAME=HLPF3.
+:PARML.
+:PT.F3=Exit
+:PD.Ends the current task and returns you to the display from which
+the task was started.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF5.
+:PARML.
+:PT.F5=Refresh
+:PD.Shows the display you are viewing with updated information.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF8WRD.
+:PARML.
+:PT.F8=Work with RDB directory entry
+:PD.Executes the Work with RDB Directory Entry (WRKRDBDIRE) command.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF8WCS.
+:PARML.
+:PT.F8=Work with configuration status
+:PD.Executes the Work with Configuration Status (WRKCFGSTS) command.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF12.
+:PARML.
+:PT.F12=Cancel
+:PD.Cancels processing of any options or changes you have made to the
+current display and returns you to the previous menu or display.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPF24.
+:PARML.
+:PT.F24=More keys
+:PD.Changes the keys shown at the bottom of the display.  When you
+press this key, additional function keys are displayed at the bottom
+of the display.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPHLP.
+:PARML.
+:PT.Help
+:PD.Provides additional information about using the display.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPPGD.
+:PARML.
+:PT.Page Down (Roll Up)
+:PD.Moves the information displayed forward to show additional
+information.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPPGU.
+:PARML.
+:PT.Page Up (Roll Down)
+:PD.Moves the information displayed backward to show additional
+information.
+:EPARML.
+:EHELP.
+
+:HELP NAME=HLPPRT.
+:PARML.
+:PT.Print
+:PD.Prints information currently shown on the display.
+:EPARML.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/'.Display Data Queue Description - Help
+:P.
+The Display Data Queue Description display shows information about the
+specified data queue.  The type of information varies depending on the
+actual type of data queue, standard or DDM respectively.
+:P.
+If you press the Enter key you are returned to the previous menu or
+display.
+:P.
+If you see More ... on the lower right side of your display, there is
+more information to view.  Press Page Down (Roll Up) to move toward the
+end of the information.  Press Page Up (Roll Down) to move toward the
+beginning of the information.
+:P.
+If you see Bottom instead of More ..., you are at the end of the list.
+:P.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/DTQNAM'.
+Data queue - Help
+:XH3.Data queue
+:P.
+The name of the data queue whose information is displayed.
+:EHELP.
+
+:HELP name='DSPDTAQD/DTQLIB'.
+Library - Help
+:XH3.Library
+:P.
+The library of the data queue being displayed.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/DTQTYP'.
+Type - Help
+:XH3.Type
+:P.
+The type of data queue, which can be *STD or *DDM for standard and DDM
+Distributed Data Management) data queues, respectively.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/MAXELN'.
+Maximum entry length - Help
+:XH3.Maximum entry length
+:P.
+The maximum length allowed for messages as specified with the MAXLEN
+keyword on the CRTDTAQ command.
+:P.
+This will be zero for a DMM data queue.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/FORCE'.
+Force to auxiliary storage - Help
+:XH3.Force to auxiliary storage
+:P.
+Whether or not the data queue is forced to auxiliary storage when
+entries are sent or received for the specified data queue.
+:P.
+Possible values are:
+:DL COMPACT.
+:DT.*NO   :DD.The data queue is not forced to auxiliary storage.
+:DT.*YES  :DD.The data queue is forced to auxiliary storage.
+:EDL.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/QUESEQ'.
+Sequence - Help
+:XH3.Sequence
+:P.
+The sequence in which messages can be removed from the data queue.
+:P.
+Possible values are:
+:DL COMPACT.
+:DT.*FIFO :DD.First-in first-out
+:DT.*LIFO :DD.Last-in first-out
+:DT.*KEYED:DD.Key order
+:EDL.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/KEYLEN'.
+Key length - Help
+:XH3.Key length
+:P.
+Contains the length, in bytes, of the message reference key.
+:P.
+This value will be zero for a DDM data queue.
+:EHELP.
+
+:HELP name='DSPDTAQD/INCLID'.
+Include sender ID - Help
+:XH3.Include sender ID
+:P.
+If the data queue was created to include the sender ID with sent
+messages.
+:P.
+Possible values are:
+:DL COMPACT.
+:DT.*NO   :DD.Sender ID is not included
+:DT.*YES  :DD.Sender ID is included
+:EDL.
+:EHELP.
+
+:HELP name='DSPDTAQD/AUTRCL'.
+Automatic reclaim - Help
+:XH3.Automatic reclaim
+:P.
+Whether or not the specified data queue has the amount of storage
+allocated for the queue reclaimed when the queue is empty.  When
+reclaimed, the amount of storage allocated will be set to the initial
+number of entries.
+:P.
+If the data queue storage has been automatically reclaimed, the
+timestamp of the reclaim operation is also shown.  The automatic
+reclaim timestamp registration is supported as of release V6R1.
+:P.
+Possible values are:
+:DL COMPACT.
+:DT.*NO :DD.Storage is not reclaimed
+:DT.*YES:DD.Storage is reclaimed when the queue is empty
+:EDL.
+:EHELP.
+
+:HELP name='DSPDTAQD/ENFLCK'.
+Enforce data queue locks - Help
+:XH3.Enforce data queue locks
+:P.
+Identifies whether or not IBM-supplied data queue operations will
+enforce a lock on the data queue.  This attribute cannot be specified
+on the Create Data Queue (CRTDTAQ) CL Command.  The default when a data
+queue is created is for locks to be ignored.
+:P.
+A data queue can be locked with the Allocate Object (ALCOBJ) CL
+command.  When locks are enforced, performance can be degraded due to
+the additional locking performed by all data queue operations.  This
+attribute is available as of release V6R1.
+:P.
+Possible values are:
+:DL COMPACT.
+:DT.*NO :DD.Locks on the data queue are ignored by IBM-supplied data
+queue operations.
+:DT.*YES:DD.Locks on the data queue are enforced by IBM-supplied data
+queue operations.
+:EDL.
+:EHELP.
+
+:HELP name='DSPDTAQD/MAXENB'.
+Maximum number of entries - Help
+:XH3.Maximum number of entries
+:P.
+The maximum number of entries that was specified on the SIZE keyword of
+the CRTDTAQ command.
+:P.
+This value will be zero for a DDM data queue.
+:P.
+Possible values are:
+:DL COMPACT.
+:DT.*MAX16MB:DD.*MAX16MB was specified for the data queue size
+:DT.*MAX2GB :DD.*MAX2GB was specified for the data queue size
+:EDL.
+:EHELP.
+
+:HELP name='DSPDTAQD/INLENB'.
+Initial number of entries - Help
+:XH3.Initial number of entries
+:P.
+The number of messages that will fit into the storages allocated for
+the data queue when it is created or when it is automatically
+reclaimed.
+:P.
+This value will be zero for DDM data queues.
+:EHELP.
+
+:HELP name='DSPDTAQD/CURENB'.
+Current number of messages - Help
+:XH3.Current number of messages
+:P.
+The number of messages currently on the data queue.
+:P.
+This value will be zero for a DDM data queue.
+:EHELP.
+
+:HELP name='DSPDTAQD/CUREAL'.
+Current number of entries allocated - Help
+:XH3.Current number of entries allocated
+:P.
+The number of entries that will fit into the data queue before it is
+extended.  When the data queue is extended, additional storage is
+allocated for the queue.  The data queue can be extended until it
+reaches the value for the maximum number of entries allowed.
+:P.
+This value will be zero for a DDM data queue.
+:EHELP.
+
+:HELP name='DSPDTAQD/MAXEAL'.
+Maximum number of entries allowed - Help
+:XH3.Maximum number of entries allowed
+:P.
+The number of messages that will fit into the data queue when it is
+full.
+:P.
+This value will be zero for a DDM data queue.
+:EHELP.
+
+:HELP name='DSPDTAQD/DTQRMN'.
+Remote data queue - Help
+:XH3.Remote data queue
+:P.
+The name of the remote data queue on the target system.  This is the
+data queue name that was specified on the RMTDTAQ parameter of the
+CRTDTAQ command.
+:EHELP.
+
+:HELP name='DSPDTAQD/DTQRML'.
+Library - Help
+:XH3.Library
+:P.
+The library of the remove data queue on the target system.  The special
+values *LIBL and *CURLIB can be displayed.
+:EHELP.
+
+:HELP name='DSPDTAQD/RMTLOC'.
+Remote location name - Help
+:XH3.Remote location name
+:P.
+The name of the remote location that is used with this data queue.
+This is the name that was specified on the RMTLOCNAME parameter of the
+CRTDTAQ command.
+:P.
+A special value of *RDB indicates that the remote location information
+from the relational database entry specified in the relational
+database entry parameter RDBNAM is used to determine the remote system.
+:EHELP.
+
+:HELP name='DSPDTAQD/RDBNAM'.
+Relational data base name - Help
+:XH3.Relational data base name
+:P.
+The name of the relational data base entry that identifies the remote
+system or target ASP group.  This field will be set to blanks unless
+the data queue is an RDB type DDM data queue.  This is the name
+specified for the RDB parameter of the CRTDTAQ command.
+:EHELP.
+
+:HELP name='DSPDTAQD/APPCDV'.
+APPC device description - Help
+:XH3.APPC device description
+:P.
+The name of the APPC device description on the source system that is
+used with this DMM data queue.  The special value *LOC can be
+displayed.  This is the name that was specified for the DEV parameter
+of the CRTDTAQ command.
+:EHELP.
+
+:HELP name='DSPDTAQD/LCLLOC'.
+Local location name - Help
+:XH3.Local location name
+:P.
+The name of the local location.  The special values *LOC and *NETATR
+can be displayed.  This is the name that was specified for the
+LCLLOCNAME parameter of the CRTDTAQ command.  This value will be blank
+for RDB type DMM data queues.
+:EHELP.
+
+:HELP name='DSPDTAQD/MODE'.
+Mode - Help
+:XH3.Mode
+:P.
+The mode name used with the remote location name to communicate with
+the target system.  The special value *NETATR can be displayed.  This
+is the name that was specified for the MODE parameter on the CRTDTAQ
+command.  This value will be blank for RDB type DDM data queues.
+:EHELP.
+
+:HELP name='DSPDTAQD/RMTNID'.
+Remote network identifier - Help
+:XH3.Remote network identifier
+:P.
+The remote network identifier in which the remote location used to
+communicate with the target system.  The special values *LOC, *NETATR
+and *NONE can be displayed.  This is the name that was specified for
+the RMTNETID parameter on the CRTDTAQ command.  This value will be
+blank for RDB type DDM data queues.
+:EHELP.
+
+:HELP NAME='DSPDTAQD/TXTDSC'.
+Description - Help
+:XH3.Description
+:P.
+The text description of the data queue.
+:EHELP.
+
+:EPNLGRP.

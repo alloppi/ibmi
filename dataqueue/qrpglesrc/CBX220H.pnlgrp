@@ -1,0 +1,164 @@
+.*-----------------------------------------------------------------------**
+.*
+.*  Compile options:
+.*
+.*    CrtPnlGrp PnlGrp( CBX220H )
+.*              SrcFile( QPNLSRC )
+.*              SrcMbr( *PNLGRP )
+.*
+.*-----------------------------------------------------------------------**
+:PNLGRP.
+
+:HELP NAME='CHGDTAQ'.
+Change Data Queue - Help
+:P.
+The Change Data Queue (CHGDTAQ) command changes allows you to change
+a subset of data queue attributes for the data queue specified.
+:P.
+When changing a data queue, a shared update lock will be used.  If the
+lock cannot be obtained, CPF9803 (Cannot allocate object in library) is
+generated.  If any job is using the dequeue (DEQ) MI instruction with a
+wait value or the Receive Data Queue (QRCVDTAQ) API with a wait value
+while removing the entry, CPF9503 (Cannot lock data queue) is generated
+and the request would need to be tried again when the queue is
+available.
+:P.
+After the attribute is changed, the new value will be used
+for subsequent data queue operations.  For example, if the Allocate
+Object (ALCOBJ) CL command was used to lock a data queue while locks
+are being enforced, when the data queue is changed to ignore locks, no
+exception is issued.  All data queue operations waiting for a lock on
+the queue at the time of the change will remain waiting until they get
+the lock or until they timeout with the CPF9503.  Any subsequent data
+queue operations will no longer perform locking for the queue, so the
+lock via ALCOBJ is ignored by data queue operations.
+:P.
+:HP2.Restrictions::EHP2.
+:UL.
+:LI.
+Release V6R1M0 is required to run this command.
+:LI.
+This command cannot be used to change a DDM data queue.
+:LI.
+To change a data queue a shared for update (*SHRUPD) lock is required.
+:EUL.
+:P.
+:NT.
+There is a possibility of a permanent deadlock when you use this command
+to change the data queue attributes to enforce data queue locking. If
+the enforce data queue locking option is turned on, and a thread gets
+an exclusive thread scoped lock on the queue with the Allocate Object
+(ALCOBJ) CL command, and then it performs a receive (or dequeue) with a
+wait and there are no messages that satisfy the receive (or dequeue),
+then the thread will enter a permanent deadlock waiting for a message.
+:P.
+This is a permanent deadlock because no other thread or job will be
+able to get in to perform a send (or enqueue) because the receive (or
+dequeue) thread that is waiting is holding the thread scoped exclusive
+lock that was obtained via ALCOBJ. To recover from the deadlock, cancel
+the job.
+:ENT.
+:EHELP.
+
+:HELP NAME='CHGDTAQ/DTAQ'.
+Data queue (DTAQ) - Help
+
+:XH3.Data queue (DTAQ)
+:P.
+Specifies the data queue to be changed.
+:P.
+This is a required parameter.
+:P.
+:HP2.Qualifier 1: Data queue:EHP2.
+:PARML.
+:PT.:PV.name:EPV.
+:PD.
+Specify the name of the data queue to change.
+:EPARML.
+:P.
+:HP2.Qualifier 2: Library:EHP2.
+:PARML.
+:PT.:PK DEF.*LIBL:EPK.
+:PD.
+All libraries in the library list for the current thread are searched
+until the first match is found.
+:PT.:PK.*CURLIB:EPK.
+:PD.
+The current library for the thread is searched.  If no library is
+specified as the current library for the thread, the QGPL library is
+searched.
+:PT.:PV.name:EPV.
+:PD.
+Specify the name of the library in which the data queue is located.
+:EPARML.
+:EHELP.
+
+:HELP NAME='CHGDTAQ/AUTRCL'.
+Automatic reclaim (AUTRCL) - Help
+:XH3.Automatic reclaim (AUTRCL)
+:P.
+Specifies whether the data queue resets the amount of storage allocated
+for the queue when the queue is empty.
+:PARML.
+:PT.:PK DEF.*SAME:EPK.
+:PD.
+The attribute is not changed.
+:PT.:PK.*NO:EPK.
+:PD.
+Storage is not reclaimed.
+:PT.:PK.*YES:EPK.
+:PD.
+Storage is reclaimed when the queue is empty.  The amount of storage
+allocated will be set to the initial number of entries.
+:EPARML.
+:EHELP.
+
+:HELP NAME='CHGDTAQ/ENFORCE'.
+Enforce data queue locks (ENFORCE) - Help
+
+:XH3.Enforce data queue locks (ENFORCE)
+:P.
+Identifies whether IBM-supplied data queue operations will enforce a
+lock on the data queue.  This attribute cannot be specified on the
+Create Data Queue (CRTDTAQ) CL command.
+:P.
+The default when a data queue is created is for locks to be ignored.  A
+data queue can be locked with the Allocate Object (ALCOBJ) CL command.
+Locks can be viewed with the Work with Object Locks (WRKOBJLCK) CL
+command.
+:P.
+When locks are enforced, performance can be impacted due to the
+additional locking performed by all data queue operations.  When data
+queue locks are being observed, the following lock will be used for
+each data queue operation:
+:P.
+:UL.
+:LI.
+*SHRUPD: Clear Data Queue (QCLRDTAQ) API, Receive Data Queue (QRCVDTAQ)
+API, Send Data Queue (QSNDDTAQ) API, Enqueue (ENQ) and Dequeue (DEQ) MI
+instructions.
+:LI.
+*SHRRD:  Retrieve Data Queue Description (QMHQRDQD) API, Retrieve Data
+Queue Message (QMHRDQM) API, Materialize Queue Attribute (MATQAT) and
+Materialize Queue Message (MATQMSG) MI instructions.
+:LI.
+*SHRUPD: Change Data Queue (QMHQCDQ) API, irrespective of data queue
+locks being enforced.
+:EUL.
+:PARML.
+:PT.:PK DEF.*SAME:EPK.
+:PD.
+The attribute is not changed.
+:PT.:PK.*NO:EPK.
+:PD.
+Locks on the data queue are ignored by IBM-supplied data queue
+operations.
+:PT.:PK.*YES:EPK.
+:PD.
+Locks on the data queue are enforced by IBM-supplied data queue
+operations.  This value can impact performance due to the additional
+locking performed for all data queue operations.
+:EPARML.
+:EHELP.
+
+:EPNLGRP.

@@ -1,0 +1,11 @@
+     A*
+     A                                      UNIQUE
+     A          R SGFMT
+     A            SGACCT         6S 0       COLHDG('ACCOUNT NUMBER')
+     A            SGCLCODE      12A         COLHDG('CLASS CODE')
+     A            SGCLDESC      32A         COLHDG('CLASS DESCRIPTION')
+     A            SGCLTDTE       8S 0       COLHDG('TEST DATE')
+     A            SGCLGRADE      3S 0       COLHDG('TEST GRADE')
+     A          K SGACCT
+     A          K SGCLCODE
+     A          K SGCLTDTE

@@ -1,0 +1,13 @@
+     A*
+     A                                      UNIQUE
+     A          R STFMT
+     A            STACCT         6S 0       COLHDG('ACCOUNT NUMBER')
+     A            STFNAM        32A         COLHDG('FIRST NAME')
+     A            STLNAM        32A         COLHDG('LAST NAME')
+     A            STADDR1       32A         COLHDG('ADDRESS LINE 1')
+     A            STADDR2       32A         COLHDG('ADDRESS LINE 2')
+     A            STCITY        32A         COLHDG('CITY')
+     A            STSTATE        2A         COLHDG('STATE')
+     A            STPOSTAL      12A         COLHDG('POSTAL')
+     A            STMAJOR       12A         COLHDG('MAJOR')
+     A          K STACCT

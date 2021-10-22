@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+EXEC SQL INCLUDE SQLCA;
+  char dummy[[ 5 ];
+void main(int argc, char **argv) {
+
+/* Host variable declarations */
+/* Declare SQL Data Types */
+EXEC SQL BEGIN DECLARE SECTION;
+  SQL TYPE IS BLOB_FILE blob_f;
+  SQL TYPE IS BLOB(1M) blob;
+EXEC SQL END DECLARE SECTION;
+
+variable "blob_f" is replaced with:
+
+_Packed struct {
+unsigned long name_length;
+unsigned long data_length;
+unsigned long file_options;
+char name[255];
+} blob_f;
+
+variable "blob" is replaced with:
+
+_Packed struct blob_t {
+unsigned long length;
+char data[1048576];
+} blob;
+
+/* Set BLOB File data structure elements */
+strcpy(blob_f.name,filename);
+blob_f.name_length=strlen(filename);
+blob_f.file_options = SQL_FILE_OVERWRITE;
+
+/* Convert BLOB to IFS File */
+EXEC SQL VALUES :blob INTO :blob_f;

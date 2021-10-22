@@ -1,0 +1,34 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/REFFILE)
+     A                                      CHGINPDFT(CS)
+     A                                      PRINT
+     A                                      INDARA
+     A                                      HELP
+     A          R DSP01
+     A                                      OVERLAY
+     A                                      CF01(01 'EXE')
+     A                                      CA03(03 'END')
+     A                                  1  4'Stored Procedure : AAIFS2BLOB'
+     A                                  3  4'Enter'
+     A                                  3 10'Value'
+     A                                  3 18':'
+     A                                  4  6'File Name:'
+     A            D1FILE        20A  B  4 20COLOR(GRN)
+     A                                      DSPATR(UL)
+     A                                      CHECK(LC)
+     A                                  6  4'Return Value  :'
+     A                                  6 20'Message ID'
+     A*
+     A          R FT001
+     A            HDMSGID   R        O 20  2REFFLD(RFMSGID *LIBL/REFFILE)
+     A                                      DSPATR(HI)
+     A            HDMSG     R        O 20 10REFFLD(RFMSG *LIBL/REFFILE)
+     A                                      DSPATR(HI)
+     A                                 21  2'F1 - Execution     F2 -           -
+     A                                          F3 -Exit           F4 -        -
+     A                                                 F5 -               F6 - -
+     A                                                    F7 -               F8-
+     A                                       -                   F9 -          -
+     A                                           F10-               F11-       -
+     A                                              F12-              '
+     A                                      COLOR(BLU)

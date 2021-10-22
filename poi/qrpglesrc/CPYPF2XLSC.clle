@@ -1,0 +1,15 @@
+             PGM        PARM(&FILELIB &MEMBER &IFSFILE)
+             DCL        VAR(&FILELIB) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&IFSFILE) TYPE(*CHAR) LEN(1024)
+             DCL        VAR(&RQSDTA) TYPE(*CHAR) LEN(2500)
+             DCL        VAR(&Q) TYPE(*CHAR) LEN(1) VALUE(X'7D')
+
+             CHGVAR     VAR(&RQSDTA) VALUE('CALL PGM(CPYPF2XLSR) +
+                          PARM(' *CAT &Q *CAT &FILELIB *CAT &Q *CAT +
+                          ' ' *CAT &Q *CAT &MEMBER *CAT &Q *CAT ' ' +
+                          *CAT &Q *CAT &IFSFILE *CAT &Q *CAT ')')
+
+             SBMJOB     JOB(PF2XLS) RTGDTA(*JOB) RQSDTA(&RQSDTA)
+
+             ENDPGM

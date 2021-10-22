@@ -1,0 +1,7 @@
+     A* CUSTOMER PROCESSING INFORMATION
+     A*
+     A          R CUSPIREC                  TEXT('CUSTOMER PROCESSING INFO')
+     A            KEY           16          TEXT('ENCRYPTION KEY')
+     A                                      CCSID(65535)
+     A            LASTCUS        8  0       TEXT('LAST CUSTOMER NUMBER')
+     A*

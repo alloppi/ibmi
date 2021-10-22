@@ -1,0 +1,15 @@
+       /* Encrypt & Decrypt data -- Success */
+
+       PGM
+       DCL        VAR(&INSTRING) TYPE(*CHAR) LEN(32767) VALUE('my +
+                    pizza is good')
+       DCL        VAR(&OUTSTRING) TYPE(*CHAR) LEN(32767)
+       DCL        VAR(&INKEY) TYPE(*CHAR) LEN(32767) VALUE('secret')
+       MONMSG     MSGID(CPF0000)
+
+       CALL       PGM(ENCRYPT) PARM('E' &inSTRING &inkey &outSTRING)
+
+       chgvar &instring &outstring
+       chgvar &outstring ' '
+       CALL       PGM(ENCRYPT) PARM('D' &inSTRING &inkey &outSTRING)
+       ENDPGM

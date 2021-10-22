@@ -1,0 +1,16 @@
+     A* CUSTOMER FILE
+     A*
+     A          R CUSDTAREC                 TEXT('CUSTOMER RECORD')
+     A            CUSNUM         8  0       TEXT('CUSTOMER NUMBER')
+     A            IV            16          TEXT('INITIALIZATION VECTOR')
+     A                                      CCSID(65535)
+     A            ARBAL         10  2       TEXT('ACCOUNTS RECEIVABLE BALANCE')
+     A            CUSDTA        80          TEXT('ENCRYPTED CUSTOMER DATA')
+     A                                      CCSID(65535)
+     A*                                            20    NAME
+     A*                                            20    ADDRESS
+     A*                                            20    CITY
+     A*                                             2    STATE
+     A*                                             5    ZIP CODE
+     A*                                            10    PHONE NUMBER
+     A*                                             3    PAD

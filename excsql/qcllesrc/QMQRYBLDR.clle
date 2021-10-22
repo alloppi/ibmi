@@ -1,0 +1,34 @@
+/******************************************************************************/
+/*                                                                            */
+/*    COMMAND BUILDER FOR THE EXCSQL COMMAND                                  */
+/*                                                                            */
+/*    INITIAL CODING : Dan Riehl                                              */
+/*                                                                            */
+/******************************************************************************/
+             PGM        PARM(&SRCFILE &SRCLIB &OBJLIB)
+             DCL        VAR(&SRCFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJLIB) TYPE(*CHAR) LEN(10)
+/******************************************************************************/
+/*    DELETE ANY PREVIOUS INSTANCES OF FILES IN QTEMP                         */
+/******************************************************************************/
+             DLTCMD     CMD(&OBJLIB/EXCSQL)
+             MONMSG     MSGID(CPF0000)
+             DLTQMQRY   QMQRY(&OBJLIB/QMQRYGEN)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(QMQRYCLP)
+             MONMSG     MSGID(CPF0000)
+  /*********************************************************************/
+  /*                                                                   */
+  /*  RE-BUILD COMPONENTS OF RUNQRY                                    */
+  /*                                                                   */
+  /*********************************************************************/
+             CRTQMQRY   QMQRY(&OBJLIB/QMQRYGEN) +
+                          SRCFILE(&SRCLIB/&SRCFILE)
+             CRTCLPGM PGM(&SRCLIB/QMQRYCLP) +
+                       SRCFILE(&SRCLIB/&SRCFILE)
+             CRTCMD     CMD(&OBJLIB/EXCSQL) PGM(&OBJLIB/QMQRYCLP) +
+                          SRCFILE(&SRCLIB/&SRCFILE) +
+                          SRCMBR(QMQRYCMD) TEXT('Execute SQL +
+                          Command') /* Run Any SQL Command */
+                     ENDPGM

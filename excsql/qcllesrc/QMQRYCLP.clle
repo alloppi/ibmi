@@ -1,0 +1,135 @@
+        /*********************************************************************/
+        /*                                                                   */
+        /* PROGRAM    - QMQRYCLP                                             */
+        /* THIS IS THE COMMAND PROCESSING PROGRAM FOR COMMAND EXCSQL.        */
+        /*                                                                   */
+        /*********************************************************************/
+        /*                                                                   */
+        /* DESCRIPTION  PROCESS SQL COMMANDS USING QM QUERY.                 */
+        /*                                                                   */
+        /*********************************************************************/
+         SQL:        PGM        PARM(&LINES &TYPE &OUTFILE &OUTMBR &PRTFILE)
+                     DCL        VAR(&TYPE) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&LINES) TYPE(*CHAR) LEN(550)
+                     DCL        VAR(&LINE01) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE02) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE03) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE04) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE05) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE06) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE07) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE08) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE09) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&LINE10) TYPE(*CHAR) LEN(55)
+                     DCL        VAR(&OUTFILE) TYPE(*CHAR) LEN(20)
+                     DCL        VAR(&OFIL) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&OLIB) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&OUTMBR) TYPE(*CHAR) LEN(20)
+                     DCL        VAR(&OMBR) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&ORPL) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&PRTFILE) TYPE(*CHAR) LEN(20)
+                     DCL        VAR(&PFIL) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&PLIB) TYPE(*CHAR) LEN(10)
+                 /* TRAILING BLANK TRIMMING FIELDS */
+                     DCL        VAR(&LINEX) TYPE(*CHAR) LEN(550)
+                     DCL        VAR(&IS) TYPE(*DEC) LEN(3 0) VALUE(0) /* +
+                                  INDEX FOR FIELD &LINES */
+                     DCL        VAR(&IX) TYPE(*DEC) LEN(3 0) VALUE(0) /* +
+                                  INDEX FOR FIELD &LINEX */
+                     DCL        VAR(&H1) TYPE(*DEC) LEN(3 0) /* WORK FIELD */
+                     DCL        VAR(&H2) TYPE(*DEC) LEN(3 0) /* WORK FIELD */
+                     DCL        VAR(&H3) TYPE(*DEC) LEN(3 0) /* WORK FIELD */
+                 /* STANDARD ERROR HANDLER FIELDS */
+                     DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+                     DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(100)
+                     DCL        VAR(&MSGF) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&MSGFLIB) TYPE(*CHAR) LEN(10)
+                     DCL        VAR(&ERRORSW) TYPE(*LGL)
+                     MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(ERROR))
+                 /* PARSE &LINES FOR BLANKS ON 55 BYTE BOUNDARIES */
+                /* PARSE &LINES FOR BLANKS ON 55 BYTE BOUNDARIES */
+         CHECK:      IF         COND(&IS < 550 *AND &IX < 550) THEN(DO) /* +
+                                  AT END OF STRING? */
+                     CHGVAR     VAR(&IX) VALUE(&IX + 1) /* INCREMENT INDEX */
+                     CHGVAR     VAR(&IS) VALUE(&IS + 1) /* INCREMENT INDEX */
+                     CHGVAR     VAR(%SST(&LINEX &IX 1)) VALUE(%SST(&LINES +
+                                  &IS 1)) /* MOVE A BYTE... */
+                     CHGVAR     VAR(&H1) VALUE(&IX / 55) /* MULTIPLE OF 55 */
+                     CHGVAR     VAR(&H2) VALUE(&H1 * 55) /* EXTEND MULTIPLE */
+                     CHGVAR     VAR(&H3) VALUE(&IX - &H2) /* ZERO IF 55 BYTE +
+                                  BOUNDARY */
+                       IF         COND(&H3 = 0) THEN(DO) /* 55 BYTE BOUNDARY */
+                         IF         COND(%SST(&LINEX &IX 1) = ' ') THEN(DO)
+                               /* 55 BYTE BOUNDARY IS A BLANK */
+                       CHGVAR     VAR(&IX) VALUE(&IX + 1) /* ADD EXTRA BLANK */
+                         ENDDO
+                       ENDDO
+                       GOTO       CMDLBL(CHECK) /* LOOP BACK... */
+                     ENDDO
+                 /* DIVIDE &LINEX INTO 55 BYTE SUBSTITION VARIABLES */
+                     CHGVAR     VAR(&LINE01) VALUE(%SST(&LINEX 1 55))
+                     CHGVAR     VAR(&LINE02) VALUE(%SST(&LINEX 56 55))
+                     CHGVAR     VAR(&LINE03) VALUE(%SST(&LINEX 111 55))
+                     CHGVAR     VAR(&LINE04) VALUE(%SST(&LINEX 166 55))
+                     CHGVAR     VAR(&LINE05) VALUE(%SST(&LINEX 221 55))
+                     CHGVAR     VAR(&LINE06) VALUE(%SST(&LINEX 276 55))
+                     CHGVAR     VAR(&LINE07) VALUE(%SST(&LINEX 331 55))
+                     CHGVAR     VAR(&LINE08) VALUE(%SST(&LINEX 386 55))
+                     CHGVAR     VAR(&LINE09) VALUE(%SST(&LINEX 441 55))
+                     CHGVAR     VAR(&LINE10) VALUE(%SST(&LINEX 496 55))
+                     CHGVAR     VAR(&OFIL) VALUE(%SST(&OUTFILE 1 10))
+                     CHGVAR     VAR(&OLIB) VALUE(%SST(&OUTFILE 11 10))
+                     CHGVAR     VAR(&OMBR) VALUE(%SST(&OUTMBR 1 10))
+                     CHGVAR     VAR(&ORPL) VALUE(%SST(&OUTMBR 11 10))
+                     CHGVAR     VAR(&PFIL) VALUE(%SST(&PRTFILE 1 10))
+                     CHGVAR     VAR(&PLIB) VALUE(%SST(&PRTFILE 11 10))
+                     IF (&TYPE = '*OUTFILE') +
+                       THEN(DO)
+                         STRQMQRY   QMQRY(QMQRYGEN) OUTPUT(&TYPE) +
+                                      OUTFILE(&OLIB/&OFIL) OUTMBR(&OMBR +
+                                      &ORPL) ALWQRYDFN(*YES) SETVAR((LINE01 +
+                                      &LINE01) (LINE02 &LINE02) (LINE03 +
+                                      &LINE03) (LINE04 &LINE04) (LINE05 +
+                                      &LINE05) (LINE06 &LINE06) (LINE07 +
+                                      &LINE07) (LINE08 &LINE08) (LINE09 +
+                                      &LINE09) (LINE10 &LINE10))
+                         MONMSG     MSGID(QWM0000) EXEC(DO)
+                           SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('+
+                                  SYNTAX ERROR IN SQL STATEMENT. SEE PREVIOUS +
+                                  MESSAGES FOR DETAILS') MSGTYPE(*DIAG)
+                           ENDDO
+                         ENDDO
+                       ELSE (DO)
+                         OVRPRTF    FILE(QPQXPRTF) TOFILE(&PLIB/&PFIL)
+                         STRQMQRY   QMQRY(QMQRYGEN) OUTPUT(&TYPE) +
+                                      ALWQRYDFN(*YES) SETVAR((LINE01 +
+                                      &LINE01) (LINE02 &LINE02) (LINE03 +
+                                      &LINE03) (LINE04 &LINE04) (LINE05 +
+                                      &LINE05) (LINE06 &LINE06) (LINE07 +
+                                      &LINE07) (LINE08 &LINE08) (LINE09 +
+                                      &LINE09) (LINE10 &LINE10))
+                         MONMSG     MSGID(QWM0000) EXEC(DO)
+                           SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('+
+                                  SYNTAX ERROR IN SQL STATEMENT. SEE PREVIOUS +
+                                  MESSAGES FOR DETAILS') MSGTYPE(*DIAG)
+                           ENDDO
+                         DLTOVR     FILE(QPQXPRTF)
+                         ENDDO
+                     RETURN     /* NORMAL END OF PROGRAM */
+         ERROR:    /* STANDARD ERROR HANDLER */
+                     IF         COND(&ERRORSW) THEN(SNDPGMMSG MSGID(CPF9999) +
+                                  MSGF(QCPFMSG) MSGTYPE(*ESCAPE)) /* FUNCTION +
+                                  CHECK MESSAGE */
+                     CHGVAR     VAR(&ERRORSW) VALUE('1')
+         ERROR2:     RCVMSG     MSGTYPE(*DIAG) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                                  MSGF(&MSGF) MSGFLIB(&MSGFLIB)
+                     IF         COND(&MSGID = '       ') THEN(GOTO +
+                                  CMDLBL(ERROR3))
+                     SNDPGMMSG  MSGID(&MSGID) MSGF(&MSGFLIB/&MSGF) +
+                                  MSGDTA(&MSGDTA) MSGTYPE(*DIAG)
+                     GOTO       CMDLBL(ERROR2)
+         ERROR3:     RCVMSG     MSGTYPE(*EXCP) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                                  MSGF(&MSGF) MSGFLIB(&MSGFLIB)
+                     SNDPGMMSG  MSGID(&MSGID) MSGF(&MSGFLIB/&MSGF) +
+                                  MSGDTA(&MSGDTA) MSGTYPE(*ESCAPE)
+                     ENDPGM

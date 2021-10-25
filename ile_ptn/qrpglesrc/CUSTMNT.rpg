@@ -1,13 +1,14 @@
-      *  Sample of an old RPG/400 customer file maintenance
-      *  program.                     Scott Klement, Feb 2007
+      *  CUSTMNT --
+      *  Sample of an old RPG/400 customer file maintenance program.
+      *                               Scott Klement, Feb 2007
       *
       *  To Compile:
-      *    - First create the CUSTFILE physical file
+      *    - First create the CUSTF physical file
       *    - Then the CUSTS display file.
       *    CRTRPGPGM PGM(CUSTMNT) SRCFILE(xxx/QRPGSRC) +
       *              OPTION(*LSTDBG)
       *
-     FCUSTFILEUF  E           K        DISK                      A
+     FCUSTF   UF  E           K        DISK                      A
      FCUSTS   CF  E                    WORKSTN
      E                    ERR     1   8 60
      C                     EXSR SCRN1
@@ -28,7 +29,7 @@
      C                     RETRN
      C                     ENDIF
       *
-     C           SCCUST    CHAINCUSTFILE            N99
+     C           SCCUST    CHAINCUSTF               N99
      C           *IN99     IFEQ *ON
      C           *IN10     ANDEQ*OFF
      C                     MOVELERR,1     SCMSG
@@ -93,7 +94,7 @@
       *****************************************************
      C           UPDATE    BEGSR
       *
-     C           SCCUST    CHAINCUSTFILE             99
+     C           SCCUST    CHAINCUSTF                99
       *
      C                     MOVE SCCUST    CUSTNO
      C                     MOVE SCNAME    NAME

@@ -1,0 +1,7 @@
+     A                                      UNIQUE
+     A          R ORDDEC
+     A            ORDNO     R               REFFLD(ORDREC/ORDNO ORDER)
+     A            PARTNO    R               REFFLD(INVREC/PARTNO INVEN)
+     A            ORDERQTY       6  0
+     A          K ORDNO
+     A          K PARTNO

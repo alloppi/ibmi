@@ -1,0 +1,88 @@
+       ctl-opt option(*nodebugio:*srcstmt:*nounref) dftactgrp(*no) ;
+   
+       dcl-ds PgmDs psds qualified ;
+        PgmName *proc ;
+       end-ds ;
+   
+       dcl-f SFLPGMD workstn indds(Dspf) sfile(SFL01:Z1RRN) ;
+   
+       dcl-c MaxSfl 9999 ;
+   
+       dcl-ds Dspf qualified ;
+        Exit ind pos(3) ;
+        Refresh ind pos(5) ;
+        SflDspCtl ind pos(30) ;
+        SflDsp ind pos(31) ;
+       end-ds ;
+   
+       dcl-f PERSONP disk keyed ;
+   
+       dcl-s PrvPosition like(Z1POSITION) ;
+   
+       Z1SCREEN = %trimr(PgmDs.PgmName) + '-1' ;
+   
+       setll *loval PERSONR ;
+       LoadSubfile() ;
+   
+ 1b    dow (1 = 1) ;
+          write REC01 ;
+          exfmt CTL01 ;
+   
+ 2b       if (Dspf.Exit) ;
+ 1v          leave ;
+ 2x       elseif (Dspf.Refresh) ;
+             Z1POSITION = ' ' ;
+             PrvPosition = ' ' ;
+             setll *loval PERSONR ;
+             LoadSubfile() ;
+ 1i          iter ;
+ 2x       elseif (Z1POSITION <> PrvPosition) ;
+             PrvPosition = Z1POSITION ;
+             setll Z1POSITION PERSONR ;
+             LoadSubfile() ;
+ 1i          iter ;
+ 2e       endif;
+   
+ 2b       if (Dspf.SflDsp) ;
+             ReadSubfile() ;
+ 2e       endif;
+ 1e    enddo;
+   
+       *inlr = *on ;
+   
+       dcl-proc LoadSubfile ;
+        Dspf.SflDspCtl = *off ;
+        Dspf.SflDsp = *off ;
+        write CTL01 ;
+        Dspf.SflDspCtl = *on ;
+   
+        Z1OPT = ' ' ;
+   
+ 1b     for Z1RRN = 1 to MaxSfl ;
+           read PERSONR ;
+ 2b        if (%eof) ;
+ 1v           leave ;
+ 2e        endif;
+   
+           write SFL01 ;
+ 1e     endfor;
+   
+ 1b     if (Z1RRN > 1) ;
+           Dspf.SflDsp = *on ;
+ 1e     endif;
+       end-proc ;
+   
+   
+       dcl-proc ReadSubfile ;
+ 1b     dow (1 = 1) ;
+           readc SFL01 ;
+ 2b        if (%eof) ;
+ 1v           leave ;
+ 2e        endif;
+   
+         //Do something depending on value in Z1OPT
+   
+           Z1OPT = ' ' ;
+           update SFL01 ;
+ 1e     enddo;
+       end-proc ;

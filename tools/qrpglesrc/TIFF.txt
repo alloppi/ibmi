@@ -1,0 +1,18 @@
+/*=========================================================================*/
+/* Program name: TIFF                                                      */
+/* Purpose.....: TIFF Conversion Source                                    */
+/*    CRTWSCST WSCST(LIBRARY/TIFF) SRCFILE(LIBRARY/QTXTSRC)                */
+/*                                                                         */
+/* Modification:                                                           */
+/* Date       Name       Pre  Ver  Mod#  Remarks                           */
+/* ---------- ---------- --- ----- ----- ----------------------------      */
+/*=========================================================================*/
+:WSCST DEVCLASS=TRANSFORM.
+:TRNSFRMTBL.
+:PRTDTASTRM
+DATASTREAM=TIFF_G4.
+:INITPRT
+DATA = '4D4D002A'X.
+:RESETPRT
+DATA = '00000000'X.
+:EWSCST.

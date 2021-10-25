@@ -1,0 +1,20 @@
+     A* OHEAD: Order Header file
+     A*  To compile:
+     A*       CRTPF FILE(OHEAD) SRCFILE(*CURLIB/QRPGLESRC)
+     A*
+     A                                      UNIQUE
+     A          R OHEADR
+     A            X1DEL          1A         COLHDG('Status')
+      *                                     A = Active
+      *                                     B = XML Processed
+     A            X1CMP          3S 0       COLHDG('Company No.')
+     A            X1ORD          9S 0       COLHDG('Order Number')
+     A            X1TYPE         1A         COLHDG('Transaction Type')
+      *                                     O = Sales Order
+      *                                     C = Credit
+     A            X1ORDT          L         COLHDG('Order Date')
+     A            X1CUST        10A         COLHDG('Customer Number')
+     A            X1PO          20A         COLHDG('PO Number')
+     A            X1OTOT        11S 2       COLHDG('Order Total')
+     A          K X1CMP
+     A          K X1ORD

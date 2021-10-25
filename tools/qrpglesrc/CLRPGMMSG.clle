@@ -1,0 +1,50 @@
+/*=========================================================================*/
+/* Program name: CLRPGMMSG                                                 */
+/* Purpose.....: Send Program Message with Color                           */
+/*               CRTBNDCL PGM(LIBRARY/CLRPGMMSG) SRCFILE(LIBRARY/QCLLESRC) */
+/*                 SRCMBR(CLRPGMMSG)                                       */
+/* Modification:                                                           */
+/* Date       Name       Pre  Ver  Mod#  Remarks                           */
+/* ---------- ---------- --- ----- ----- ----------------------------      */
+/*=========================================================================*/
+PGM PARM(&MSG &COLOR)
+
+ DCL VAR(&MSG) TYPE(*CHAR) LEN(78)
+ DCL VAR(&MSGDTA) TYPE(*CHAR) LEN(78)
+ DCL VAR(&BLUE) TYPE(*CHAR) LEN(1) VALUE(X'3A')
+ DCL VAR(&WHITE) TYPE(*CHAR) LEN(1) VALUE(X'22')
+ DCL VAR(&RED) TYPE(*CHAR) LEN(1) VALUE(X'28')
+ DCL VAR(&GREEN) TYPE(*CHAR) LEN(1) VALUE(X'40')
+ DCL VAR(&PINK) TYPE(*CHAR) LEN(1) VALUE(X'38')
+ DCL VAR(&TURQ) TYPE(*CHAR) LEN(1) VALUE(X'30')
+ DCL VAR(&YELL) TYPE(*CHAR) LEN(1) VALUE(X'32')
+ DCL VAR(&RIMG) TYPE(*CHAR) LEN(1) VALUE(X'21')
+ DCL VAR(&UNDER) TYPE(*CHAR) LEN(1) VALUE(X'24')
+ DCL VAR(&DELIM) TYPE(*CHAR) LEN(1) VALUE(X'20')
+ DCL VAR(&COLOR) TYPE(*CHAR) LEN(1)
+
+ IF COND((&COLOR = 'B') *OR (&COLOR = 'b')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&BLUE))
+ IF COND((&COLOR = 'W') *OR (&COLOR = 'w')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&WHITE))
+ IF COND((&COLOR = 'R') *OR (&COLOR = 'r')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&RED))
+ IF COND((&COLOR = 'G') *OR (&COLOR = 'g')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&GREEN))
+ IF COND((&COLOR = 'P') *OR (&COLOR = 'p')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&PINK))
+ IF COND((&COLOR = 'T') *OR (&COLOR = 't')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&TURQ))
+ IF COND((&COLOR = 'Y') *OR (&COLOR = 'y')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&YELL))
+ IF COND((&COLOR = 'I') *OR (&COLOR = 'i')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&RIMG))
+ IF COND((&COLOR = 'U') *OR (&COLOR = 'u')) +
+ THEN(CHGVAR VAR(&COLOR) VALUE(&UNDER))
+
+ CHGVAR VAR(&MSGDTA) VALUE(' ' *CAT &COLOR *CAT &MSG)
+ CHGVAR VAR(&MSGDTA) VALUE(&MSGDTA *TCAT &DELIM)
+
+ SNDPGMMSG MSG(&MSGDTA) TOPGMQ(*EXT)
+
+ ENDPGM

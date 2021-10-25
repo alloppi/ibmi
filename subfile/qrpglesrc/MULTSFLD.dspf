@@ -1,0 +1,65 @@
+      * Refer: https://www.rpgpgm.com/2018/01/displaying-more-than-one-subfile-at-time.html
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      PRINT
+     A                                      ERRSFL
+     A                                      INDARA
+     A                                      CA03(03 'F3=Exit')
+     A          R SFL01                     SFL
+     A            Z1CTLFLD       1Y 0H      SFLCHCCTL
+     A            Z1RRN          5S 0H
+     A            Z1LINE        50A  O  5  3
+     A          R CTL01                     SFLCTL(SFL01)
+     A                                      SFLMLTCHC
+     A                                      SFLSIZ(&SFLSIZ01)
+     A                                      SFLPAG(0012)
+     A                                      OVERLAY
+     A  31                                  SFLDSP
+     A  30                                  SFLDSPCTL
+     A N30                                  SFLDLT
+     A* 30                                  SFLEND(*MORE)
+     A                                      SFLLIN(3)
+     A                                      ROLLUP(10)
+     A  10                                  SFLEND(*SCRBAR)
+     A            F3             5S 0H      SFLSCROLL
+     A            F2             4S 0H      SFLRCDNBR(CURSOR *TOP)
+     A            SFLSIZ01       5S 0P
+     A                                  1  2USER
+     A                                  1 26'Example screen with 2 +
+     A                                      subfiles'
+     A                                  1 63TIME
+     A                                  1 72DATE
+     A                                      EDTCDE(Y)
+     A            Z1SCREEN      12A  O  2  2
+     A                                  2 72SYSNAME
+     A                                  3  2'                       -
+     A                                                              -
+     A                                               '
+     A                                      DSPATR(UL)
+     A                                  4 36'SUBFILE 1'
+     A          R SFL02                     SFL
+     A            Z2RRN          5S 0H
+     A            Z2LINE       100A  O 15  3
+     A            Z2LINE2       40A  O 16  3
+     A            Z2LINE3       40A  O 16 53
+
+     A          R CTL02                     SFLCTL(SFL02)
+     A                                      SFLSIZ(0036)
+     A                                      SFLPAG(0003)
+     A                                      CF02(02 'F2=Fold')
+     A                                      OVERLAY
+     A  33                                  SFLDSP
+     A  32                                  SFLDSPCTL
+     A N32                                  SFLDLT
+     A  32                                  SFLEND(*MORE)
+     A                                      SFLMODE(&MODE)
+     A  35                                  SFLDROP(CF02)
+     A N35                                  SFLFOLD(CF02)
+     A            MODE           1A  H
+     A                                 13  2'                       -
+     A                                                              -
+     A                                               '
+     A                                      DSPATR(UL)
+     A                                 14 36'SUBFILE 2'
+     A          R FOOTER
+     A                                 23  3'F2=Expand'
+     A                                 23 23'F3=Exit'

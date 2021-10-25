@@ -1,0 +1,32 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      INDARA
+     A                                      ERRSFL
+     A                                      REF(PERSONP)
+     A                                      CA03(03 'F3=Exit')
+     A          R SFL01                     SFL
+     A            ZRRN           2S 0H
+     A            NAME          40A  O  6  2
+     A            LASTNAME  R        H
+     A            FIRSTNAME R        H
+     A          R CTL01                     SFLCTL(SFL01)
+     A                                      SFLSIZ(0010)
+     A                                      SFLPAG(0010)
+     A                                      OVERLAY
+     A                                      PAGEDOWN(25)
+     A                                      PAGEUP(26)
+     A  30                                  SFLDSPCTL
+     A  31                                  SFLDSP
+     A  32                                  SFLEND(*MORE)
+     A  33                                  SFLCLR
+     A                                  1  2'R P G P G M . C O M'
+     A                                  1 26'Screen at a time subfile +
+                                             example'
+     A                                      COLOR(WHT)
+     A                                  3  2'Position to'
+     A            ZPOSITION R        B  3 14REFFLD(LASTNAME)
+     A                                      CHECK(LC)
+     A                                  5  2'Person name'
+     A                                      COLOR(WHT)
+     A          R FOOT01
+     A                                 23  3'F3=Exit'

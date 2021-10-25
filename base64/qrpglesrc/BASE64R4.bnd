@@ -1,0 +1,4 @@
+STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('BASE64R4 V1.00  ')
+   export symbol(base64_encode)
+   export symbol(base64_decode)
+ENDPGMEXP

@@ -1,0 +1,35 @@
+/*Run only in StrSQL interactive environment                  */
+/* Refer to:
+   https://www.rpgpgm.com/2019/02/finding-really-big-objects-in-my.html */
+
+SELECT A.OBJNAME AS OBJECT,
+       A.OBJATTRIBUTE AS ATTRIBUTE,
+       A.OBJSIZE AS SIZE,
+       CAST(A.LAST_USED_TIMESTAMP AS DATE) AS LAST_DATE
+  FROM TABLE(QSYS2.OBJECT_STATISTICS('MYLIB','ALL')) A
+  ORDER BY A.OBJSIZE DESC
+
+
+       Edit Library List
+
+    Type new/changed info
+
+    Sequence
+     Number   Library
+
+        10    MYLIB
+        20    MYLIB2
+        30    MYTEST1
+        40    MYTEST2
+        50    MYTEST3
+        60    MYTEST4
+        70
+
+SELECT A.OBJNAME AS OBJECT,
+       CAST(A.OBJLONGSCHEMA AS CHAR(10)) AS LIBRARY,
+       A.OBJATTRIBUTE AS ATTRIBUTE,
+       A.OBJSIZE AS SIZE,
+       CAST(A.LAST_USED_TIMESTAMP AS DATE) AS LAST_DATE
+  FROM TABLE(QSYS2.OBJECT_STATISTICS('*USRLIBL','ALL')) A
+  ORDER BY A.OBJSIZE DESC
+

@@ -1,0 +1,85 @@
+     A* DDS SOURCE FOR SCREENS USED BY ACMEORDR4.  SEE THE
+     A* ACMEORDR4 MEMBER IN QRPGLESRC FOR DETAILS.
+     A*
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A          R ACMEORDS1
+     A                                      CA03(03)
+     A                                  1 33'Acme Order Entry'
+     A                                      DSPATR(HI)
+     A                                  8 10'Enter customer number:'
+     A            SCCUST         6  0B  8 33
+     A                                 11 15'- OR -'
+     A                                 14 10'Enter order number to change an ex-
+     A                                      isting order:'
+     A            SCORDER       10   B 14 58
+     A            SCERRMSG      78   O 23  2DSPATR(HI)
+     A                                      DSPATR(BL)
+     A                                 24  2'F3=Exit'
+     A          R ACMEORDS2
+     A                                      CA12(12)
+     A                                  1 33'Acme Order Entry'
+     A                                      DSPATR(HI)
+     A                                  5  5'Ship to:'
+     A            SCSHIP1       30   B  5 14
+     A            SCSHIP2       30   B  6 14
+     A            SCSHIP3       30   B  7 14
+     A            SCSHIP4       30   B  8 14
+     A                                 11  5'Bill to:'
+     A            SCBILL1       30   B 11 14
+     A            SCBILL2       30   B 12 14
+     A            SCBILL3       30   B 13 14
+     A            SCBILL4       30   B 14 14
+     A                                 17  5'Truck line (SCAC):'
+     A            SCTRUCK        4   B 17 24
+     A                                 20  5'Ship Date:'
+     A            SCSHIPDATE    10   B 20 16
+     A            SCERRMSG      78   O 23  2DSPATR(HI)
+     A                                      DSPATR(BL)
+     A                                 24  2'F12=Cancel'
+     A          R ACMEORD3S                 SFL
+     A            SCITEM         8   B  4  2
+     A            SCQTY          5   B  4 11
+     A            SCPRICE       11   B  4 17
+     A            SCDESC        20   O  4 29
+     A            SCMSG         30   O  4 50
+     A            SCLINE         3  0H
+     A          R ACMEORD3C                 SFLCTL(ACMEORD3S)
+     A                                      CA12(12)
+     A                                      OVERLAY
+     A N51                                  SFLDSP
+     A N50                                  SFLDSPCTL
+     A  50                                  SFLCLR
+     A N50                                  SFLEND(*MORE)
+     A                                      SFLSIZ(1000)
+     A                                      SFLPAG(0018)
+     A                                  1 33'Acme Order Entry'
+     A                                      DSPATR(HI)
+     A                                  3  2'  Item  '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                  3 11' Qty '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                  3 17'  Price    '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                  3 29'Item Description    '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                  3 50'Messages                      '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A          R ACMEORD3F
+     A                                 24  2'F12=Cancel'
+     A            SCERRMSG      78   O 23  2DSPATR(HI)
+     A                                      DSPATR(BL)
+     A          R ACMEORDS4
+     A                                  1 33'Acme Order Entry'
+     A                                      DSPATR(HI)
+     A                                 10 21'Order number'
+     A            SCORDER       10   O 10 34
+     A                                 10 45'has been placed.'
+     A                                 15 29'Press ENTER to continue'
+     A                                      DSPATR(HI)
+     A                                      DSPATR(BL)

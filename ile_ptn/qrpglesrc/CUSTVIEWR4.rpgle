@@ -1,4 +1,5 @@
-      *  This is a sample display logic (VIEW) module for the "new style"
+      *  CUSTVIEWR4 --
+      *  This is a sample display logic (view) module for the "new style"
       *  customer maintenance program.
       *                                        Scott Klement, Feb 2007
       *
@@ -15,7 +16,7 @@
      FCUSTS     CF   E             WORKSTN USROPN
      F                                     INDDS(Screen)
 
-      /copy ile_ptn,cust_h
+      /copy QRPGLESRC,cust_h
 
      D Screen          DS                  qualified
      D   Exit                         1N   overlay(Screen: 03)
@@ -33,6 +34,7 @@
      D CEE4RAGE        PR
      D   procedure                     *   procptr const
      D   feedback                    12A   options(*omit)
+
       /free
          if (Initialized);
             return;

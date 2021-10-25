@@ -1,0 +1,14 @@
+     A* T_TESTFILE: PF to Demostrate the Output of Simple Trigger
+     A                                      REF(TESTFILE)
+     A          R RCDFORMAT
+     A            TRGTIME         Z
+     A            JOBNAME       10A
+     A            JOBUSER       10A
+     A            JOBNBR         6S 0
+     A            TRGTYPE        2A
+     A            F1        R
+     A            F2        R
+     A            F3        R
+     A            F4        R
+     A            F5        R
+     A            F6        R

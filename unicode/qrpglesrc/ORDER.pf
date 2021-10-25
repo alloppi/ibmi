@@ -1,0 +1,9 @@
+     A                                      UNIQUE
+     A          R ORDREC
+     A            ORDNO          5  0
+     A            ORDSTS         1
+     A            COMPANY       40G         CCSID(13488 20)
+     A            CONTACT       40G         CCSID(13488 20)
+     A            ADDR1         40G         CCSID(13488 20)
+     A            ADDR2         40G         CCSID(13488 20)
+     A          K ORDNO

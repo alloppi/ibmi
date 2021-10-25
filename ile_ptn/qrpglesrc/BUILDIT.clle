@@ -1,13 +1,58 @@
-/*   CL PROGRAM TO BUILD THE CUSTOMER MAINTENANCE              +
+/*   CL PROGRAM TO BUILD THE ACME ORDERING SYSTEM              +
      TO COMPILE:                                               +
         CRTBNDCL BUILDIT SRCFILE(XXX/QCLSRC) DBGVIEW(*LIST)    */
 PGM
+
+    /********************************************************+
+     * THE FOLLOWING FOR CUSTOMER MAINTENANCE                +
+     ********************************************************/
+
+     DLTF       FILE(*CURLIB/CUSTF)
+     MONMSG     CPF2105
+
+     CRTPF FILE(CUSTF) SRCFILE(*CURLIB/QRPGLESRC)
+
+     RUNSQLSTM  SRCFILE(QRPGLESRC) SRCMBR(DEMOCUS) +
+                COMMIT(*NONE) NAMING(*SYS)
+     DLTSPLF    FILE(DEMOCUS) SPLNBR(*LAST)
+
+     CRTRPGPGM  PGM(CUSTMNT) SRCFILE(*CURLIB/QRPGLESRC) OPTION(*LSTDBG)
+
+     CRTRPGMOD  MODULE(QTEMP/CUSTR4) SRCFILE(*CURLIB/QRPGLESRC) DBGVIEW(*LIST)
+     CRTSRVPGM  CUSTR4 EXPORT(*SRCFILE) SRCFILE(*CURLIB/QSRVSRC)
+
+     CRTDSPF    FILE(*CURLIB/CUSTS) SRCFILE(*CURLIB/QRPGLESRC)
+     CRTRPGMOD  MODULE(QTEMP/CUSTVIEWR4) SRCFILE(*CURLIB/QRPGLESRC) DBGVIEW(*LIST)
+
+     CRTRPGMOD QTEMP/CUSTMNTR4 SRCFILE(*CURLIB/QRPGLESRC) DBGVIEW(*LIST)
+     CRTPGM    PGM(*CURLIB/CUSTMNTR4) MODULE(QTEMP/CUSTMNTR4 QTEMP/CUSTVIEWR4) BNDSRVPGM((CUSTR4))
+
 
     /********************************************************+
      * DELETE DEMO FILES IF THEY EXIST                       +
      ********************************************************/
 
              DLTF       FILE(*CURLIB/CUSTFILE)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/ITEMFILE)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/ORDHEAD)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/ORDITEM)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/CTRLFILE)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/CUSTFILEF)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/ITEMFILEF)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/ORDHEADF)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/ORDITEMF)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/CTRLFILEF)
+             MONMSG     CPF2105
+             DLTF       FILE(*CURLIB/ACMEORDS)
              MONMSG     CPF2105
 
     /********************************************************+
@@ -21,7 +66,7 @@ PGM
      *        BUT THIS CODE STRIVES TO BE V5R3 COMPATIBLE    +
      ********************************************************/
 
-     RUNSQLSTM  SRCFILE(ILE_ORDER) SRCMBR(MKFILESSQL) +
+     RUNSQLSTM  SRCFILE(QRPGLESRC) SRCMBR(MKFILESSQL) +
                 COMMIT(*NONE) NAMING(*SYS)
      DLTSPLF    FILE(MKFILESSQL) SPLNBR(*LAST)
 
@@ -31,7 +76,7 @@ PGM
      RNMOBJ OBJ(*CURLIB/ORDITEMF)  OBJTYPE(*FILE) NEWOBJ(ORDITEM)
      RNMOBJ OBJ(*CURLIB/CTRLFILEF) OBJTYPE(*FILE) NEWOBJ(CTRLFILE)
 
-     RUNSQLSTM  SRCFILE(ILE_ORDER) SRCMBR(DEMORECS) +
+     RUNSQLSTM  SRCFILE(QRPGLESRC) SRCMBR(DEMORECS) +
                 COMMIT(*NONE) NAMING(*SYS)
      DLTSPLF    FILE(DEMORECS) SPLNBR(*LAST)
 
@@ -42,7 +87,7 @@ PGM
 
      CRTSQLRPGI OBJ(QTEMP/ORDERR4) +
                 OBJTYPE(*MODULE) +
-                SRCFILE(*LIBL/ILE_ORDER) +
+                SRCFILE(*LIBL/QRPGLESRC) +
                 DBGVIEW(*SOURCE)
 
      CRTSRVPGM SRVPGM(*CURLIB/ORDERR4) +
@@ -60,7 +105,7 @@ PGM
      * CREATE STORED PROCEDURE INTERFACES FOR ORDERR4       +
      ********************************************************/
 
-     RUNSQLSTM  SRCFILE(ILE_ORDER) SRCMBR(CRTPROC) +
+     RUNSQLSTM  SRCFILE(QRPGLESRC) SRCMBR(CRTPROC) +
                 COMMIT(*NONE) NAMING(*SYS) ERRLVL(20)
      DLTSPLF    FILE(CRTPROC) SPLNBR(*LAST)
 
@@ -69,8 +114,8 @@ PGM
      * BUILD THE 5250 INTERFACE FOR PLACING ORDERS          +
      ********************************************************/
 
-     CRTDSPF    FILE(ACMEORDS) SRCFILE(*LIBL/ILE_ORDER)
-     CRTRPGMOD  MODULE(QTEMP/ACMEORDR4) SRCFILE(*LIBL/ILE_ORDER) +
+     CRTDSPF    FILE(ACMEORDS) SRCFILE(*LIBL/QRPGLESRC)
+     CRTRPGMOD  MODULE(QTEMP/ACMEORDR4) SRCFILE(*LIBL/QRPGLESRC) +
                   DBGVIEW(*LIST)
      CRTPGM     PGM(ACMEORDR4) MODULE(QTEMP/ACMEORDR4) BNDSRVPGM(ORDERR4) +
                   ACTGRP(ACME)

@@ -1,3 +1,4 @@
+      *  CUSTR4 --
       *  Sample business logic module (or "model") for the "new style"
       *  customer maintenance program.
       *                                  Scott Klement, February 2007
@@ -7,18 +8,21 @@
       *        QRPGLESRC file in your library list.
       *    - Make sure the binder source (CUSTR4.BND) is in a QSRVSRC
       *        file in your source library.
-      *    - Make sure you've already built the CUSTFILE physical file.
+      *    - Make sure you've already built the CUSTF physical file.
       *
-      *    - CRTRPGMOD CUSTR4 SRCFILE(xxx/QRPGLESRC) DBGVIEW(*LIST)
-      *    - CRTSRVPGM CUSTR4 EXPORT(*SRCFILE) SRCFILE(xxx/QSRVSRC)
+      *    - CRTRPGMOD CUSTR4 SRCFILE(*CURLIB/QRPGLESRC) DBGVIEW(*LIST)
+      *    - CRTSRVPGM CUSTR4 EXPORT(*SRCFILE) SRCFILE(*CURLIB/QSRVSRC)
       *
      H NOMAIN
 
-     FCUSTFILE  UF A E           K DISK    USROPN
+     FCUSTF     UF A E           K DISK    USROPN
 
-      /copy ile_ptn,cust_h
+      /copy QRPGLESRC,cust_h
 
       * Register Activation Group Exit Procedure (CEE4RAGE) API
+      * The Register Activation Group Exit Procedure (CEE4RAGE) API is used to register procedures
+      * that are called when an activation group ends
+
      D CEE4RAGE        PR
      D   procedure                     *   procptr const
      D   feedback                    12A   options(*omit)
@@ -46,13 +50,13 @@
            return;
          endif;
 
-         open CUSTFILE;
+         open CUSTF;
 
          CEE4RAGE( %paddr(Cust_Done): *omit );
          Initialized = *On;
          return;
        on-error;
-           close CUSTFILE;
+           close CUSTF;
            Initialized = *Off;
        endmon;
       /end-free
@@ -67,8 +71,8 @@
      P cust_Done       B                   export
      D cust_Done       PI
       /free
-         if %open(CUSTFILE);
-           close CUSTFILE;
+         if %open(CUSTF);
+           close CUSTF;
          endif;
          Initialized = *Off;
       /end-free

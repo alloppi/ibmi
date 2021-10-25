@@ -1,10 +1,8 @@
-      ******************************************************************
-      * Compile: CRTRPGMOD MODULE(OFFSETR4) SRCFILE(*LIBL/QPTRSRC) DBGVIEW(*LIST)
-      *          CRTSRVPGM SRVPGM(OFFSETR4) EXPORT(*ALL)
-      ******************************************************************
+      * CRTRPGMOD MODULE(OFFSETR4) SRCFILE(*CURLIB/QRPGLESRC) DBGVIEW(*LIST)
+      * CRTSRVPGM SRVPGM(OFFSETR4) EXPORT(*ALL)
      H NOMAIN
 
-     D/COPY QPTRSRC,OFFSET_H
+     D/COPY QRPGLESRC,OFFSET_H
 
      P*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
      P* Return a pointer at a specified offset value from another ptr
@@ -21,8 +19,8 @@
 
      c                   if        peOffset > 0
 
-     C                   dow       peOffset > 4096
-     C                   eval      p_NewPtr = %addr(wkMove(4097))
+     c                   dow       peOffset > 4096
+     c                   eval      p_NewPtr = %addr(wkMove(4097))
      c                   eval      peOffset = peOffset - 4096
      c                   enddo
 

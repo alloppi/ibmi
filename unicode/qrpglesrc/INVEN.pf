@@ -1,0 +1,5 @@
+     A                                      UNIQUE
+     A          R INVREC
+     A            PARTNO         5  0
+     A            PARTDESC      40G         CCSID(13488 20)
+     A          K PARTNO

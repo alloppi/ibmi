@@ -1,0 +1,92 @@
+/*===================================================================*/
+/* Program name: DSPAUTLIBC                                          */
+/* Purpose.....: Display Authority of All Objects in a Library       */
+/*                                                                   */
+/* Remarks     : Must Own by PHOENIX and object Usrprf(*OWNER)       */
+/*               USEADPAUT(*YES)                                     */
+/*                                                                   */
+/* Modification:                                                     */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- ---- ---- ----- --------------------------- */
+/* 2013/01/04 Alan       AC        04769 New Develop                 */
+/*===================================================================*/
+             PGM        PARM(&LIBRARY &OBJTYPE &QUALFILE)
+
+             DCL        VAR(&LIBRARY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&QUALFILE) TYPE(*CHAR) LEN(20)
+
+             DCL        VAR(&OUTFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTFILELIB) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&HASREC) TYPE(*LGL) VALUE('1')
+             DCL        VAR(&ERRORSW) TYPE(*LGL)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(100)
+             DCL        VAR(&MSGF) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSGFLIB) TYPE(*CHAR) LEN(10)
+
+             DCLF       FILE(QADSPOBJ)
+
+             MONMSG     MSGID(CPA0000 CPD0000 CPF0000) EXEC(GOTO +
+                          CMDLBL(STDERR1))
+
+             CHGVAR     VAR(&OUTFILELIB) VALUE(%SST(&QUALFILE 11 10))
+             CHGVAR     VAR(&OUTFILE) VALUE(%SST(&QUALFILE 1 10))
+
+/* Check for library existence */
+ STEP10:     CHKOBJ     OBJ(QSYS/&LIBRARY) OBJTYPE(*LIB)
+
+/* Delete output file */
+             DLTF       FILE(&OUTFILELIB/&OUTFILE)
+             MONMSG     MSGID(CPF2105)
+
+/* Delete file to store list of objects */
+             DLTF       FILE(QTEMP/QADSPOBJ)
+             MONMSG     MSGID(CPF0000)
+
+/* Display list of objects to outfile in QTEMP */
+             DSPOBJD    OBJ(&LIBRARY/*ALL) OBJTYPE(&OBJTYPE) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/QADSPOBJ)
+
+             OVRDBF     FILE(QADSPOBJ) TOFILE(QTEMP/QADSPOBJ)
+
+/* Read objects list to retrieve object authority */
+             DOWHILE    COND(&HASREC)
+             RCVF
+             MONMSG     MSGID(CPF0864) EXEC(LEAVE)
+
+             DSPOBJAUT  OBJ(&ODLBNM/&ODOBNM) OBJTYPE(&ODOBTP) +
+                          OUTPUT(*OUTFILE) +
+                          OUTFILE(&OUTFILELIB/&OUTFILE) +
+                          OUTMBR(*FIRST *ADD)
+             ENDDO
+
+             GOTO       CMDLBL(STEP60) /* No error */
+
+/* Standard error handling routine */
+ STDERR1:
+             IF         COND(&ERRORSW) THEN(SNDPGMMSG MSGID(CPF9999) +
+                          MSGF(QCPFMSG) MSGTYPE(*ESCAPE))
+             CHGVAR     VAR(&ERRORSW) VALUE('1')
+
+ STDERR2:    RCVMSG     MSGTYPE(*DIAG) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                          MSGF(&MSGF) MSGFLIB(&MSGFLIB)
+             IF         COND(&MSGID *EQ '       ') THEN(GOTO +
+                          CMDLBL(STDERR3))
+             SNDPGMMSG  MSGID(&MSGID) MSGF(&MSGFLIB/&MSGF) +
+                          MSGDTA(&MSGDTA) MSGTYPE(*DIAG)
+             GOTO       CMDLBL(STDERR2) /* Loop back for diagnostics */
+
+ STDERR3:    RCVMSG     MSGTYPE(*EXCP) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                          MSGF(&MSGF) MSGFLIB(&MSGFLIB)
+             SNDPGMMSG  MSGID(&MSGID) MSGF(&MSGFLIB/&MSGF) +
+                          MSGDTA(&MSGDTA) MSGTYPE(*ESCAPE)
+
+/* Display all objects authority in library */
+ STEP60:     RUNQRY     QRYFILE((&OUTFILELIB/&OUTFILE *FIRST))
+
+ STEP99:     DLTOVR     FILE(*ALL)
+             RCLRSC
+
+             ENDPGM

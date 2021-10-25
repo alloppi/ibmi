@@ -1,0 +1,19 @@
+     A* ODETL: Order Detail file
+     A*  To compile:
+     A*       CRTPF FILE(ODETL) SRCFILE(*CURLIB/QRPGLESRC)
+     A*
+     A                                      UNIQUE
+     A          R ODETLR
+     A            X2DEL          1A         COLHDG('Status')
+      *                                     A = Active
+      *                                     B = XML Processed
+     A            X2CMP          3S 0       COLHDG('Company No.')
+     A            X2ORD          9S 0       COLHDG('Order Number')
+     A            X2SEQ          4S 0       COLHDG('Order Line No.')
+     A            X2ITEM        20A         COLHDG('Item Number')
+     A            X2DESC        30A         COLHDG('Item Description')
+     A            X2QTY          8S 0       COLHDG('Order Quantity')
+     A            X2PRIC        11S 2       COLHDG('Item Price')
+     A          K X2CMP
+     A          K X2ORD
+     A          K X2SEQ

@@ -12,7 +12,7 @@
       *
       *        - CRTPGM xxx/CUSTMNTR4 MODULE(CUSTMNTR4 CUSTVIEWR4) BNDSRVPGM(CUSTR4)
       *
-      /copy ile_ptn,cust_h
+      /copy QRPGLESRC,cust_h
 
      D Control_AskCust...
      D                 PR             1N

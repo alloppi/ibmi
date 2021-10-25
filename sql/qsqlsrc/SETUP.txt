@@ -1,0 +1,19 @@
+/* Create the library from the command line */
+/* CRTLIB LIB(ALAN)                         */
+/* ADDLIBLE LIB(ALAN)                       */
+
+/* Start SQL Interactive Session (STRSQL)    */
+CREATE TABLE ALAN/OTABLE (
+  O1ITEM CHAR (10 ) NOT NULL,
+  O1DESC CHAR (50 ) NOT NULL WITH DEFAULT,
+  O1QTY DEC (9,0) NOT NULL WITH DEFAULT,
+  O1PRICE DEC (11,2) NOT NULL WITH DEFAULT,
+  O1DISC DEC (5,2) NOT NULL WITH DEFAULT);
+
+/* Insert some data into the Order Table */
+INSERT INTO ALAN/OTABLE VALUES('A001', 'A Item Description', 1, 11.11, 10.0);
+INSERT INTO ALAN/OTABLE VALUES('A002', 'B Item Description', 2, 22.22, 0.0);
+INSERT INTO ALAN/OTABLE VALUES('C002', 'C Item Description', 3, 33.33, 15.0);
+
+/* Query the table to see your data */
+/* SELECT * FROM ALAN/OTABLE        */

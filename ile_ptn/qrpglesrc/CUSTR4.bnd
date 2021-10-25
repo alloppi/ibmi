@@ -1,0 +1,14 @@
+/*  This contains a list of procedures to be exported from the CUSTR4 +
+    service program.   See the CUSTR4.RPGLE member for details     */
+STRPGMEXP SIGNATURE('CUSTR4 v1.00')
+   export symbol(cust_init)
+   export symbol(cust_done)
+   export symbol(cust_new)
+   export symbol(cust_load)
+   export symbol(cust_save)
+   export symbol(cust_getName)
+   export symbol(cust_getAddress)
+   export symbol(cust_setName)
+   export symbol(cust_setAddress)
+   export symbol(cust_error)
+ENDPGMEXP

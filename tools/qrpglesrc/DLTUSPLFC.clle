@@ -1,0 +1,57 @@
+             PGM        PARM(&SLTUSER &OUTQNAME &OUTQLIB &SLTSFLF)
+
+             DCL        VAR(&SLTUSER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTQNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OUTQLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SLTSFLF) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DELETE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&COPIES1) TYPE(*DEC) LEN(5 0)
+             DCL        VAR(&FILNUM1) TYPE(*DEC) LEN(6 0)
+
+             DCLF       FILE(DLTUSPLFF)
+
+             CHKOBJ     OBJ(QTEMP/DLTUSPLFF) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(CRTDUPOBJ OBJ(DLTUSPLFF) +
+                          FROMLIB(*LIBL) OBJTYPE(*FILE) TOLIB(QTEMP))
+
+             OVRDBF     FILE(DLTUSPLFF) TOFILE(QTEMP/DLTUSPLFF) +
+                        MBR(*FIRST)
+
+             WRKOUTQ    OUTQ(&OUTQLIB/&OUTQNAME) OUTPUT(*PRINT)
+
+             CPYSPLF    FILE(QPRTSPLQ) TOFILE(QTEMP/DLTUSPLFF) +
+                        SPLNBR(*LAST)
+
+ GETF:       RCVF
+             MONMSG     MSGID(CPF0864) EXEC(GOTO CMDLBL(ENDPGM))
+
+             CHGVAR     VAR(&DELETE) VALUE(' ')
+
+ /* INSERT LOGIC TO SET THE DELETE FLAG ON HERE. WHEN A +
+      SPOOLED FILE MEETS THE DELETION CRITERIA, SET THE +
+      &DELETE + VARIABLE TO 'Y' */
+
+             CHGVAR     VAR(&COPIES1) VALUE(&COPIES)
+             MONMSG     MSGID(CPF0818) EXEC(GOTO CMDLBL(GETF))
+
+             IF         COND(&COPIES *GE '    1' *AND &COPIES *LE +
+                          '99999') THEN(DO)
+             IF         COND(&SLTSFLF = &SPLFIL *OR &SLTSFLF = +
+                          '*ALL') THEN(DO)
+             IF         COND(&SLTUSER = &USER) THEN(DO)
+             CHGVAR     VAR(&DELETE) VALUE('Y')
+             ENDDO
+             ENDDO
+             ENDDO
+
+             IF         COND(&DELETE *EQ 'Y') THEN(DO)
+             CHGVAR     VAR(&FILNUM1) VALUE(&FILNUM)
+               MONMSG     MSGID(CPF0818) EXEC(GOTO CMDLBL(GETF))
+
+             DLTSPLF    FILE(&SPLFIL) JOB(&JOBNUM/&USER/&JOB) +
+                          SPLNBR(&FILNUM1)
+             ENDDO
+
+             GOTO       CMDLBL(GETF)
+
+             ENDPGM:

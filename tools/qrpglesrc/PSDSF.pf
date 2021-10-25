@@ -1,0 +1,44 @@
+     A*  Externally described Program Status Data Structure (PSDS)
+     A*
+     A          R PSDSFR
+     A            PROCNME       10A         COLHDG('Procedure' 'Name')
+     A            STSCDE         5S 0       COLHDG('Status' 'Code')
+     A            PRVSTSCDE      5S 0       COLHDG('Previous' 'Status' 'Code')
+     A            SRCLINNBR      8A         COLHDG('Source' 'Line' 'No,')
+     A            EXCPTSUBR      8A         COLHDG('Exception' 'Subroutine')
+     A            NBRPARMS       3S 0       COLHDG('No. of' 'Parameters')
+     A            EXCPTTYP       3A         COLHDG('Exception' 'Type')
+     A            EXCPTNBR       4A         COLHDG('Exception' 'No.')
+     A            RESERVED01     4A         COLHDG('Reserved')
+     A            MSGWRKAREA    30A         COLHDG('Message' 'Work' 'Area')
+     A            LIB           10A         COLHDG('Library')
+     A            RTVEXCPTDT    80A         COLHDG('Retrieved' 'Exception' +
+                                                   'Data')
+     A            EXCPTID        4A         COLHDG('Id. of' 'Exception' +
+                                                   'RNX9001')
+     A            UNUSED0001    16A         COLHDG('Unused')
+     A            DTEJOBENTR     8A         COLHDG('*DATE' 'Job entered' +
+                                                   'System')
+     A            CNTJOBENTR     2S 0       COLHDG('Century' 'Job entered' +
+                                                   'System')
+     A            LASTFILEOP     8A         COLHDG('File last' 'operation' +
+                                                   'Performed')
+     A            FILESTS       35A         COLHDG('STATUS' 'OF' 'FILE')
+     A            JOBNME        10A         COLHDG('Job' 'Name')
+     A            USER          10A         COLHDG('User' 'Profile')
+     A            JOBNMBR        6S 0       COLHDG('Job' 'Number')
+     A            DTEJOBENT2     6S 0       COLHDG('Date job' 'Entered' +
+                                                   'System')
+     A            DTEPGMRUN      6S 0       COLHDG('Date' 'Program' 'Running')
+     A            TMEPGMRUN      6S 0       COLHDG('Time' 'Program' 'Running')
+     A            COMPILEDTE     6A         COLHDG('Compile' 'Date')
+     A            COMPILETME     6A         COLHDG('Compile' 'Time')
+     A            COMPILELVL     4A         COLHDG('Level' 'of' 'Compile')
+     A            SRCFILE       10A         COLHDG('Source' 'File' 'Name')
+     A            SRCLIB        10A         COLHDG('Source' 'Library')
+     A            SRCMBR        10A         COLHDG('Source' 'Member')
+     A            MODULEPGM     10A         COLHDG('Program' 'Containing' +
+                                                   'Module')
+     A            MODULEPROC    10A         COLHDG('Module' 'Containing' +
+                                                   'Procedure')
+     A            UNUSED0002    76A         COLHDG('Unused')

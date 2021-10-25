@@ -14,6 +14,7 @@
      A                                      DSPATR(HI)
      A                                 12 27'Enter customer number:'
      A            SCCUST         4  0B 12 50
+     A                                      EDTCDE(4)
      A            SCMSG         60   O 23 11DSPATR(HI BL)
      A                                 24  2'F3=Exit'
      A                                 24 24'F10=New'
@@ -29,6 +30,7 @@
      A                                  9 21'State:'
      A                                 10 23'Zip:'
      A            SCCUST         4  0B  4 28
+     A                                      EDTCDE(4)
      A            SCNAME        25   B  6 28
      A            SCADDR        25   B  7 28
      A            SCCITY        15   B  8 28

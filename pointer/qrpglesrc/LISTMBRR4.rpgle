@@ -1,15 +1,17 @@
-      ******************************************************************
-      * Compile: CRTRPGMOD MODULE(LISTMBRR4) DBGVIEW(*LIST)
-      *          CRTPGM PGM(LISTMBRR4) BNDSRVPGM(OFFSETR4)
-      ******************************************************************
+      * https://www.scottklement.com/rpg/pointers.html#topic7
+      * List Members in File using QUSLMBR API
+
+      * CRTRPGMOD MODULE(LISTMBRR4) SRCFILE(*CURLIB/QRPGLESRC) DBGVIEW(*LIST)
+      * CRTPGM PGM(LISTMBRR4) BNDSRVPGM(OFFSETR4)
+
       ******************************************************************
       * API Error Code Structure -- used with most non-bindable API's
       ******************************************************************
      D dsEC            DS
      D*                                    Bytes Provided (size of struct)
-     D  dsECBytesP             1      4B 0 INZ(256)
+     D  dsECBytesP             1      4B 0 inz(256)
      D*                                    Bytes Available (returned by API)
-     D  dsECBytesA             5      8B 0 INZ(0)
+     D  dsECBytesA             5      8B 0 inz(0)
      D*                                    Msg ID of Error Msg Returned
      D  dsECMsgID              9     15
      D*                                    Reserved
@@ -73,34 +75,35 @@
       * Create User Space API
       *
      D CrtUsrSpc       PR                  ExtPgm('QUSCRTUS')
-     D   UsrSpc                      20A   CONST
-     D   ExtAttr                     10A   CONST
-     D   InitSiz                     10I 0 CONST
-     D   InitVal                      1A   CONST
-     D   PubAuth                     10A   CONST
-     D   Text                        50A   CONST
-     D   Replace                     10A   CONST
-     D   ErrorCode                  256A
+     D   UsrSpc                      20A   Const                                quali user space nam
+     D   ExtAttr                     10A   Const                                extend attribute
+     D   InitSiz                     10I 0 Const                                initial size
+     D   InitVal                      1A   Const                                initial value
+     D   PubAuth                     10A   Const                                public authority
+     D   Text                        50A   Const                                text description
+     D   Replace                     10A   Const Options(*nopass)               replace
+     D   ErrorCode                  256A   Options(*varsize: *nopass)           error code
 
       * Retrieve Pointer to User Space API
       *
      D RtvPtrUS        PR                  ExtPgm('QUSPTRUS')
-     D   UsrSpc                      20A   CONST
-     D   PtrUsrSpc                     *
+     D   UsrSpc                      20A   Const                                quali user space nam
+     D   PtrUsrSpc                     *                                        return pointer
+     D   ErrorCode                  256A   Options(*varsize: *nopass)           error code
 
       * List Members (QUSLMBR) API
       *
      D ListMbrs        PR                  ExtPgm('QUSLMBR')
-     D   UsrSpc                      20A   CONST
-     D   Format                       8A   CONST
-     D   DataBase                    20A   CONST
-     D   Member                      10A   CONST
-     D   Override                     1A   CONST
-     D   ErrorCode                  256A
+     D   UsrSpc                      20A   Const                                quali user space nam
+     D   Format                       8A   Const                                format name
+     D   DataBase                    20A   Const                                qualified file name
+     D   Member                      10A   Const                                record format name
+     D   Override                     1A   Const                                override format name
+     D   ErrorCode                  256A   Options(*varsize: *nopass)           error code
 
       * OffsetPtr service program:
       *
-     D/COPY QPTRSRC,OFFSET_H
+     D/COPY QRPGLESRC,OFFSET_H
 
       ******************************************************************
       * Local variables:
@@ -112,8 +115,8 @@
 
 
       *** Create the User Space QTEMP/MBRDATA
-     C                   callp     CrtUsrSpc('MBRDATA   QTEMP':'USRSPC':
-     C                             1:x'00':'*ALL':'List of Members in File':
+     c                   callp     CrtUsrSpc('MBRDATA   QTEMP': 'USRSPC':
+     c                             1: x'00': '*ALL': 'List of Members in File':
      c                             '*YES': dsEC)
 
      c                   if        dsECBytesA > 0
@@ -127,8 +130,8 @@
 
       *** Ask the List Members API to put a list of members in the
       ***   QRPGLESRC file into the desired user space:
-     C                   callp     ListMbrs('MBRDATA   QTEMP':'MBRL0100':
-     C                             'QRPGLESRC *LIBL':'*ALL':'0':dsEC)
+     c                   callp     ListMbrs('MBRDATA   QTEMP':'MBRL0100':
+     c                             'QRPGLESRC *LIBL':'*ALL':'0':dsEC)
 
      c                   if        dsECBytesA > 0
      c                   eval      Msg = 'Error ' + dsECMsgID + ' calling -
@@ -144,16 +147,16 @@
 
       *** Loop through the list of members, each time changing the
       ***   p_MbrName pointer to point to the next member in the list
-     C                   do        dsLHEntCnt    Entry             4 0
+     c                   do        dsLHEntCnt    Entry             4 0
      c                   eval      Offset = ((Entry-1) * dsLHEntSiz)
      c                               + dsLHLstOff
      c                   eval      p_MbrName = OffsetPtr(p_GenHdr: Offset)
      c     MbrName       dsply
      c                   enddo
 
-     C                   eval      Msg = 'Press ENTER to end program'
+     c                   eval      Msg = 'Press ENTER to end program'
      c                   dsply                   Msg
 
       *** End Program
-     c                   eval      *INLR = *On
+     c                   eval      *InLr = *On
      c                   Return

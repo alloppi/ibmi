@@ -1,0 +1,42 @@
+     A                                      REF(PERSONP)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      INDARA
+     A                                      CA03(03 'F3=Exit')
+     A          R SFL01                     SFL
+     A            Z1RRN          4S 0H
+     A            Z1OPT          1A  B  5  3
+     A            LASTNAME  R        O  5  6
+     A            FIRSTNAME R        O  5 38
+     A          R CTL01                     SFLCTL(SFL01)
+     A                                      SFLSIZ(9999)
+     A                                      SFLPAG(0017)
+     A                                      OVERLAY
+     A  31                                  SFLDSP
+     A  30                                  SFLDSPCTL
+      *** A N30                                  SFLDLT
+     A N30                                  SFLCLR
+     A  30                                  SFLEND(*MORE)
+     A                                      CA05(05 'F5=Refresh')
+     A                                  1  2USER
+     A                                      COLOR(BLU)
+     A                                  1 63TIME
+     A                                      COLOR(BLU)
+     A                                  1 72DATE
+     A                                      EDTCDE(Y)
+     A                                      COLOR(BLU)
+     A            Z1SCREEN      12A  O  2  2COLOR(BLU)
+     A                                  2 72SYSNAME
+     A                                      COLOR(BLU)
+     A                                  3  2'Position to:'
+     A                                      COLOR(BLU)
+     A            Z1POSITIONR        B  3 15REFFLD(LASTNAME)
+     A                                      CHECK(LC)
+     A                                      COLOR(BLU)
+     A                                  4  2'Opt Last Name                     -
+     A                                        First Name               '
+     A                                      DSPATR(UL)
+     A                                      DSPATR(HI)
+     A          R REC01
+     A                                 23  3'F3=Exit   F5=Refresh'
+     A                                      COLOR(BLU)

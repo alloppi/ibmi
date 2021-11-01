@@ -1,0 +1,20 @@
+     A*==============================================================*
+     A* File name: CHKCHIFB                                          *
+     A*                                                              *
+     A* Purpose: Check Invalid Chinese Character (White List)        *
+     A*                                                              *
+     A* Date written: 2019/09/17                                     *
+     A*                                                              *
+     A* Remarks :                                                    *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2019/09/17 Alan       AC           New                       *
+     A*==============================================================*
+     A                                      UNIQUE
+     A                                      REF(REFFILE)
+     A          R CHKCHIFBR
+     A            XRWHTC         4O         TEXT('WHITE LIST CHARACTER')
+     A                                      COLHDG('WHITE LIST CHARACTER')
+     A          K XRWHTC

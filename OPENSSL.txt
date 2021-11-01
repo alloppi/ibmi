@@ -1,0 +1,141 @@
+This procedure explains how to encrypt large files with OpenSSL and Public/Private keys.
+=======================================================================================
+Configurate OpenSSL by configuration file: openssl.cnf
+- set OPENSSL_CONF=c:\xampp\apache\conf\openssl.cnf
+
+Generate a private key with password protect:
+- openssl genrsa -out private.pem -passout pass:promise -des3 2048
+
+Write corresponding self-signed certificate:
+- openssl req -new -x509 -key private.pem -passin pass:promise -out cert.pem -subj "/C=CN/ST=/L=Hong
+  Ltd./OU=IT Department/CN=promise.com.hk"
+
+Zip the larger file using jar:
+- jar cfM upload.zip 5Mphoto1.jpg 5Mphoto2.jpg 5Mphoto3.jpg 5Mphoto4.jpg 5Mphoto5.jpg
+
+Generate 2048 random password to password file
+- openssl rand -base64 2048 > passwd.bin
+
+Encrypt the larger file:
+- openssl enc -aes-256-cbc -base64 -salt -in upload.zip -out upload.zip.enc -pass file:./passwd.bin
+
+Encrypt the password file using s/mime with public key:
+- openssl smime -encrypt -binary -aes256 -in passwd.bin -out passwd.bin.enc cert.pem
+
+Remove random password in source:
+- rm ./passwd.bin
+
+Send encrypt larger file and encrypted password file to destination
+===================================================================
+Decrypt the password file with private key:
+- openssl smime -decrypt -binary -in passwd.bin.enc -inkey private.pem -passin pass:promise -des3 -o
+
+Decrypt the larger file:
+- openssl enc -d -aes-256-cbc -base64 -salt -in upload.zip.enc -out upload.enc.zip -pass file:./pass
+
+UnZip the larger file using jar:
+- jar xf upload.enc.zip
+
+----------------------------------------------------------------------------------------------------
+Key-pair Consideration
+- https://www.sslshopper.com/article-most-common-openssl-commands.html
+Generate an RSA keypair with a 1024 bit private key
+===========================
+openssl genrsa -out private_key.pem 1024
+
+Extracting the public key from an RSA keypair
+===========================
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+
+openssl rsautl -in lam.txt -inkey /home/QSECOFR/lampub_key.pem -encrypt
+
+Check a private key
+===========================
+openssl rsa -in privateKey.key -check
+
+// encrypt
+openssl rsautl -in encrypted_file -out decrypted_file -inkey pubkey.pem -pubin -encrypt
+// encode to base64
+openssl enc -base64 -in encrypted_file -out b
+
+
+// decode to file b
+openssl enc -base64 -d -in encrypted_file -out b
+
+// decrypt
+openssl rsautl -in encrypted_file -out decrypted_file -inkey privkey.pem -decrypt
+
+CSR Request
+===========
+openssl req -text -noout -verify -in test.csr
+
+Cert Validation (shows valid period,...)
+========================================
+openssl x509 -text -in cert.pem
+
+Check version
+========================================
+openssl version, 2015-11-26 V6R1 both in 0.9.7.d 17 version
+
+Create Symetric aes key (for Doc net)
+========================================
+openssl enc -aes-256-cbc -k promise -P -md sha1
+ -aes-256-cbc : AES algorithm with key size 256 bits in CBC-mode.
+ -k- : This option allows you to set the key used for encryption or decryption
+ -P  : Additionally to any encryption tasks, this prints the key, initialization vector and salt val
+        is used just these values are printed, no encryption will take place
+ -md : This specifies the message digest which is used for key derivation. It can take one of the va
+         or sha1 (Secure Hash Algorithm  1)
+
+Test with ZA Bank
+========================================
+- Input string
+  > {"businessId":"fcff8984-5a8a-40e1-981a-ef254b8fe4e7","reqTime":"0721174354","reqDate":"20210721"
+    {}
+- Include intermedia hash file
+  > https://stackoverflow.com/questions/10782826/digital-signature-for-a-file-using-openssl
+
+- On-line create hash file
+  > https://passwordsgenerator.net/sha256-hash-generator/
+  > https://coding.tools/sha256
+
+ - Output a hash file from a string file
+  > openssl dgst -sha256 test1.txt > test1.hash
+    Result in lower case : sha256:34cee036d7640a96fb7160eecd969ba50dba4a26513688065e94df730997c9e9
+    change upper case manually : sha256:34CEE036D7640A96FB7160EECD969BA50DBA4A26513688065E94DF730997
+
+  > echo -n
+  '
+  {"businessId":"fcff8984-5a8a-40e1-981a-ef254b8fe4e7","reqTime":"0721174354","reqDate":"20210721","
+  '
+    | openssl dgst -sha256
+    (stdin)= 78ff44efc40249680955a1e41e6c16c38f84324b2ba5099182f70b0bd3dc36e7
+
+
+ - Output a binary hash file from a string file
+  > openssl dgst -sha256 -binary test1.txt > test1.bin.hash
+
+ - Output Sign file from above hash file
+  > openssl rsautl -sign -inkey prikey.pem -in test1.hash > test1.sig
+
+ - Output abase 64 from above sign file
+  > openssl enc -base64 -in test1.sig -out test1.b64
+  > openssl base64 -in test1.sig -out test1.b64
+   - may use -A option without line break
+
+ - direct sign (i.e. no hash file)
+  > openssl dgst -sha256 -sign prikey.pem -out test1.sig test1.txt
+
+ - Command suggest by ZA Bank in double hash
+   cat SndHB.txt| tr -d "\n" | sha256sum |tr -d "\n -"|tr 'a-z' 'A-Z'|openssl dgst -sha256 -sign pri
+   base64 -A
+ - However we don't have sha256sum, either using 'sed' or RPG
+   cat SndHB.txt| tr -d "\n" | openssl dgst -sha256 | sed 's/^.*= //'
+   > sed is 'string editor'
+      s - replace  s/String A/String B/', replace String A with String B
+      ^ - match the null string at beginning of the parttern space
+      . - match any charater, including newline
+      * - match a sequence of zero of more instance of mathes for the preceding regular expressoin
+      as a whole '^.*= ' , match all end with '= '
+      example : echo 'ab= asdfjk dd= fdjaskf' | sed 's/^.*= //'
+                output : fdjaskf

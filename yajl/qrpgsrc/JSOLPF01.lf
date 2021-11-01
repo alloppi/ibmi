@@ -1,0 +1,19 @@
+     A*==============================================================*
+     A* File name: ZAOLPF01                                          *
+     A*                                                              *
+     A* Purpose: Order List Parsed File                              *
+     A*                                                              *
+     A* Date written: 2021/08/06                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2021/08/06 Alan       AC           New Development           *
+     A*==============================================================*
+     A                                      UNIQUE
+     A          R ZAOLPFR                   PFILE(ZAOLPF)
+     A          K OLPTCD
+     A          K OLPTSN
+     A          K OLPOS
+     A          K OLPEP
+     A          O OLPDC                      CMP(EQ '9')

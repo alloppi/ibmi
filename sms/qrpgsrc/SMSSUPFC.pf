@@ -1,0 +1,29 @@
+     A*==============================================================*
+     A* File name...: SMSSUPFC                                       *
+     A* Purpose.....: IT Support Request - Message Sending Log File  *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- ---------------------- *
+     A* 2015/08/03 Alan       AC        05821 New                    *
+     A*==============================================================*
+     A                                      UNIQUE
+     A          R SMSSUPFCR
+     A            SMSSUPCSDD      L         TEXT('Sending Date')
+     A                                      COLHDG('Sending' 'Date')
+     A            SMSSUPCSDT      Z         TEXT('Sending Timestamp ')
+     A                                      COLHDG('Sending' 'Timestamp')
+     A            SMSSUPCNAM     8A         TEXT('Staff Name')
+     A                                      COLHDG('Staff' 'Name')
+     A            SMSSUPCJOB    10A         TEXT('Job Name')
+     A                                      COLHDG('Job' 'Name')
+     A            SMSSUPCEML    25A         TEXT('E-Mail')
+     A                                      COLHDG('E-Mail')
+     A            SMSSUPCSMT     8A         TEXT('SMS Telephone No.')
+     A                                      COLHDG('SMS' 'Telephone' 'No.')
+     A            SMSSUPCMSG   160A         TEXT('Message')
+     A                                      COLHDG('Message')
+      *
+     A          K SMSSUPCSDD
+     A          K SMSSUPCSDT
+     A          K SMSSUPCNAM

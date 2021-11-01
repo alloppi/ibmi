@@ -1,0 +1,110 @@
+     A*==============================================================*
+     A* Display file name: ENCAPI3D                                  *
+     A*                                                              *
+     A* Purpose: Set up PHKEYF (Run 1st Time Only)                   *
+     A*                                                              *
+     A* Specificatin:                                                *
+     A*                                                              *
+     A* Date written: 2017/03/06                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- ---------------------- *
+     A* 2017/03/06 Alan       AC              New Development        *
+     A*==============================================================*
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/REFFILE)
+     A                                      CHGINPDFT(CS)
+     A                                      PRINT
+     A          R DP001
+     A                                      CHGINPDFT
+     A                                      CF01
+     A                                      CA05
+     A                                      CA10
+     A                                      CF12(12)
+     A                                      OVERLAY
+     A  12N61                               CSRLOC(CPLIN      CPCOL)
+     A            CPLIN          3S 0H
+     A            CPCOL          3S 0H
+     A            PGMID     R        O  1  2REFFLD(RFRP)
+     A                                      COLOR(BLU)
+     A            HDBC      R        O  1 11REFFLD(RFBC)
+     A                                      COLOR(BLU)
+     A                                  1 14'-'
+     A                                      COLOR(WHT)
+     A            HDWSID    R        O  1 16REFFLD(RFWSID)
+     A                                      COLOR(BLU)
+     A                                  1 19'* * *'
+     A                                      DSPATR(HI)
+     A                                  1 27'Set up Credential Info.'
+     A                                      DSPATR(HI)
+     A                                  1 56'* * *'
+     A                                      COLOR(WHT)
+     A            HDDATE    R        O  1 62REFFLD(RFDATE)
+     A                                      EDTWRD('    /  / 0')
+     A                                      COLOR(BLU)
+     A                                  1 73TIME
+     A                                      COLOR(BLU)
+     A                                  8  8'Gateway Machine IP'
+     A            D1GMIP        15A  B  8 30COLOR(YLW)
+     A  41                                  DSPATR(RI)
+     A  41                                  DSPATR(PC)
+     A                                  9  8'CBS Account No.'
+     A            D1CBSAN       14A  B  9 30COLOR(YLW)
+     A  42                                  DSPATR(RI)
+     A  42                                  DSPATR(PC)
+     A                                 10  8'User Name'
+     A            D1UID          6A  B 10 30COLOR(YLW)
+     A  43                                  DSPATR(RI)
+     A  43                                  DSPATR(PC)
+     A                                 11  8'User Password'
+     A            D1PW          12A  B 11 30COLOR(YLW)
+     A  44                                  DSPATR(RI)
+     A  44                                  DSPATR(PC)
+     A                                 13  8'E-Cert Name'
+     A            D1ECN         50A  B 13 30COLOR(YLW)
+     A  45                                  DSPATR(RI)
+     A  45                                  DSPATR(PC)
+     A                                 15  8'E-Cert Password'
+     A            D1ECPW        16A  B 15 30COLOR(YLW)
+     A                                      CHECK(LC)
+     A  46                                  DSPATR(RI)
+     A  46                                  DSPATR(PC)
+     A          R FT001
+     A*%%TS  SD  19990531  093124  NELSON      REL-V4R2M0  5769-PW1
+     A            HDMSGID   R        O 20  2REFFLD(RFMSGID)
+     A                                      COLOR(RED)
+     A            HDMSG     R        O 20 10REFFLD(RFMSG)
+     A                                      COLOR(RED)
+     A                                 21  2'F 1'
+     A                                      DSPATR(RI)
+     A                                 21  6'Execution'
+     A                                      DSPATR(HI)
+     A                                 21 21'F 2'
+     A                                      DSPATR(RI)
+     A                                 21 40'F 3'
+     A                                      DSPATR(RI)
+     A                                 21 59'F 4'
+     A                                      DSPATR(RI)
+     A                                 22  2'F 5'
+     A                                      DSPATR(RI)
+     A                                 22  6'Exit'
+     A                                      DSPATR(HI)
+     A                                 22 21'F 6'
+     A                                      DSPATR(RI)
+     A                                 22 40'F 7'
+     A                                      DSPATR(RI)
+     A                                 22 59'F 8'
+     A                                      DSPATR(RI)
+     A                                 23  2'F 9'
+     A                                      DSPATR(RI)
+     A                                 23 21'F10'
+     A                                      DSPATR(RI)
+     A                                 23 25'Re-Input'
+     A                                      DSPATR(HI)
+     A                                 23 40'F11'
+     A                                      DSPATR(RI)
+     A                                 23 59'F12'
+     A                                      DSPATR(RI)
+     A                                 23 63'Confirm'
+     A                                      DSPATR(HI)

@@ -1,0 +1,23 @@
+     A*==============================================================*
+     A* File name: XMLEX2F                                           *
+     A*                                                              *
+     A* Purpose: United Nations Security Council Consolidated List   *
+     A*                                                              *
+     A* Date written: 2019/03/08                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2019/03/14 Alan       AC           New                       *
+     A*==============================================================*
+     A          R XMLEX2FR
+     A            UNSCID        10P 0       TEXT('DATA ID')
+     A                                      COLHDG('UNSCID')
+     A            UNSC1N       100A         TEXT('FIRST NAME')
+     A                                      COLHDG('FIRST_NAME')
+     A            UNSC2N        30A         TEXT('SECOND_NAME')
+     A                                      COLHDG('SECOND_NAME')
+     A            UNSC3N        30A         TEXT('THIRD_NAME')
+     A                                      COLHDG('THIRD_NAME')
+     A            UNSC4N        30A         TEXT('FOURTH_NAME')
+     A                                      COLHDG('FOURTH_NAME')

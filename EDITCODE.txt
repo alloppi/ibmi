@@ -1,0 +1,145 @@
+Usage :
+ Simple ………MyField = %editc( NumericField : EditCode )
+ More Advanced ……..MyField = %editc( numeric : editcode {: *ASTFIL | *CURSYM | currency-symbol})
+
+ Edit code summary
+
+Code Comma  Zeros  Sign
+1     Y      Y      N
+2     Y      N      N
+3     N      Y      N
+4     N      N      N
+5-9 User-defined use WRKEDTD to define
+A     Y      Y      CR
+B     Y      N      CR
+C     N      Y      CR
+D     N      N      CR
+J     Y      Y      - (right)
+K     Y      N      -
+L     N      Y      -
+M     N      N      -
+N     Y      Y      - (left)
+O     Y      N      -
+P     N      Y      -
+Q     N      N      -
+X     N      Y      -
+Y         used for dates
+Z     N      N      -
+
+Edit Code Description
+=====================
+                             No Sign  CR Sign  Sign '-' Right  Sign '-' Left
+Commas and Zero Balances        1        A           J               N
+Commas                          2        B           K               O
+Zero Balances                   3        C           L               P
+No Commas or Zero Balances      4        D           M               Q
+Date Edit (4 Digits)            W
+No Edit - Sign Suppression      X
+Date Edit                       Y
+Leading Zeros Suppressed        Z
+
+Notes:
+ 1. The X edit code ensures a hexadecimal F sign for positive values. Because
+ the system does this for you, normally you do not have to specify this code.
+ 2. The Y edit code suppresses the leftmost zeros of date fields, up to, but not including
+ the digit preceding the first separator. The Y edit code inserts slashes (/) between the month, day
+ according to the following pattern (with zero suppression):
+ nn/n
+ nn/nn
+ nn/nn/n
+ nn/nn/nn
+ nnn/nn/nn
+ nn/nn/nnnn
+ nnn/nn/nnnn
+ nnnn/nn/nn
+ nnnnn/nn/nn
+ 3. The Z edit code removed the sign (plus or minus) from a numeric field and suppresses leading zer
+
+ Number Used:        01234.56               -01234.56      00000.00
+ Edit Code
+     1      1,234.56                1,234.56                      .00
+     2      1,234.56                1,234.56
+     3      1234.56                 1234.56                      .00
+     4      1234.56                 1234.56
+     A      1,234.56                1,234.56CR                    .00
+     B      1,234.56                1,234.56CR
+     C      1234.56                 1234.56CR                    .00
+     D      1234.56                 1234.56CR
+     J      1,234.56                1,234.56-                     .00
+     K      1,234.56                1,234.56-
+     L      1234.56                 1234.56-                     .00
+     M      1234.56                 1234.56-
+     N       1,234.56               -1,234.56                      .00
+     O       1,234.56               -1,234.56
+     P       1234.56                -1234.56                      .00
+     Q       1234.56                -1234.56
+     X     0123456                 012345O                  0000000
+     Y      12/34/56                12/34/56                  0/00/00
+     Z      123456                  123456
+
+
+
+
+
+Example 1
+=========================================================================
+DName+++++++++++ETDsFrom+++To/L+++IDc.Keywords+++++++++++++++++++++++++++
+D msg             S            100A
+D salary          S              9P 2 INZ(1000)
+ * If the value of salary is 1000, then the value of salary * 12
+ * is 12000.00. The edited version of salary * 12 using the A edit
+ * code with floating currency is ' $12,000.00 '.
+ * The value of msg is 'The annual salary is $12,000.00'
+CL0N01Factor1+++++++Opcode&ExtExtended-factor2+++++++++++++++++++++++++++
+C                   EVAL      msg = 'The annual salary is '
+C                                + %trim(%editc(salary * 12
+C                                              :'A': *CURSYM))
+ * In the next example, the value of msg is 'The annual salary is &12,000.00'
+C                   EVAL      msg = 'The annual salary is '
+C                                + %trim(%editc(salary * 12
+C                                              :'A': '&'))
+
+ * In the next example, the value of msg is 'Salary is $*****12,000.00'
+ * Note that the '$' comes from the text, not from the edit code.
+C                   EVAL      msg = 'Salary is $'
+C                                + %trim(%editc(salary * 12
+C                                               :'B': *ASTFILL))
+
+ * In the next example, the value of msg is 'The date is 1/14/1999'
+C                   EVAL      msg = 'The date is '
+C                                + %trim(%editc(*date : 'Y'))
+
+Example 2
+=========================================================================
+DName+++++++++++ETDsFrom+++To/L+++IDc.Keywords+++++++++++++++++++++++++++
+D neg             S              5P 2      inz(-12.3)
+D pos             S              5P 2      inz(54.32)
+D editparens      PR            50A
+D    val                        30P 2      value
+D editedVal       S             10A
+CL0N01Factor1+++++++Opcode&ExtExtended-factor2+++++++++++++++++++++++++++
+C                   EVAL      editedVal = editparens(neg)
+ * Now editedVal has the value '(12.30)   '
+C                   EVAL      editedVal = editparens(pos)
+ * Now editedVal has the value ' 54.32    '
+ *---------------------------------------------------------------
+ * Subprocedure EDITPARENS
+ *---------------------------------------------------------------
+P editparens      B
+D editparens      PI            50A
+D    val                        30P 2      value
+D lparen          S              1A        inz(' ')
+D rparen          S              1A        inz(' ')
+D res             S             50A
+ * Use parentheses if the value is negative
+C                   IF        val < 0
+C                   EVAL      lparen = '('
+C                   EVAL      rparen = ')'
+C                   ENDIF
+ * Return the edited value
+ * Note that the '1' edit code does not include a sign so we
+ * don't have to calculate the absolute value.
+C                   RETURN    lparen             +
+C                             %editc(val : '1')  +
+C                             rparen
+P editparens      E

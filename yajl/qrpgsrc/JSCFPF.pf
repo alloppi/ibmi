@@ -1,0 +1,54 @@
+     A*==============================================================*
+     A* File name: ZACFPF                                            *
+     A*                                                              *
+     A* Purpose: Confirm Parsed File                                 *
+     A*                                                              *
+     A* Date written: 2021/08/30                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2021/08/30 Alan       AC           New Development           *
+     A*==============================================================*
+     A                                      REF(REFFILE)
+     A          R ZACFPFR
+     A            CFPDC     R               TEXT('DELETE CODE')
+     A                                      REFFLD(RFDC)
+     A                                      COLHDG('CFPDC')
+     A**          CFPRT     R               TEXT('REGISTRATION DATE AND TIME YY-
+     A**                                    YYMMDDHHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('CFPRT')
+     A**          CFPRP     R               TEXT('REGISTRATION PROGRAM')
+     A**                                    REFFLD(RFRP)
+     A**                                    COLHDG('CFPRP')
+     A**          CFPUT     R               TEXT('UPDATE DATE AND TIME YYYYMMDD-
+     A**                                    HHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('CFPUT')
+      *
+     A            CFPLUT    R               TEXT('LAST UPDATE TIME')
+     A                                      REFFLD(RFTMESTP)
+     A                                      COLHDG('CFPLUT')
+      *
+     A            CFPTCD    R               TEXT('TU CHECK DATE')
+     A                                      REFFLD(RFISOD)
+     A                                      COLHDG('CFPTCD')
+     A            CFPTSN    R               TEXT('TU CHECK SEQ NO')
+     A                                      REFFLD(RFSN5)
+     A                                      COLHDG('CFPTSN')
+      *
+     A            CFPOS          3P 0       TEXT('ORDER SEQUENCE')
+     A                                      COLHDG('CFPOS')
+     A            CFPBN         64A         TEXT('BUSINESS NUMBER')
+     A                                      COLHDG('CFPBN')
+      *
+     A            CFPON         64A         TEXT('ORDER NUMBER')
+     A                                      COLHDG('CFPON')
+     A            CFPEP         64A         TEXT('ELEMENT PATH')
+     A                                      COLHDG('CFPEN')
+      *
+     A            CFPVS        100A         TEXT('VALUE STRING')
+     A                                      COLHDG('CFPVS')
+     A            CFPVN         18P 4       TEXT('VALUE NUMBER')
+     A                                      COLHDG('CFPVN')

@@ -1,0 +1,66 @@
+/*===================================================================*/
+/* Program name: RTVLASTSPL                                          */
+/* Purpose.....: Retrieve Identity of Last Spooled File Created      */
+/* Description.: Use QSPRILSP api to retrieve Identity of            */
+/*               last Spooled File Created                           */
+/*                                                                   */
+/* Output Parameter: Job Name          (10A)                         */
+/*                   Job User          (10A)                         */
+/*                   Job Number        (6A)                          */
+/*                   Spool File Name   (10A)                         */
+/*                   Spool File Number (6A)                          */
+/*                                                                   */
+/* Date written: 2011/02/18                                          */
+/*                                                                   */
+/* Modification:                                                     */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- --- ----- ----- --------------------------- */
+/* 2011/02/18 Alan       AC              New Development             */
+/*===================================================================*/
+             PGM
+/*           PGM        PARM(&R_JOBNAME &R_JOBUSER &R_JOBNUM +
+                          &R_SPLFNAM &R_SPLFNUM) */
+
+/* Return Value */
+             DCL        VAR(&R_SPLFNAM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_JOBNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_JOBUSER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_JOBNUM)  TYPE(*CHAR) LEN(6)
+             DCL        VAR(&R_SPLFNUM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_SYSNAME) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_CRTDATE) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&R_CRTTIME) TYPE(*CHAR) LEN(6)
+
+/* Working Variable for API QSPRILSP */
+             DCL        VAR(&RCVVAR) TYPE(*CHAR) LEN(70)
+             DCL        VAR(&RCVLEN) TYPE(*CHAR) LEN(4) +
+                          VALUE(X'00000046')
+             DCL        VAR(&FMTNAM) TYPE(*CHAR) LEN(8) +
+                          VALUE('SPRL0100')
+             DCL        VAR(&ERRCODE) TYPE(*CHAR) LEN(8)
+
+/* Call API QSPRILSP to get spool attribute */
+             CALL       PGM(QSPRILSP) PARM(&RCVVAR &RCVLEN &FMTNAM +
+                          &ERRCODE)
+
+             /* Spooled file name */
+             CHGVAR     VAR(&R_SPLFNAM) VALUE(%SST(&RCVVAR 9 10))
+             /* Job name */
+             CHGVAR     VAR(&R_JOBNAME) VALUE(%SST(&RCVVAR 19 10))
+             /* User name */
+             CHGVAR     VAR(&R_JOBUSER) VALUE(%SST(&RCVVAR 29 10))
+             /* Job number */
+             CHGVAR     VAR(&R_JOBNUM) VALUE(%SST(&RCVVAR 39 10))
+             /* Spooled file number */
+             CHGVAR     VAR(&R_SPLFNUM) VALUE(%BIN(&RCVVAR 45 4))
+             /* Job System name */
+             CHGVAR     VAR(&R_SYSNAME) VALUE(%SST(&RCVVAR 49 10))
+             /* Spooled file create date */
+             CHGVAR     VAR(&R_CRTDATE) VALUE(%SST(&RCVVAR 57 7))
+             /* Spooled file create time */
+             CHGVAR     VAR(&R_CRTTIME) VALUE(%SST(&RCVVAR 65 6))
+
+/* Dump for Testing */
+             DMPCLPGM
+
+ $END:       ENDPGM

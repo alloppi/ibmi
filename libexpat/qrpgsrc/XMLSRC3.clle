@@ -1,0 +1,38 @@
+/*===================================================================*/
+/* Program name: XMLSRC3                                             */
+/* Purpose.....: Transfer Request XML Sending                        */
+/*                                                                   */
+/* Remark      : Set XML Reply File Authority                        */
+/*                                                                   */
+/* Date written: 2017/02/28                                          */
+/*                                                                   */
+/* Modification:                                                     */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- ---- ---- ----- --------------------------- */
+/* 2017/03/13 Alan       AC              New Development             */
+/*===================================================================*/
+             PGM        PARM(&P_ReqType &P_PID &P_ReqFile &P_GMIP +
+                          &R_RtnCde &R_RpyFile)
+             DCL        VAR(&P_ReqType) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&P_PID)     TYPE(*CHAR) LEN(17)
+             DCL        VAR(&P_ReqFile) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&P_GMIP)    TYPE(*CHAR) LEN(15)
+             DCL        VAR(&R_RtnCde)  TYPE(*DEC)  LEN(2 0)
+             DCL        VAR(&R_RpyFile) TYPE(*CHAR) LEN(50)
+
+             CALL       PGM(XMLSRR3) PARM(&P_ReqType &P_PID +
+                          &P_ReqFile &P_GMIP &R_RtnCde &R_RpyFile)
+
+             IF         COND(&R_RtnCde *EQ 0) THEN(DO)
+
+/* Change Authority to Read Only and *PUBLIC User is *Exclude */
+             CHGAUT     OBJ(&R_RpyFile) USER(*PUBLIC) +
+                          DTAAUT(*EXCLUDE) OBJAUT(*NONE)
+
+/* Change Authority to Read Only for PGMRGRP */
+             CHGAUT     OBJ(&R_RpyFile) USER(PGMRGRP) DTAAUT(*R) +
+                          OBJAUT(*NONE)
+
+             ENDDO
+
+             ENDPGM

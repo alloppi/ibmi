@@ -1,0 +1,23 @@
+/* Copy from https://www.mcpressonline.com/programming-other/cl/                                  */
+/*              the-cl-corner-getting-additional-ifs-file-information                             */
+
+/* With the stat64 API, the location of the &ObjTyp subfield has changed. Bolding the one change  */
+/* in the DCL for &ObjTyp, the stat64 definition for the three subfields is this:                 */
+
+PGM           PARM(&FILEINFO)
+
+   Dcl        Var(&FileInfo)   Type(*Char) Len(128)
+   Dcl        Var(&LstAccess)  Type(*Int) +
+               Stg(*Defined) DefVar(&FileInfo 25)
+
+   Dcl        Var(&LstDtaChg)  Type(*Int) +
+               Stg(*Defined) DefVar(&FileInfo 29)
+
+   Dcl        Var(&ObjTyp)     Type(*Char) Len(10) +
+                Stg(*Defined) DefVar(&FileInfo 49)
+
+   Dcl        Var(&Status)  Type(*Int)
+
+   CallPrc    Prc('stat') Parm(&Path &FileInfo) +
+                RtnVal(&Status)
+EndPgm

@@ -1,0 +1,64 @@
+/*PGM                     PARM(&FILELIB &MEMBER &EXCELPATH &EXCELNAME +
+                               &COLHDR &TITLE &TITLECOL &TITLEALIGN &ACTION &LOG) */
+  PGM                     PARM(&FILELIB &EXCELPATH &EXCELNAME)
+
+  DCL VAR(&FILELIB)       TYPE(*CHAR) LEN(20)
+/*DCL VAR(&MEMBER)        TYPE(*CHAR) LEN(10)                        */
+  DCL VAR(&EXCELPATH)     TYPE(*CHAR) LEN(32)
+  DCL VAR(&EXCELNAME)     TYPE(*CHAR) LEN(20)
+/*DCL VAR(&COLHDR)        TYPE(*CHAR) LEN(7)                         */
+/*DCL VAR(&TITLE)         TYPE(*CHAR) LEN(50)                        */
+/*DCL VAR(&TITLECOL)      TYPE(*INT)                                 */
+/*DCL VAR(&TITLEALIGN)    TYPE(*CHAR) LEN(7)                         */
+/*DCL VAR(&ACTION)        TYPE(*CHAR) LEN(9)                         */
+/*DCL VAR(&LOG)           TYPE(*CHAR) LEN(4)                         */
+  DCL VAR(&RQSDTA)        TYPE(*CHAR) LEN(200)
+  DCL VAR(&Q)             TYPE(*CHAR) LEN(1) VALUE(X'7D')
+
+/*DCL VAR(&TITLECOL_C)    TYPE(*CHAR) LEN(2)                         */
+  DCL VAR(&FILE)          TYPE(*CHAR) LEN(10)
+  DCL VAR(&LIB)           TYPE(*CHAR) LEN(10)
+/*IF COND(&TITLECOL = -1) THEN(CHGVAR VAR(&TITLECOL_C) VALUE('00'))  */
+/*ELSE                    CHGVAR VAR(&TITLECOL_C) VALUE(&TITLECOL)   */
+
+  CHGVAR VAR(&FILE)       VALUE(%SST(&FILELIB 1 10))
+  CHGVAR VAR(&LIB)        VALUE(%SST(&FILELIB 11 10))
+
+  ADDENVVAR               ENVVAR(JAVA_HOME) +
+                            VALUE('/QOpenSys/QIBM/ProdData/JavaVM/jdk60/32bit') +
+                            REPLACE(*YES)
+
+  ADDENVVAR               ENVVAR(QIBM_RPG_JAVA_PROPERTIES) +
+                            VALUE('-Djava.awt.headless=true;+
+                              -Dos400.awt.native=true;+
+                              -Dos400.stderr=file:/java/stderr.txt;+
+                              -Dos400.stdout=file:/java/stdout.txt;') +
+                            REPLACE(*YES)
+
+  ADDENVVAR               ENVVAR(QIBM_USE_DESCRIPTOR_STDIO) +
+                            VALUE('Y') +
+                            REPLACE(*YES)
+
+  ADDENVVAR               ENVVAR(CLASSPATH) +
+                            VALUE(':/java/poi/classes+
+                              :/javaapps/poi-3.13/poi-3.13-20150929.jar+
+                              :/javaapps/poi-3.13/poi-ooxml-3.13-20150929.jar+
+                              :/javaapps/poi-3.13/poi-ooxml-schemas-3.13-20150929.jar+
+                              :/javaapps/dom4j-1.6.1/dom4j-1.6.1.jar+
+                              :/javaapps/xmlbeans-2.6.0/lib/jsr173_1.0_api.jar+
+                              :/javaapps/xmlbeans-2.6.0/lib/xbean.jar') +
+                            REPLACE(*YES)
+
+  CHGJOB                  CCSID(937) LOG(4 00 *SECLVL) LOGCLPGM(*YES)
+
+  CHGVAR VAR(&RQSDTA)     VALUE('RUNJVA CLASS(hk.com.cisd.excel.PF2XLS3) +
+                            OPTION(*VERBOSE) +
+                            PROP((os400.stdout ''file:/java/stdout.txt'')) +
+                            PARM(' *CAT &Q *CAT &FILE      *TCAT &Q *CAT +
+                               ' ' *CAT &Q *CAT &LIB       *TCAT &Q *CAT +
+                               ' ' *CAT &Q *CAT &EXCELPATH *TCAT &Q *CAT +
+                               ' ' *CAT &Q *CAT &EXCELNAME *TCAT &Q *CAT ')')
+
+  SBMJOB JOB(PF2XLS)      RTGDTA(*JOB) RQSDTA(&RQSDTA) CPYENVVAR(*YES)
+
+  ENDPGM

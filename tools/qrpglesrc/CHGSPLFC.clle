@@ -1,0 +1,169 @@
+     /*==================================================================*/
+     /* Program name: CHGSPLFC                                           */
+     /* Purpose.....: Change Spool File Content                          */
+     /*               Staff Number Setting for Output                    */
+     /*                                                                  */
+     /* Date written: 2010/04/12                                         */
+     /*                                                                  */
+     /* Modification:                                                    */
+     /* Date       Name       Pre  Ver  Mod#  Remarks                    */
+     /* ---------- ---------- ---- ---- ----- -------------------------- */
+     /* 2010/04/12 Alan       AC              New Development            */
+     /*==================================================================*/
+             PGM        PARM(&OutQ &Job &JobUser &JobNbr &SplfNam +
+                          &SplfNbr &LocX &LocY &RtnCde)
+
+             DCL        VAR(&OutQ)    TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SplfNam) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LocX)    TYPE(*DEC)  LEN(3 0)
+             DCL        VAR(&LocY)    TYPE(*DEC)  LEN(2 0)
+             DCL        VAR(&RtnCde)  TYPE(*DEC)  LEN(2 0)
+
+             DCL        VAR(&SplfNbr)   TYPE(*DEC)  LEN(6 0)
+             DCL        VAR(&UserData)  TYPE(*CHAR) LEN(10)
+             DCL        VAR(&HoldSts)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PageStr10) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&PageEnd10) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&PageStr)   TYPE(*CHAR) LEN(8)
+             DCL        VAR(&PageEnd)   TYPE(*CHAR) LEN(8)
+             DCL        VAR(&LPI10)     TYPE(*CHAR) LEN(4)
+             DCL        VAR(&CPI10)     TYPE(*CHAR) LEN(4)
+             DCL        VAR(&LPI)       TYPE(*CHAR) LEN(3)
+             DCL        VAR(&CPI)       TYPE(*CHAR) LEN(3)
+             DCL        VAR(&PageLen)   TYPE(*CHAR) LEN(4)
+             DCL        VAR(&PageWid)   TYPE(*CHAR) LEN(4)
+             DCL        VAR(&OverFlow)  TYPE(*CHAR) LEN(4)
+
+             DCL        VAR(&WhichSplf) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&RcvLen)    TYPE(*CHAR) LEN(4)
+             DCL        VAR(&Receiver)  TYPE(*CHAR) LEN(440)
+             DCL        VAR(&Job)       TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JobUser)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JobNbr)    TYPE(*CHAR) LEN(6)
+             DCL        VAR(&QualJob)   TYPE(*CHAR) LEN(26)
+
+             DCL        VAR(&SavOutQ)    TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SavOutQLib) TYPE(*CHAR) LEN(10)
+
+             DCL        VAR(&CurUser)    TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RJobNam)    TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RJobUser)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RJobNbr)    TYPE(*CHAR) LEN(6)
+             DCL        VAR(&RSplfNbr)   TYPE(*DEC)  LEN(6 0)
+
+             RTVJOBA    USER(&CurUser)
+             RTVJOBA    OUTQ(&SavOutQ) OUTQLIB(&SavOutQLib)
+
+             CHGVAR     VAR(&QualJob) VALUE(&Job *CAT &JobUser *CAT +
+                          &JobNbr)
+
+ /* Retrieve Spool File Attribute */
+             CHGVAR     VAR(%BIN(&WhichSplf)) VALUE(&SplfNbr)
+             CHGVAR     VAR(%BIN(&RcvLen))    VALUE(440)
+
+             CALL       PGM(QUSRSPLA) PARM(&Receiver &RcvLen +
+                          'SPLA0100' &QualJob ' ' ' ' &SplfNam +
+                          &WhichSplf)
+             CHGVAR     VAR(&UserData) VALUE(%SubString(&Receiver 91 10))
+             CHGVAR     VAR(&HoldSts)  VALUE(%SubString(&Receiver 121 10))
+             CHGVAR     VAR(&PageStr10) VALUE(%BIN(&Receiver 149 4))
+             CHGVAR     VAR(&PageEnd10) VALUE(%BIN(&Receiver 153 4))
+             CHGVAR     VAR(&LPI10)    VALUE(%BIN(&Receiver 173 4))
+             CHGVAR     VAR(&CPI10)    VALUE(%BIN(&Receiver 177 4))
+             CHGVAR     VAR(&PageLen)  VALUE(%BIN(&Receiver 425 4))
+             CHGVAR     VAR(&PageWid)  VALUE(%BIN(&Receiver 429 4))
+             CHGVAR     VAR(&OverFlow) VALUE(%BIN(&Receiver 437 4))
+
+             CHGVAR     VAR(&LPI) VALUE(&LPI10)
+             CHGVAR     VAR(&CPI) VALUE(&CPI10)
+
+             /* Setting for start page */
+             SELECT
+               WHEN       COND(&PageStr10 *EQ '0000') +
+                            THEN(CHGVAR VAR(&PageStr) VALUE('1'))
+               WHEN       COND(&PageStr10 *EQ '-001') +
+                            THEN(CHGVAR VAR(&PageStr) VALUE('*ENDPAGE'))
+               OTHERWISE  CHGVAR VAR(&PageStr) VALUE(&PageStr10)
+             ENDSELECT
+
+             /* Setting for end page */
+             IF         COND(&PageEnd10 *EQ '0000') THEN(CHGVAR +
+                          VAR(&PageEnd) VALUE('*END'))
+             ELSE       CMD(CHGVAR VAR(&PageEnd) VALUE(&PageEnd10))
+
+             DLTF       FILE(QTEMP/CHGSPLFF)
+               MONMSG     MSGID(CPF2105)
+
+             CRTDUPOBJ  OBJ(CHGSPLFF) FROMLIB(*LIBL) OBJTYPE(*FILE) +
+                          TOLIB(QTEMP)
+
+ /* Copy Original Spool File to Physical File */
+             CPYSPLF    FILE(&SplfNam) TOFILE(QTEMP/CHGSPLFF) +
+                          JOB(&JobNbr/&JobUser/&Job) SPLNBR(&SplfNbr) +
+                          CTLCHAR(*FCFC)
+               MONMSG     MSGID(CPF3429) EXEC(DO)
+
+ /* If Copying is failed, Send Original Spool File to New Spool File */
+                 IF         COND(%SST(&HoldSts 1 4) *NE '*YES') +
+                            THEN(DO)
+                   HLDSPLF    FILE(&SplfNam) +
+                                JOB(&JobNbr/&JobUser/&Job) +
+                                SPLNBR(&SplfNbr)
+                 ENDDO
+                 SNDTCPSPLF RMTSYS(LOCALHOST) +
+                              PRTQ(&OutQ) FILE(&SplfNam) +
+                              JOB(&JobNbr/&JobUser/&Job) +
+                              SPLNBR(&SplfNbr) DESTTYP(*AS400) +
+                              TRANSFORM(*NO)
+                 IF         COND(%SST(&HoldSts 1 4) *NE '*YES') +
+                            THEN(DO)
+                   RLSSPLF    FILE(&SplfNam) +
+                                JOB(&JobNbr/&JobUser/&Job) +
+                                SPLNBR(&SplfNbr)
+                 ENDDO
+ /* Get New Spool File Job ID and Spool ID */
+                 CALL       PGM(GETSPLAR) +
+                              PARM(&OutQ &SplfNam 'QPRTJOB' &CurUser +
+                              &RJobNam &RJobUser &RJobNbr &RSplfNbr +
+                              &RtnCde)
+                 IF         COND(&RtnCde *EQ 0) THEN(DO)
+                   CHGSPLFA   FILE(&SplfNam) +
+                                JOB(&RJobNbr/&RJobUser/&RJobNam) +
+                                SPLNBR(&RSplfNbr) SAVE(*NO)
+                   RLSSPLF    FILE(&SplfNam) +
+                                JOB(&RJobNbr/&RJobUser/&RJobNam) +
+                                SPLNBR(&RSplfNbr)
+                 ENDDO
+                 GOTO       CMDLBL(ExitPgm)
+               ENDDO
+
+ /* Setting of Staff Number to New Spool File */
+             OVRDBF     FILE(CHGSPLFF) TOFILE(QTEMP/CHGSPLFF)
+             CALL       PGM(CHGSPLFR) PARM(&LocX &LocY &RtnCde)
+             DLTOVR     FILE(CHGSPLFF)
+
+ /* Change Job Output Queue */
+             CHGJOB     OUTQ(&OutQ)
+
+ /* Setting EndPage of New Spool File */
+             OVRPRTF    FILE(QSYSPRT) PAGESIZE(&PageLen &PageWid) +
+                          LPI(&LPI) CPI(&CPI) OVRFLW(&OverFlow) +
+                          CTLCHAR(*FCFC) CHLVAL(*NORMAL) +
+                          PAGERANGE(&PageStr &PageEnd) +
+                          USRDTA(&UserData)
+
+ /* Copy Physical File to New Spool File */
+             CPYF       FROMFILE(QTEMP/CHGSPLFF) TOFILE(QSYSPRT) +
+                          FMTOPT(*NOCHK)
+             DLTOVR     FILE(QSYSPRT)
+
+ /* Restore Job Attribute */
+             IF         COND(%SST(&SavOutQ 1 1) = '*') THEN(CHGJOB +
+                           OUTQ(&SavOutQ))
+             ELSE       CMD(CHGJOB OUTQ(&SavOutQLib/&SavOutQ))
+
+ ExitPgm:
+             DLTF       FILE(QTEMP/CHGSPLFF)
+               MONMSG     MSGID(CPF2105)
+
+ EndPgm:     ENDPGM

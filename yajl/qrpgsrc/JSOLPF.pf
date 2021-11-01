@@ -1,0 +1,54 @@
+     A*==============================================================*
+     A* File name: ZAOLPF                                            *
+     A*                                                              *
+     A* Purpose: Order List Parsed File                              *
+     A*                                                              *
+     A* Date written: 2021/08/06                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2021/08/06 Alan       AC           New Development           *
+     A*==============================================================*
+     A                                      REF(REFFILE)
+     A          R ZAOLPFR
+     A            OLPDC     R               TEXT('DELETE CODE')
+     A                                      REFFLD(RFDC)
+     A                                      COLHDG('OLPDC')
+     A**          OLPRT     R               TEXT('REGISTRATION DATE AND TIME YY-
+     A**                                    YYMMDDHHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('OLPRT')
+     A**          OLPRP     R               TEXT('REGISTRATION PROGRAM')
+     A**                                    REFFLD(RFRP)
+     A**                                    COLHDG('OLPRP')
+     A**          OLPUT     R               TEXT('UPDATE DATE AND TIME YYYYMMDD-
+     A**                                    HHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('OLPUT')
+      *
+     A            OLPLUT    R               TEXT('LAST UPDATE TIME')
+     A                                      REFFLD(RFTMESTP)
+     A                                      COLHDG('OLPLUT')
+      *
+     A            OLPTCD    R               TEXT('TU CHECK DATE')
+     A                                      REFFLD(RFISOD)
+     A                                      COLHDG('OLPTCD')
+     A            OLPTSN    R               TEXT('TU CHECK SEQ NO')
+     A                                      REFFLD(RFSN5)
+     A                                      COLHDG('OLPTSN')
+      *
+     A            OLPOS          3P 0       TEXT('ORDER SEQUENCE')
+     A                                      COLHDG('OLPOS')
+     A            OLPBN         64A         TEXT('BUSINESS NUMBER')
+     A                                      COLHDG('OLPBN')
+      *
+     A            OLPON         64A         TEXT('ORDER NUMBER')
+     A                                      COLHDG('OLPON')
+     A            OLPEP         64A         TEXT('ELEMENT PATH')
+     A                                      COLHDG('OLPEN')
+      *
+     A            OLPVS        100A         TEXT('VALUE STRING')
+     A                                      COLHDG('OLPVS')
+     A            OLPVN         18P 4       TEXT('VALUE NUMBER')
+     A                                      COLHDG('OLPVN')

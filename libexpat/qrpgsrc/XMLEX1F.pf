@@ -1,0 +1,47 @@
+     A*==============================================================*
+     A* File name: XMLEX1F                                           *
+     A*                                                              *
+     A* Purpose: US Security Council Consolidated list Parsing       *
+     A*                                                              *
+     A* Date written: 2019/03/06                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2017/03/06 Alan       AC           New                       *
+     A*==============================================================*
+     A                                      REF(REFFILE)
+     A          R XMLEX1FR
+     A            XM01DC    R               TEXT('DELETE CODE')
+     A                                      REFFLD(RFDC)
+     A                                      COLHDG('BTRDC')
+     A            XM01RT    R               TEXT('REGISTRATION DATE AND TIME YY-
+     A                                      YYMMDDHHMM')
+     A                                      REFFLD(RFRT)
+     A                                      COLHDG('XM01RT')
+     A            XM01RP    R               TEXT('REGISTRATION PROGRAM')
+     A                                      REFFLD(RFRP)
+     A                                      COLHDG('XM01RP')
+     A            XM01UT    R               TEXT('UPDATE DATE AND TIME YYYYMMDD-
+     A                                      HHMM')
+     A                                      REFFLD(RFRT)
+     A                                      COLHDG('XM01UT')
+     A            XM01UP    R               TEXT('UPDATE PROGRAM NAME')
+     A                                      REFFLD(RFRP)
+     A                                      COLHDG('XM01UP')
+      *
+     A            XM01RD    R               TEXT('REPLY DATE')
+     A                                      REFFLD(RFISOD)
+     A                                      COLHDG('XM01RD')
+     A            XM01EN    R               TEXT('ELEMENT NAME')
+     A                                      REFFLD(RFELN)
+     A                                      COLHDG('XM01EN')
+     A            XM01AN    R               TEXT('ATTRIBUTE NAME')
+     A                                      REFFLD(RFATN)
+     A                                      COLHDG('XM01AN')
+     A            XM01AV    R               TEXT('ATTRIBUTE VALUE')
+     A                                      REFFLD(RFATV)
+     A                                      COLHDG('XM01AV')
+     A            XM01EV    R               TEXT('ELEMENT VALUE')
+     A                                      REFFLD(RFELV)
+     A                                      COLHDG('XM01EV')

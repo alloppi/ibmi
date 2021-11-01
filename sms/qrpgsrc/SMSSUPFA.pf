@@ -1,0 +1,29 @@
+     A*==============================================================*
+     A* File name...: SMSSUPFA                                       *
+     A* Purpose.....: IT Support Request - Staff Control File        *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- ---------------------- *
+     A* 2015/07/22 Alan       AC              New                    *
+     A*==============================================================*
+     A                                      UNIQUE
+     A          R SMSSUPFAR
+     A            SMSSUPAJOB    10A         TEXT('Job Name')
+     A                                      COLHDG('Job Name')
+     A            SMSSUPASTF     7A         TEXT('Staff / Party')
+     A                                      COLHDG('Staff / Party')
+     A            SMSSUPASUP     7A         TEXT('Supported Party')
+     A                                      COLHDG('Supported' 'Party')
+     A            SMSSUPAEMF     1A         TEXT('Send Email Flag')
+     A                                      COLHDG('Send' 'Email' 'Flag')
+     A            SMSSUPASMF     1A         TEXT('Send SMS Flag')
+     A                                      COLHDG('Send' 'SMS' 'Flag')
+     A            SMSSUPAVOF     1A         TEXT('Send Voice Flag')
+     A                                      COLHDG('Send' 'Voice' 'Flag')
+     A            SMSSUPAWAV    10A         TEXT('Wave File')
+     A                                      COLHDG('Wave' 'File')
+      *
+     A          K SMSSUPAJOB
+     A          K SMSSUPASTF
+     A          K SMSSUPASUP

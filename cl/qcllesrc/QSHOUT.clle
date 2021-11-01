@@ -1,0 +1,90 @@
+pgm
+   /* Handling SQL run errors in QSHELL */
+
+   /* File alan/qshlog must be created first. +
+      CRTPF alan/qshlog RCDLEN(80) */
+
+   dclf alan/qshlog
+
+   dcl &cmd   *char 256
+   dcl &redri *char   1   x'29'
+   DCL VAR(&MSGID) TYPE(*CHAR) LEN(7)
+   DCL VAR(&MSGDTA) TYPE(*CHAR) LEN(256)
+   DCL VAR(&RESULT) TYPE(*CHAR) LEN(4)
+   DCL VAR(&STATUS) TYPE(*DEC) LEN(10 0)
+   DCL VAR(&SIGNAL) TYPE(*DEC) LEN(10 0)
+   DCL VAR(&CHARSTAT) TYPE(*CHAR) LEN(10)
+   DCL VAR(&CHARSIG) TYPE(*CHAR) LEN(10)
+
+   clrpfm qshlog
+
+   ADDENVVAR  ENVVAR(QIBM_QSH_CMD_OUTPUT) VALUE(NONE) +
+                REPLACE(*YES)
+   MONMSG     MSGID(CPFA980) EXEC(DO)
+   RCVMSG     MSGTYPE(*EXCP) RMV(*YES)
+   ENDDO
+
+   OVRDBF     FILE(STDOUT) TOFILE(QSHLOG) +
+                OVRSCOPE(*JOB)
+
+   ADDENVVAR  ENVVAR(QIBM_QSH_CMD_ESCAPE_MSG) VALUE(Y) +
+                REPLACE(*YES)
+   MONMSG     MSGID(CPFA980) EXEC(DO)
+   RCVMSG     MSGTYPE(*EXCP) RMV(*YES)
+   ENDDO
+
+   CHGVAR &CMD ('(db2 "update alan.MyTable +
+                            set numfield = ABCDEF" > +
+      /qsys.lib/alan.lib/qshlog.file/qshlog.mbr)')
+
+    STRQSH CMD( &cmd )
+    /* From "Handling QShell Errors in a CL Program" +
+       By Scott Klement                              +
+    */
+    MONMSG MSGID(QSH0005 QSH0006 QSH0007) EXEC(DO)
+     RCVMSG  MSGTYPE(*LAST) RMV(*YES) MSGDTA(&MSGDTA) +
+               MSGID(&MSGID)
+
+     /* CPF0005 - QSHELL COMMAND ENDED "NORMALLY." */
+     IF (&MSGID *EQ 'QSH0005') DO
+         CHGVAR VAR(&RESULT) VALUE(%SST(&MSGDTA 1 4))
+         CHGVAR VAR(&STATUS) VALUE(%BIN(&RESULT))
+         CHGVAR VAR(&SIGNAL) VALUE(0)
+     ENDDO
+
+    /* QSH0006 - QSHELL COMMAND ENDED WHEN IT RECEIVED A  +
+          SIGNAL.                                         */
+       IF (&MSGID *EQ 'QSH0006') DO
+          CHGVAR VAR(&RESULT) VALUE(%SST(&MSGDTA 1 4))
+          CHGVAR VAR(&SIGNAL) VALUE(%BIN(&RESULT))
+          CHGVAR VAR(&STATUS) VALUE(-1)
+       ENDDO
+
+    /* QSH0007 - QSHELL COMMAND ENDED DUE TO AN EXCEPTION,+
+         FOR EXAMPLE THE PROGRAM CRASHED WITH A CPF MSG.+
+    */
+       IF (&MSGID *EQ 'QSH0007') DO
+          CHGVAR VAR(&STATUS) VALUE(-1)
+          CHGVAR VAR(&SIGNAL) VALUE(-1)
+       ENDDO
+    ENDDO
+
+    IF (&STATUS *NE 0) THEN(DO)
+      CHGVAR VAR(&CHARSTAT) VALUE(&STATUS)
+      CHGVAR VAR(&CHARSIG) VALUE(&SIGNAL)
+      SNDPGMMSG  MSGID(CPF9897) MSGF(QCPFMSG) MSGDTA('QShell +
+            command failed with status ' *CAT +
+            &CHARSTAT *CAT ' and signal ' *CAT &CHARSIG)
+    ENDDO
+    /* End "Handling QShell Errors in a CL Program" excerpt */
+
+    RCVF
+    MONMSG     MSGID(CPF0864) EXEC(GOTO CMDLBL(FINPGM))
+
+    RCVF
+    SNDPGMMSG  MSG(&QSHLOG)
+
+FINPGM:
+    DLTOVR     FILE(STDOUT) LVL(*JOB)
+
+endpgm

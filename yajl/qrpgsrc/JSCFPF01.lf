@@ -1,0 +1,19 @@
+     A*==============================================================*
+     A* File name: ZACFPF01                                          *
+     A*                                                              *
+     A* Purpose: Confirm Parsed File                                 *
+     A*                                                              *
+     A* Date written: 2021/08/30                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2021/08/30 Alan       AC           New Development           *
+     A*==============================================================*
+     A                                      UNIQUE
+     A          R ZACFPFR                   PFILE(ZACFPF)
+     A          K CFPTCD
+     A          K CFPTSN
+     A          K CFPOS
+     A          K CFPEP
+     A          O CFPDC                      CMP(EQ '9')

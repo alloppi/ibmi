@@ -1,0 +1,17 @@
+             PGM
+             DCL        VAR(&INPUT) TYPE(*CHAR) LEN(48) +
+                          VALUE('2010-05-18;2010-05-18T11:22:19;FAC +
+                          001/14;3.12; ')
+             DCL        VAR(&RESULT) TYPE(*CHAR) LEN(1200)
+             DLTDTAARA  DTAARA(QTEMP/RANDOUTPUT)
+             MONMSG     MSGID(CPF2105)
+             CRTDTAARA  DTAARA(RANDOUTPUT) TYPE(*CHAR) LEN(1024)
+             ADDENVVAR  ENVVAR(TESTME) VALUE(&INPUT) REPLACE(*YES)
+
+             QSH        CMD('PATH=$PATH:/QOpenSys/usr/bin && ECHO +
+                          "$TESTME" | openssl rand -base64 1024 +
+                          | TR -D ''\N '' +
+                          | DATAREA -WL RANDOUTPUT')
+             RTVDTAARA  DTAARA(RANDOUTPUT *ALL) RTNVAR(&RESULT)
+             SNDUSRMSG  MSG('RESULT IS =' *BCAT &RESULT)
+             ENDPGM

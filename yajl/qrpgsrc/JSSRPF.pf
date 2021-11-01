@@ -1,0 +1,54 @@
+     A*==============================================================*
+     A* File name: JSSRPF                                            *
+     A*                                                              *
+     A* Purpose: JSON Success Results Parsed File                    *
+     A*                                                              *
+     A* Date written: 2021/08/30                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2021/08/30 Alan       AC           New Development           *
+     A*==============================================================*
+     A                                      REF(REFFILE)
+     A          R JSSRPFR
+     A            SRPDC     R               TEXT('DELETE CODE')
+     A                                      REFFLD(RFDC)
+     A                                      COLHDG('SRPDC')
+     A**          SRPRT     R               TEXT('REGISTRATION DATE AND TIME YY-
+     A**                                    YYMMDDHHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('SRPRT')
+     A**          SRPRP     R               TEXT('REGISTRATION PROGRAM')
+     A**                                    REFFLD(RFRP)
+     A**                                    COLHDG('SRPRP')
+     A**          SRPUT     R               TEXT('UPDATE DATE AND TIME YYYYMMDD-
+     A**                                    HHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('SRPUT')
+      *
+     A            SRPLUT    R               TEXT('LAST UPDATE TIME')
+     A                                      REFFLD(RFTMESTP)
+     A                                      COLHDG('SRPLUT')
+      *
+     A            SRPTCD    R               TEXT('TU CHECK DATE')
+     A                                      REFFLD(RFISOD)
+     A                                      COLHDG('SRPTCD')
+     A            SRPTSN    R               TEXT('TU CHECK SEQ NO')
+     A                                      REFFLD(RFSN5)
+     A                                      COLHDG('SRPTSN')
+      *
+     A            SRPOS          3P 0       TEXT('ORDER SEQUENCE')
+     A                                      COLHDG('SRPOS')
+     A            SRPBN         64A         TEXT('BUSINESS NUMBER')
+     A                                      COLHDG('SRPBN')
+      *
+     A            SRPON         64A         TEXT('ORDER NUMBER')
+     A                                      COLHDG('SRPON')
+     A            SRPEP         64A         TEXT('ELEMENT PATH')
+     A                                      COLHDG('SRPEN')
+      *
+     A            SRPVS        100A         TEXT('VALUE STRING')
+     A                                      COLHDG('SRPVS')
+     A            SRPVN         18P 4       TEXT('VALUE NUMBER')
+     A                                      COLHDG('SRPVN')

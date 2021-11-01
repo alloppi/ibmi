@@ -1,0 +1,132 @@
+Add host to Host Table
+----------------------
+ADDTCPHTE INTNETADR('202.134.63.221')  HOSTNAME(AUTHSMTP.PROMISE.COM.HK)
+
+Set SMTP to use SMTP Auth
+-------------------------
+CHGSMTPA DIRTYPE(*SMTP) ALWAUTH(*NONE) FWDHUBSVR(AUTHSMTP.PROMISE.COM.HK) MAILROUTER(*NONE)
+
+Add SMTP List Entry
+--------------------
+ADDSMTPLE TYPE(*HOSTAUTH) HOSTNAME(AUTHSMTP.PROMISE.COM.HK) USERNAME(test@promise.com.hk) PASSWORD(C
+
+Change the Port to 587 to use SSL
+---------------------------------
+ENDTCPSVR SERVER(*SMTP)
+wrkactjob sbs(qsyswrk) JOB(QTSMTP*) to check
+ADDENVVAR ENVVAR(QIBM_SMTP_SERVER_PORT) VALUE('587') LEVEL(*SYS)
+STRTCPSVR SERVER(*SMTP)
+wrkactjob sbs(qsyswrk) JOB(QTSMTP*) to check again
+
+Only 2 process
+Subsystem/Job  User        Type  CPU %  Function        Status
+  QTSMTPCLTD   QTCP        BCI      .0  PGM-QTMSSMTPC    SELW
+  QTSMTPSRVD   QTCP        BCH      .0  PGM-QTMSSMTPD    SELW
+
+If error, try starting the trace to check
+-----------------------------------------
+Please get an SMTP Client trace,so that we can see if anything from the client side:
+1. ENDTCPSVR SERVER(*SMTP)
+2. TRCTCPAPP APP(*SMTPCLT) TRCFULL(*STOPTRC)
+3. STRTCPSVR *SMTP
+4. Run the test scenario causing the issue
+5. TRCTCPAPP APP(*SMTPCLT) SET(*OFF) TITLE('Outbound E-mail')
+
+ PROMISE email URL
+ - mail.promise.com.hk
+
+====================================================================================================
+Server  : 202.134.63.144
+Login   : smtpauth@promise.com.hk
+Password: Abc1234d
+Sender  : PROMISE9@promise.com.hk or PROMISE1@promise.com.hk
+
+ - /Email, for sending Email -> SMS (CI0006, CI0008)
+   if not exist, create it by MD DIR('/Email'), CHGOWN OBJ('/Email') NEWOWN(PGMRGRP)
+   Also refer to PSXX81R, pre-request
+   - CHGTCPDMN HOSTNAME('PROMISE4') DMNNAME('PROMISE_HK')
+   - ADDTCPHTE INTNETADR('172.18.101.14') HOSTNAME((PROMISE4.PROMISE_HK))
+   - ADDTCPHTE INTNETADR('202.60.252.58') HOSTNAME((SMTP.PROMISE.COM.HK))
+   - Config the SMTP Server with Mail Router = 'SMTP.PROMISE.COM.HK'
+      * CHGSMTPA MAILROUTER('SMTP.PROMISE.COM.HK')
+      * You may refer to PSXX81R
+   - STRTCPSVR SERVER(*SMTP), then type wrkactjob sbs(qsyswrk) job(qtsmtp*), and look for
+     QTSMTPBRCL   QTCP        BCH      .0                   DEQW
+     QTSMTPBRSR   QTCP        BCH      .0                   DEQW
+     QTSMTPCLTD   QTCP        BCH      .0                   DEQW
+     QTSMTPSRVD   QTCP        BCH      .0                   SELW
+ - for sending SMS
+   if not exist, create it by MD DIR('/SMS'), CHGOWN OBJ('/sms') NEWOWN(PGMRGRP)
+ - /smartone, For backup files under '/sms'
+ Below is for smtp authentication
+ - http://www.ibm.com/support/knowledgecenter/ssw_ibm_i_71/rzair/rzairsslsmtpreceiver.htm
+ - http://www.ibm.com/support/knowledgecenter/ssw_ibm_i_61/rzair/configuringthesmtpserver.htm
+ - http://www.easy400.net/mmail/EmailAuthentication/EmailAuthentication.htm
+   - ADDENVVAR ENVVAR(QIBM_SMTP_SERVER_PORT) VALUE('587') LEVEL(*SYS)
+   - ADDSMTPLE TYPE(*HOSTAUTH) HOSTNAME(YOURSYSTEM) USERNAME(receiver) PASSWORD(xxxx)
+ e.g.  ADDSMTPLE TYPE(*HOSTAUTH) HOSTNAME('SMTP.PROMISE.COM.HK') USERNAME('SMTPAUTH@PROMISE.COM.HK')
+
+   - Need to restar ENDTCPSVR *SMTP, STRTCPSVR *SMTP
+ - https://publib.boulder.ibm.com/iseries/v5r2/ic2924/index.htm?info/rzair/rzairscenariomailloc.htm
+ - http://www-01.ibm.com/support/docview.wss?uid=nas8N1017620
+
+ *To turn on journaling and view the journal contents, follow these steps:
+ ========================================================================
+ 1.In iSeries Navigator expand your iSeries server --> Network --> Servers --> TCP/IP.
+ 2.Double-click SMTP. The SMTP properties dialog appears.
+ 3.Click the General tab.
+ 4.Select the Enable journal entries check box.
+ 5.Open an emulation session.
+ 6.To convert the SMTP journal entries to a viewable form, in the character-based interface, type:
+   DSPJRN JRN(QZMF) OUTPUT(*OUTFILE) OUTFILE(qtemp/zmfstuff) OUTMBR(MAR2) ENTDTALEN(512)
+   where zmfstuff is the name of the physical file that will be created in qtemp
+   DSPPFM QTEMP/ZMFSTUFF MAR2
+
+ 7.To view the SMTP journal entries, type the following on the command line: DSPPFM FILE(qtemp/zmfst
+ 8.Press F20 (Shift + F8) to see the journal-specific information.
+
+ *Tracking undelivered email for v6r1
+ ========================================================================
+ Other version, http://www.ibm.com/support/knowledgecenter/da/ssw_ibm_i_61/rzair/rzairworkml.htm
+
+ You can use a generic user ID to track problems with undeliverable e-mail. This method can be usefu
+ delivery and configuration problems.
+ 1.Select or create a user ID to receive notification. In the character-based interface, type CRTUSR
+ Profile command) and press Enter.
+ 2.Type WRKDIRE (the Work with Directory Entries command) and press Enter.
+ 3.Type 1 to add the user to the system distribution directory.
+ 4.Ensure that the Mail Store value is 2 and the Preferred Address value is 3.
+ 5.Press F19 (Add Name for SMTP).
+ 6.Type NONDELIVERY@localhost.domain as the SMTP address for any POP user.
+
+ *Useful command
+ ========================================================================
+  DSPJRN JRN(QZMF) OUTPUT(*OUTFILE) OUTFILE(QTEMP/ZMFSTUFF) OUTMBR(MAR2)
+  DSPPFM FILE(qtemp/zmfstuff) MBR(MAR2)
+  CI0006CMD FILENAME('/email/lam') RECIPADDR(CHA003@PROMISE.COM.HK) RECIPNA
+   ME('Lam') SENDERADDR(PROMISE9@PROMISE.COM.HK) SENDERNAME(SMTPAUTH) SUBJEC
+   T('TESTING Again') MESSAGE('Testing Lam from DRILLPRO')
+
+ Start SMTP Trace
+ ========================================================================
+ 1) On the IBM i command line type the following to start the traces:
+    ENDTCPSVR SERVER(*SMTP),
+    TRCTCPAPP APP(*SMTPCLT) TRCFULL(*STOPTRC)
+    STRTCPSVR SERVER(*SMTP),
+
+ 2) Reproduce the problem and verify a journal entry was generated.
+
+ 3) Turn off the traces with the following commands:
+    TRCTCPAPP APP(*SMTPCLT) SET(*OFF)
+
+ 4) Then send the resulting trace spool files to IBM.
+
+ 5) We also would like a
+ Mail collector from :
+ http://www-01.ibm.com/support/docview.wss?uid=nas8N1020999
+
+ *Generate Cert
+ ========================================================================
+  https://www.linux.com/learn/creating-self-signed-ssl-certificates-apache-linux
+  you may use native Power System to create cert in loing
+  http://172.18.101.15:2004/ibm/console OR https://172.18.10.15:2005/ibm/console

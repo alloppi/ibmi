@@ -1,0 +1,64 @@
+online Base64 converter https://www.base64encode.org/
+
+https://dencode.com/en/string/hex
+
+Procedure for prepare MMS in Testing Power System from PC
+=========================================================
+- Suppose you need to send a content (e.g. example.txt) and Media (e.g. example.gif)
+ = Prepare media file
+  > FTP the example.gif to '/mms/'
+ = Prepare content text file
+  > ChgJob CCSID(937)
+  > type command : wrklnk '/mms'
+  > Copy standard file (i.e. /mms/Standard.txt) to '/mms' with the name example.txt
+    # This file has special attribute
+    # every line contains tail x'0D25'
+    # CCSID(937)
+  > FTP (replace
+   ....
+   ....
+  > use option '2' to edit this new IFS file example.txt
+  > Under PC using Notepad, just copy and paste the content in eaxmple.txt to the one in IFS
+  > copy the first line <Subject> in the field AMMSSBJBG5 of PHAMMSCF
+  > Press command F3 to save and exit
+  > ChgJob CCSID(65535)
+ = Update DB2 PHAMMSCF
+  > AMMSSBJBG5:  refer to the <Subject> of example.txt
+  > AMMSCFLE:   /mms/example.gif
+  > AMMSCONTF:  /mms/example.txt
+ For testing
+ = Add record to PHAHMTF (include LF), better in Qtemp
+
+** Note as checking in PBMM01R  and setting mobile #, ,please update the data PHCMF
+     update thtdlib/phcmf03   set cmpmn = '11111111'          <- mobile to receive MMS
+     ,cmsapc = '', cmmpscc = '3' where cmmn = nnnnnnn
+                                                              <- Member Ship #
+ = Call PBMM01R  parm('XXX'), e.g. XXX = S01 or S02
+ Or Call CPS0353R for directly calling the Suroutine PS0353R
+
+Keynote in sending files between Power System by FTP for Release (i.e. to two production machines)
+==================================================================================================
+  > keynote on FTP the gif and text files
+    - namefmt 1         <- use name format 1 (i.e. put /mms/example.txt /mms/example.txt)
+    - Bin               <- using binary mode for no change in text or gif content
+  > Example
+    In PROMISE 4
+    ------------
+    - Create a right file layout first
+      # CCSID = 937
+      # Contains two hex control characters '0D25' for each lines
+    - by command, CPY OBJ('/mms/Suspend_MMS_text_202001.txt') TOOBJ('/mms/Suspend_MMS_text202005.txt
+
+    In PROMISE 3
+    ------------
+    ftp 'PROMISE4'
+    bin
+    namefmt 1
+    put /mms/Suspend_MMS_Gif_202005.gif /mms/Suspend_MMS_Gif_202005.gif
+    put /mms/Suspend_MMS_text_202005.txt /mms/Suspend_MMS_text_202005.txt
+
+Tools upload MMS file to Power System
+=====================================
+- Place the 2 files in under \down\it\tuef\ in FTP Server
+  > PROMFTPUP
+- Prepare a same name of txt file under '/mms' in CCSID = 937 (hence, copy from a old txt file)

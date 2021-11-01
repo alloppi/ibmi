@@ -1,0 +1,57 @@
+/*============================================================================================*/
+/* Program name: ENCAPI1C                                                                     */
+/* Purpose.....: Set up Encryption keys                                                       */
+/*                                                                                            */
+/* Remark......: Before ruuning this setup program, set up an encryption environment.         */
+/*   Refer to http://www-01.ibm.com/support/docview.wss?uid=nas8N1018617                      */
+/*   1. Add master key part: ADDMSTPART MSTKEY(3) PASSPHRASE(put your Passphrase here)        */
+/*   2. Set master key: SETMSTKEY MSTKEY(3)                                                   */
+/*      It is possible to check master KVV with command CHKMSTKVV MSTKEY(3) VERSION(*CURRENT) */
+/*                                                                                            */
+/* Modification:                                                                              */
+/* Date       Name       Pre  Ver  Mod#  Remarks                                              */
+/* ---------- ---------- --- ----- ----- ---------------------------------------------------- */
+/* 2017/02/24 Alan       AC              New Development                                      */
+/* ===========================================================================================*/
+             PGM
+
+             DCL        VAR(&O_INPROD) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&W_LIB)    TYPE(*CHAR) LEN(10)
+             DCL        VAR(&W_OWNER)  TYPE(*CHAR) LEN(10)
+             DCL        VAR(&W_JOB)    TYPE(*CHAR) LEN(10)
+
+/* Check Key File ENCKEYF should be existed */
+             CHKOBJ     OBJ(&W_LIB/ENCKEYF) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+               RTVJOBA    JOB(&W_JOB)
+               SNDBRKMSG  MSG('ENCKEYF not exists in Library ' *CAT +
+                            &W_LIB) TOMSGQ(&W_JOB)
+               GOTO       CMDLBL(ENDPGM)
+             ENDDO
+
+/* Delete key store File PHENCSTRF and Key File ENCKEYF and will create this file in PSXX0IR */
+             DLTF       FILE(&W_LIB/PHENCSTRF)
+             MONMSG     MSGID(CPF2105)
+
+/* Setup Encrypted Key and Key Store File */
+             OVRDBF     FILE(ENCKEYF) TOFILE(&W_LIB/ENCKEYF)
+             CALL       PGM(ENCAPI1R) PARM(&W_LIB)
+             DLTOVR     FILE(ENCKEYF)
+
+/* Change Encryption Key File authority */
+             GRTOBJAUT  OBJ(&W_LIB/ENCKEYF) OBJTYPE(*FILE) +
+                          USER(*PUBLIC) AUT(*EXCLUDE)
+
+/* Change Encryption Key File owner */
+             CHGOBJOWN  OBJ(&W_LIB/ENCKEYF) OBJTYPE(*FILE) +
+                          NEWOWN(&W_OWNER)
+
+/* Change ENC key store File authority */
+             CHGOBJOWN  OBJ(&W_LIB/PHENCSTRF) OBJTYPE(*FILE) +
+                          NEWOWN(&W_OWNER)
+
+/* Change ENC key store File authority */
+             STRJRNPF   FILE(&W_LIB/PHENCSTRF) JRN(*LIBL/PHJRN)
+
+
+ ENDPGM:     ENDPGM

@@ -1,0 +1,70 @@
+Print Spool file to PDF file
+============================
+1. CRTPSFCFG PSFCFG(MYLIB/PSFCFG) PDFGEN(*STMF) PDFDIR('/print1')
+2. CRTDEVPRT DEVD(MYPDF) DEVCLS(*LAN) TYPE(*IPDS) MODEL(0) LANATTACH(*IP)
+     AFP(*YES) PORT(2005) FONT(11) FORMFEED(*AUTOCUT) RMTLOCNAME('127.0.0.1')
+     USRDFNOBJ(MYLIB/PSFCFG *PSFCFG)
+3. STRPRTWTR MYPDF
+
+Printing PDF in IFS
+============================
+1. Reference site
+   - https://www-01.ibm.com/support/docview.wss?uid=nas8N1018851
+
+2. Printing PDF Files in the (IFS) using Adobe Reader
+   - The simplest way to print PDF files which are stored in the Integrated File System (IFS) is ope
+     Reader on a user's PC. This can be done by doing one of the following:
+     o Mapping a network drive to an IBM i NetServer file share, navigating to the IFS directory whe
+       stored, then double clicking on the PDF file to open it in Adobe Reader.
+     o Mapping a network drive to an IBM i NetServer file share, navigating to the IFS directory whe
+       stored, copying the PDF file to your Desktop or to Windows Explorer, then double clicking on
+       open it in Adobe Reader.
+     o Accessing File Systems > Integrated File System (IFS) within System i Navigator, navigating t
+       where the PDF files are stored, copying the PDF file to your Desktop or to Windows Explorer,
+       clicking on the PDF file to open it in Adobe Reader.
+     * Once the PDF has been opened in Adobe Reader, the PDF file can be printed to virtually any pr
+       configured on the Windows PC
+   - Command Line to Print a PDF file from Adobe Reader
+     o StrPCO
+     o StrPCCmd with parameter
+       > "C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe" /t "Z:\directory\pdf-file-name.pdf"
+       > "C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe" /t "Z:\directory\pdf-file-name.pdf"
+         PCL 5e" "HP4200"
+         where Windows printer name ("HP LaserJet 4200 PCL 5e") and the TCP/IP port name created wit
+               ("HP4200")
+
+3. Copying PDF Files in the (IFS) to a *USERASCII Printer File and then:
+   - Printing PDF Files in (IFS) to an ASCII Laser Printer that Supports Direct PDF Printing
+   - Printing PDF Files in (IFS) to an ASCII Laser Printer using Host Print Transform (HPT)
+   - Printing PDF Files in (IFS) to an IPDS Laser Printer
+   - Faxing PDF Files in the (IFS) using Facsimile Support/400 (FAX/400)
+   * here we use Printer that supports direct PDF Printing
+   - Creating *USERASCCII Printer files
+     o Create a print file that will direct spoolf file to Outq QUSRSYS/PDF2AFP
+       >  CRTPRTF FILE(QGPL/PDF2AFP) DEVTYPE(*USERASCII) PAGESIZE(11.0 8.5 *UOM)
+               LPI(6) CPI(10) PAGRTT(0) UOM(*INCH) OUTQ(QUSRSYS/PDF2AFP)
+               HOLD(*NO) SAVE(*YES) USRDTA('AFPrespool')
+               USRDFNDTA('AFPRESPOOL(*NOPRINT)') TEXT('Respool AFP print data')
+     o Create a printer file in portrait
+       > CRTPRTF FILE(QGPL/PDFPORT) DEVTYPE(*USERASCII) PAGESIZE(8.5 11.0 *UOM)
+               LPI(6) CPI(10) OVRFLW(66) FORMDF(*NONE) PAGRTT(0) HOLD(*NO)
+               SAVE(*YES) USRDTA('Portrait')
+               TEXT('Print PDF stream file in portrait')
+     o Create a printer file in landscape
+       >  CRTPRTF FILE(QGPL/PDFLAND) DEVTYPE(*USERASCII) PAGESIZE(11.0 8.5 *UOM)
+               LPI(6) CPI(10) OVRFLW(51) FORMDF(*NONE) PAGRTT(90) HOLD(*NO)
+               SAVE(*YES) USRDTA('Landscape')
+               TEXT('Print PDF stream file in landscape')
+     o Send IFS PDF to one of printer file will create a spool file contains PDF data
+          ftp localhost
+           Connecting to remote host 127.0.0.1 using port 21.
+           220-QTCP at LOOPBACK.
+           220 Connection will close if idle more than 8333 minutes.
+           v2kea261
+           (password)
+           lcd qgpl
+           bin
+           quote site namefmt 1
+           250 Now using naming format "1".
+           get /home/v2kea261/pmr15394.pdf PDFPORT
+           get /home/v2kea261/pmr15394.pdf PDFLAND

@@ -1,0 +1,447 @@
+/*===================================================================*/
+/* Program name: GETSPLFAC                                           */
+/* Purpose.....: Get Spool File Attribute                            */
+/* Description.: Use QUSRSPLA api to get spool file attribute        */
+/*                                                                   */
+/* Input Parameter:  Job Name          (10A)                         */
+/*                   Job User          (10A)                         */
+/*                   Job Number        (6A)                          */
+/*                   Spool File Name   (10A)                         */
+/*                   Spool File Number (6A)                          */
+/* Output Parameter: Spool Create Date (7A)                          */
+/*                   Spool Create Time (6A)                          */
+/*                   Spool Status      (10A)                         */
+/*                   Spool Hold        (10A)                         */
+/*                   Spool Save        (10A)                         */
+/*                                                                   */
+/* Date written: 2011/02/16                                          */
+/*                                                                   */
+/* Modification:                                                     */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- --- ----- ----- --------------------------- */
+/* 2011/02/16 Alan       AC              New Development             */
+/*===================================================================*/
+             PGM        PARM(&P_JOBNAME &P_JOBUSER &P_JOBNUM +
+                          &P_SPLFNAM &P_SPLFNUM &R_CRTDATE +
+                          &R_CRTTIME &R_STATUS &R_HOLD &R_SAVE)
+
+/* Incoming Value */
+             DCL        VAR(&P_JOBNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&P_JOBUSER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&P_JOBNUM)  TYPE(*CHAR) LEN(6)
+             DCL        VAR(&P_SPLFNAM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&P_SPLFNUM) TYPE(*CHAR) LEN(6)
+
+/* Return Value */
+             DCL        VAR(&R_FORMTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_USERDATA) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_STATUS) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_AVAIL) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_HOLD) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_SAVE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_TTLPAGE) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_PAGEWRT) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_STRPAGE) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_ENDPAGE) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_LASTPAGE)
+             DCL        VAR(&R_RESTART) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_TTLCOPY) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_COPYLEFT) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_LPI) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_CPI) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_OUTQPRIO) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&R_OUTQ) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_OUTQLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CRTDATE) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&R_CRTTIME) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&R_DEVFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DEVLIB)  TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_PGM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_PGMLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_ACCCODE) TYPE(*CHAR) LEN(15)
+             DCL        VAR(&R_PRTTEXT) TYPE(*CHAR) LEN(30)
+             DCL        VAR(&R_RECLEN) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_MAXREC) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_DEVTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_PRTTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DOCNAME) TYPE(*CHAR) LEN(12)
+             DCL        VAR(&R_FLDNAME) TYPE(*CHAR) LEN(64)
+             DCL        VAR(&R_FIDELITY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_UNPRTCHR) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&R_RPLCHAR) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&R_PAGELEN) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_PAGEWID) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_NUMSEP) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_OVERLIN) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_MULTBYTE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DBCSEXTC) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DBCSSOSI) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DBCSCHRR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DBCSCPI) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_GRAPHCHR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CODEPAGE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FORMNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FORMLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DRAWER) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_PRTFONT) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&R_ROTATION) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_JUSTIFIC) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_BOTHSIDE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FOLDREC) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CTLCHAR) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_ALIGNFRM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_PRTQUALY) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FORMFEED) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_VOLUME) TYPE(*CHAR) LEN(71)
+             DCL        VAR(&R_LABELID) TYPE(*CHAR) LEN(17)
+             DCL        VAR(&R_EXGTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CHARCODE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_TTLREC) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_MULTIUP) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_FRONTOVL) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FROVLLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FROVLDWN) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_FROVLACR) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_BACKOVL) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_BKOVLLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_BKOVLDWN) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_BKOVLACR) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_UOM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_PAGENAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_PAGELIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_LINSPAC) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_POINTSIZ) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_FRMRGDWN) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_FRMRGACR) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_BKMRGDWN) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_BKMRGACR) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_LENOFPAG) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_WIDOFPAG) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_MEASMTD) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_AFPRSC) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&R_CHARNAM) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CHARLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CODENAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CODELIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FONTNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_FONTLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DBCSNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DBCSLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_USERFILE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_REDUCE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_CBACKOVL) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&R_OUTBIN) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_CCSID) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_USERTEXT) TYPE(*CHAR) LEN(100)
+             DCL        VAR(&R_SYSCRT) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_IDCRT) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_USERCRT) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_RESERVE1) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&R_OFFSDEF) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_NUMDEF) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_LENDEF) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_DEFDATA) TYPE(*CHAR) LEN(255)
+             DCL        VAR(&R_DEFNAME) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_DEFLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_OBJTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_RESERVE2) TYPE(*CHAR) LEN(3)
+             DCL        VAR(&R_CHARSIZE) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_CODESIZE) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_DBCSSIZE) TYPE(*DEC) LEN(15 5)
+             DCL        VAR(&R_STGPOOL) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_SPLFSIZE) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_SIZMULTI) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_INTID) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_SECMTD) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&R_AUTMTD) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&R_DATEBEG) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&R_TIMEBEG) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&R_DATECMPL) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&R_TIMECMPL) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&R_SYSNAME) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&R_STGDEV) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&R_EXPDATE) TYPE(*CHAR) LEN(7)
+
+/* Working Variable for API QUSRSPLA */
+             DCL        VAR(&JOBNAME) TYPE(*CHAR) LEN(26)
+             DCL        VAR(&JOBID) TYPE(*CHAR) LEN(16)
+             DCL        VAR(&SPLFID) TYPE(*CHAR) LEN(16)
+             DCL        VAR(&SPLFNUM) TYPE(*CHAR) LEN(4)
+
+             DCL        VAR(&RCVVAR) TYPE(*CHAR) LEN(1537)
+             DCL        VAR(&RCVLEN) TYPE(*CHAR) LEN(4) +
+                          VALUE(X'00000601')
+             DCL        VAR(&FMTNAM) TYPE(*CHAR) LEN(8) +
+                          VALUE('SPLA0100')
+
+             CHGVAR     VAR(&JOBNAME) VALUE(&P_JOBNAME || &P_JOBUSER +
+                          || &P_JOBNUM)
+             CHGVAR     VAR(%BIN(&SPLFNUM)) VALUE(&P_SPLFNUM)
+
+/* Call API QUSRSPLA to get spool attribute */
+             CALL       PGM(QUSRSPLA) PARM(&RCVVAR &RCVLEN &FMTNAM +
+                          &JOBNAME &JOBID &SPLFID &P_SPLFNAM +
+                          &SPLFNUM)
+
+/* Retrieve value from API QUSRSPLA */
+             /* Form type */
+             CHGVAR     VAR(&R_FORMTYPE) VALUE(%SST(&RCVVAR 81 10))
+             /* User-specified data */
+             CHGVAR     VAR(&R_USERDATA) VALUE(%SST(&RCVVAR 91 10))
+             /* Status */
+             CHGVAR     VAR(&R_STATUS) VALUE(%SST(&RCVVAR 101 10))
+             /* File available */
+             CHGVAR     VAR(&R_AVAIL) VALUE(%SST(&RCVVAR 111 10))
+             /* Hold file before written */
+             CHGVAR     VAR(&R_HOLD) VALUE(%SST(&RCVVAR 121 10))
+             /* Save file after written */
+             CHGVAR     VAR(&R_SAVE) VALUE(%SST(&RCVVAR 131 10))
+             /* Total pages */
+             CHGVAR     VAR(&R_TTLPAGE) VALUE(%BIN(&RCVVAR 141 4))
+             /* Page or record being written */
+             CHGVAR     VAR(&R_PAGEWRT) VALUE(%BIN(&RCVVAR 145 4))
+             /* Starting page */
+             CHGVAR     VAR(&R_STRPAGE) VALUE(%BIN(&RCVVAR 149 4))
+             /* Ending page */
+             CHGVAR     VAR(&R_ENDPAGE) VALUE(%BIN(&RCVVAR 153 4))
+             /* Last page printed */
+             CHGVAR     VAR(&R_LASTPAGE) VALUE(%BIN(&RCVVAR 157 4))
+             /* Restart printing */
+             CHGVAR     VAR(&R_RESTART) VALUE(%BIN(&RCVVAR 161 4))
+             /* Total copies */
+             CHGVAR     VAR(&R_TTLCOPY) VALUE(%BIN(&RCVVAR 165 4))
+             /* Copies left to produce */
+             CHGVAR     VAR(&R_COPYLEFT) VALUE(%BIN(&RCVVAR 169 4))
+             /* Lines per inch */
+             CHGVAR     VAR(&R_LPI) VALUE(%BIN(&RCVVAR 173 4))
+             /* Characters per inch */
+             CHGVAR     VAR(&R_CPI) VALUE(%BIN(&RCVVAR 177 4))
+             /* Output priority */
+             CHGVAR     VAR(&R_OUTQPRIO) VALUE(%SST(&RCVVAR 181 2))
+             /* Output queue name */
+             CHGVAR     VAR(&R_OUTQ) VALUE(%SST(&RCVVAR 183 10))
+             /* Output queue library name */
+             CHGVAR     VAR(&R_OUTQLIB) VALUE(%SST(&RCVVAR 193 10))
+             /* Date file opened (created) */
+             CHGVAR     VAR(&R_CRTDATE) VALUE(%SST(&RCVVAR 203 7))
+             /* Time file opened (created) */
+             CHGVAR     VAR(&R_CRTTIME) VALUE(%SST(&RCVVAR 210 6))
+             /* Device file named */
+             CHGVAR     VAR(&R_DEVFILE) VALUE(%SST(&RCVVAR 216 10))
+             /* Device file library name */
+             CHGVAR     VAR(&R_DEVLIB) VALUE(%SST(&RCVVAR 226 10))
+             /* Program that opened file name */
+             CHGVAR     VAR(&R_PGM) VALUE(%SST(&RCVVAR 236 10))
+             /* Program that opened file library name */
+             CHGVAR     VAR(&R_PGMLIB) VALUE(%SST(&RCVVAR 246 10))
+             /* Accounting code */
+             CHGVAR     VAR(&R_ACCCODE) VALUE(%SST(&RCVVAR 256 10))
+             /* Print text */
+             CHGVAR     VAR(&R_PRTTEXT) VALUE(%SST(&RCVVAR 271 30))
+             /* Record length */
+             CHGVAR     VAR(&R_RECLEN) VALUE(%BIN(&RCVVAR 301 4))
+             /* Maximum records */
+             CHGVAR     VAR(&R_MAXREC) VALUE(%BIN(&RCVVAR 305 4))
+             /* Device type */
+             CHGVAR     VAR(&R_DEVTYPE) VALUE(%SST(&RCVVAR 309 10))
+             /* Printer device type */
+             CHGVAR     VAR(&R_PRTTYPE) VALUE(%SST(&RCVVAR 319 10))
+             /* Document name */
+             CHGVAR     VAR(&R_DOCNAME) VALUE(%SST(&RCVVAR 329 10))
+             /* Folder namee */
+             CHGVAR     VAR(&R_FLDNAME) VALUE(%SST(&RCVVAR 341 10))
+             /* Print fidelity */
+             CHGVAR     VAR(&R_FIDELITY) VALUE(%SST(&RCVVAR 413 10))
+             /* Replace unprintable characters */
+             CHGVAR     VAR(&R_UNPRTCHR) VALUE(%SST(&RCVVAR 423 1))
+             /* Replacement character */
+             CHGVAR     VAR(&R_RPLCHAR) VALUE(%SST(&RCVVAR 424 1))
+             /* Page length */
+             CHGVAR     VAR(&R_PAGELEN) VALUE(%BIN(&RCVVAR 425 4))
+             /* Page width */
+             CHGVAR     VAR(&R_PAGEWID) VALUE(%BIN(&RCVVAR 429 4))
+             /* Number of separators */
+             CHGVAR     VAR(&R_NUMSEP) VALUE(%BIN(&RCVVAR 433 4))
+             /* Overflow line number */
+             CHGVAR     VAR(&R_OVERLIN) VALUE(%BIN(&RCVVAR 437 4))
+             /* Multi-byte data */
+             CHGVAR     VAR(&R_MULTBYTE) VALUE(%SST(&RCVVAR 441 10))
+             /* DBCS extension characters */
+             CHGVAR     VAR(&R_DBCSEXTC) VALUE(%SST(&RCVVAR 451 10))
+             /* DBCS shift-out shift-in (SO/SI) spacing */
+             CHGVAR     VAR(&R_DBCSSOSI) VALUE(%SST(&RCVVAR 461 10))
+             /* DBCS character rotation */
+             CHGVAR     VAR(&R_DBCSCHRR) VALUE(%SST(&RCVVAR 471 10))
+             /* DBCS characters per inch */
+             CHGVAR     VAR(&R_DBCSCPI) VALUE(%BIN(&RCVVAR 481 4))
+             /* Graphic character set */
+             CHGVAR     VAR(&R_GRAPHCHR) VALUE(%SST(&RCVVAR 485 10))
+             /* Code page */
+             CHGVAR     VAR(&R_CODEPAGE) VALUE(%SST(&RCVVAR 495 10))
+             /* Form definition name */
+             CHGVAR     VAR(&R_FORMNAME) VALUE(%SST(&RCVVAR 505 10))
+             /* Form definition library name */
+             CHGVAR     VAR(&R_FORMLIB) VALUE(%SST(&RCVVAR 515 10))
+             /* Source drawer */
+             CHGVAR     VAR(&R_DRAWER) VALUE(%BIN(&RCVVAR 525 4))
+             /* Printer font */
+             CHGVAR     VAR(&R_PRTFONT) VALUE(%SST(&RCVVAR 529 10))
+             /* Page rotation */
+             CHGVAR     VAR(&R_ROTATION) VALUE(%BIN(&RCVVAR 545 4))
+             /* Justification */
+             CHGVAR     VAR(&R_JUSTIFIC) VALUE(%BIN(&RCVVAR 549 4))
+             /* Print on both sides (duplex) */
+             CHGVAR     VAR(&R_BOTHSIDE) VALUE(%SST(&RCVVAR 553 10))
+             /* Fold records */
+             CHGVAR     VAR(&R_FOLDREC) VALUE(%SST(&RCVVAR 563 10))
+             /* Control character */
+             CHGVAR     VAR(&R_CTLCHAR) VALUE(%SST(&RCVVAR 573 10))
+             /* Align forms */
+             CHGVAR     VAR(&R_ALIGNFRM) VALUE(%SST(&RCVVAR 583 10))
+             /* Print quality */
+             CHGVAR     VAR(&R_PRTQUALY) VALUE(%SST(&RCVVAR 593 10))
+             /* Form feed */
+             CHGVAR     VAR(&R_FORMFEED) VALUE(%SST(&RCVVAR 603 10))
+             /* Volumes (array) */
+             CHGVAR     VAR(&R_VOLUME) VALUE(%SST(&RCVVAR 613 71))
+             /* File label identifier */
+             CHGVAR     VAR(&R_LABELID) VALUE(%SST(&RCVVAR 684 17))
+             /* Exchange type */
+             CHGVAR     VAR(&R_EXGTYPE) VALUE(%SST(&RCVVAR 701 10))
+             /* Character code */
+             CHGVAR     VAR(&R_CHARCODE) VALUE(%SST(&RCVVAR 711 10))
+             /* Total records */
+             CHGVAR     VAR(&R_TTLREC) VALUE(%BIN(&RCVVAR 721 4))
+             /* Multiple up (pages per side) */
+             CHGVAR     VAR(&R_MULTIUP) VALUE(%BIN(&RCVVAR 725 4))
+             /* Front overlay name */
+             CHGVAR     VAR(&R_FRONTOVL) VALUE(%SST(&RCVVAR 729 10))
+             /* Front overlay library name */
+             CHGVAR     VAR(&R_FROVLLIB) VALUE(%SST(&RCVVAR 739 10))
+             /* Front overlay offset down */
+             CHGVAR     VAR(&R_FROVLDWN) VALUE(%BIN(&RCVVAR 749 4) *2)
+             /* Front overlay offset across */
+             CHGVAR     VAR(&R_FROVLACR) VALUE(%BIN(&RCVVAR 757 4) *2)
+             /* Back overlay name */
+             CHGVAR     VAR(&R_BACKOVL) VALUE(%SST(&RCVVAR 765 10))
+             /* Back overlay library name */
+             CHGVAR     VAR(&R_BKOVLLIB) VALUE(%SST(&RCVVAR 775 10))
+             /* Back overlay offset down */
+             CHGVAR     VAR(&R_BKOVLDWN) VALUE(%BIN(&RCVVAR 785 4) *2)
+             /* Back overlay offset across */
+             CHGVAR     VAR(&R_BKOVLACR) VALUE(%BIN(&RCVVAR 793 4) *2)
+             /* Unit of measure */
+             CHGVAR     VAR(&R_UOM) VALUE(%SST(&RCVVAR 801 10))
+             /* Page definition name */
+             CHGVAR     VAR(&R_PAGENAME) VALUE(%SST(&RCVVAR 811 10))
+             /* Page definition library name */
+             CHGVAR     VAR(&R_PAGELIB) VALUE(%SST(&RCVVAR 821 10))
+             /* Line spacing */
+             CHGVAR     VAR(&R_LINSPAC) VALUE(%SST(&RCVVAR 831 10))
+             /* Point size */
+             CHGVAR     VAR(&R_POINTSIZ) VALUE(%BIN(&RCVVAR 841 4) *2)
+             /* Front margin offset down */
+             CHGVAR     VAR(&R_FRMRGDWN) VALUE(%BIN(&RCVVAR 849 4) *2)
+             /* Front margin offset across */
+             CHGVAR     VAR(&R_FRMRGACR) VALUE(%BIN(&RCVVAR 857 4) *2)
+             /* Back margin offset down */
+             CHGVAR     VAR(&R_BKMRGDWN) VALUE(%BIN(&RCVVAR 865 4) *2)
+             /* Back margin offset across */
+             CHGVAR     VAR(&R_BKMRGACR) VALUE(%BIN(&RCVVAR 873 4) *2)
+             /* Length of page */
+             CHGVAR     VAR(&R_LENOFPAG) VALUE(%BIN(&RCVVAR 881 4) *2)
+             /* Width of page */
+             CHGVAR     VAR(&R_WIDOFPAG) VALUE(%BIN(&RCVVAR 889 4) *2)
+             /* Measurement method */
+             CHGVAR     VAR(&R_MEASMTD) VALUE(%SST(&RCVVAR 897 10))
+             /* Advanced Function Printing (AFP) resource */
+             CHGVAR     VAR(&R_AFPRSC) VALUE(%SST(&RCVVAR 907 1))
+             /* Character set name */
+             CHGVAR     VAR(&R_CHARNAM) VALUE(%SST(&RCVVAR 908 10))
+             /* Character set library name */
+             CHGVAR     VAR(&R_CHARLIB) VALUE(%SST(&RCVVAR 918 10))
+             /* Character set name */
+             CHGVAR     VAR(&R_CODENAME) VALUE(%SST(&RCVVAR 928 10))
+             /* Code page name */
+             CHGVAR     VAR(&R_CODELIB) VALUE(%SST(&RCVVAR 938 10))
+             /* Code font name */
+             CHGVAR     VAR(&R_FONTNAME) VALUE(%SST(&RCVVAR 948 10))
+             /* Coded font library name */
+             CHGVAR     VAR(&R_FONTLIB) VALUE(%SST(&RCVVAR 958 10))
+             /* DBCS-coded font name */
+             CHGVAR     VAR(&R_DBCSNAME) VALUE(%SST(&RCVVAR 968 10))
+             /* DBCS-coded font library name */
+             CHGVAR     VAR(&R_DBCSLIB) VALUE(%SST(&RCVVAR 978 10))
+             /* User-defined file */
+             CHGVAR     VAR(&R_USERFILE) VALUE(%SST(&RCVVAR 988 10))
+             /* Reduce output */
+             CHGVAR     VAR(&R_REDUCE) VALUE(%SST(&RCVVAR 998 10))
+             /* Constant back overlay */
+             CHGVAR     VAR(&R_CBACKOVL) VALUE(%SST(&RCVVAR 1008 1))
+             /* Output bin */
+             CHGVAR     VAR(&R_OUTBIN) VALUE(%BIN(&RCVVAR 1009 4))
+             /* CCSID */
+             CHGVAR     VAR(&R_CCSID) VALUE(%BIN(&RCVVAR 1013 4))
+             /* User-defined text */
+             CHGVAR     VAR(&R_USERTEXT) VALUE(%SST(&RCVVAR 1017 100))
+             /* System where file created */
+             CHGVAR     VAR(&R_SYSCRT) VALUE(%SST(&RCVVAR 1117 8))
+             /* ID where file created */
+             CHGVAR     VAR(&R_IDCRT) VALUE(%SST(&RCVVAR 1125 8))
+             /* User who created file */
+             CHGVAR     VAR(&R_USERCRT) VALUE(%SST(&RCVVAR 1133 10))
+             /* Reserved */
+             CHGVAR     VAR(&R_RESERVE1) VALUE(%SST(&RCVVAR 1143 2))
+             /* Offset to user-defined options */
+             CHGVAR     VAR(&R_OFFSDEF) VALUE(%BIN(&RCVVAR 1145 4))
+             /* Number of user-defined options returned */
+             CHGVAR     VAR(&R_NUMDEF) VALUE(%BIN(&RCVVAR 1149 4))
+             /* Length of each user-defined option entry */
+             CHGVAR     VAR(&R_LENDEF) VALUE(%BIN(&RCVVAR 1153 4))
+             /* User-defined data */
+             CHGVAR     VAR(&R_DEFDATA) VALUE(%SST(&RCVVAR 1157 255))
+             /* User-defined object name */
+             CHGVAR     VAR(&R_DEFNAME) VALUE(%SST(&RCVVAR 1412 10))
+             /* User-defined object library name */
+             CHGVAR     VAR(&R_DEFLIB) VALUE(%SST(&RCVVAR 1412 10))
+             /* User object type */
+             CHGVAR     VAR(&R_OBJTYPE) VALUE(%SST(&RCVVAR 1432 10))
+             /* Reserved */
+             CHGVAR     VAR(&R_RESERVE2) VALUE(%SST(&RCVVAR 1442 3))
+             /* Character set point size */
+             CHGVAR     VAR(&R_CHARSIZE) VALUE(%BIN(&RCVVAR 1445 4) *2)
+             /* Coded font point size */
+             CHGVAR     VAR(&R_CODESIZE) VALUE(%BIN(&RCVVAR 1453 4) *2)
+             /* DBCS-coded font point size */
+             CHGVAR     VAR(&R_DBCSSIZE) VALUE(%BIN(&RCVVAR 1461 4) *2)
+             /* Auxiliary storage pool */
+             CHGVAR     VAR(&R_STGPOOL) VALUE(%BIN(&RCVVAR 1469 4))
+             /* Spooled file size */
+             CHGVAR     VAR(&R_SPLFSIZE) VALUE(%BIN(&RCVVAR 1473 4))
+             /* Spooled file size multiplier */
+             CHGVAR     VAR(&R_SIZMULTI) VALUE(%BIN(&RCVVAR 1477 4))
+             /* Internet print protocol job identifier */
+             CHGVAR     VAR(&R_INTID) VALUE(%BIN(&RCVVAR 1481 4))
+             /* Spooled file creation security method */
+             CHGVAR     VAR(&R_SECMTD) VALUE(%SST(&RCVVAR 1485 1))
+             /* Spooled file creation authentication method */
+             CHGVAR     VAR(&R_AUTMTD) VALUE(%SST(&RCVVAR 1486 1))
+             /* Date writer began processing spooled file */
+             CHGVAR     VAR(&R_DATEBEG) VALUE(%SST(&RCVVAR 1487 7))
+             /* Time writer began processing spooled file */
+             CHGVAR     VAR(&R_TIMEBEG) VALUE(%SST(&RCVVAR 1494 6))
+             /* Date writer completed processing spooled file */
+             CHGVAR     VAR(&R_DATECMPL) VALUE(%SST(&RCVVAR 1500 7))
+             /* Time writer completed processing spooled file */
+             CHGVAR     VAR(&R_TIMECMPL) VALUE(%SST(&RCVVAR 1507 6))
+             /* Job system name */
+             CHGVAR     VAR(&R_SYSNAME) VALUE(%SST(&RCVVAR 1513 8))
+             /* Auxiliary storage pool device name */
+             CHGVAR     VAR(&R_STGDEV) VALUE(%SST(&RCVVAR 1521 10))
+             /* Expiration date */
+             CHGVAR     VAR(&R_EXPDATE) VALUE(%SST(&RCVVAR 1531 7))
+
+/* Dump for Testing */
+/*           DMPCLPGM */
+
+ $END:       ENDPGM

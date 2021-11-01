@@ -1,0 +1,30 @@
+     A*==============================================================*
+     A* File name   : SCKPGMF                                        *
+     A*                                                              *
+     A* Purpose     : - Used in relation to OnLineupdating           *
+     A*               - Rec Len is Max - 90 = 32650                  *
+     A* Date written: 2003/07/03                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2007/01/26 ALAN                    Host-To-Host              *
+     A*==============================================================*
+     A                                      REF(REFFILE)
+     A          R SCKPGMFR
+     A            TUETCD    R               TEXT('TIS CHECK DATE')
+     A                                      REFFLD(RFISOD)
+     A                                      COLHDG('TUETCD')
+     A            TUETSN    R               TEXT('TIS CHECK SEQ NO')
+     A                                      REFFLD(RFSN5)
+     A                                      COLHDG('TUETSN')
+     A            TUEMN     R               TEXT('MEMBERSHKP NUMBER')
+     A                                      REFFLD(RFMN)
+     A                                      COLHDG('TUEMN')
+     A            TUEPASN   R               TEXT('TU PA SEQUENCE NO.')
+     A                                      REFFLD(RFSN5)
+     A                                      COLHDG('TUEPASN')
+     A            TUERSN         3P 0       TEXT('RECORD SEQ NO')
+     A                                      COLHDG('TUERSN')
+      * 32740 - 90 = 32650
+     A            TUERRD     32650A         TEXT('RAW RESPONSE DATA')

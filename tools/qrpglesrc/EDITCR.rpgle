@@ -1,0 +1,85 @@
+     H DFTACTGRP(*NO)
+     FEDITCD    CF   E             WORKSTN
+     D POS             S              7S 2 INZ(01234.56)
+     D NEG             S                   LIKE(POS)
+     D NONE            S                   LIKE(POS)
+      /Free
+                NEG   = POS * -1;
+                NONE  = 0;
+                POS1A = %EDITC( POS : '1');
+                NEGNA = %EDITC( NEG : 'N');
+                     POS1 = %EDITC( POS : '1')             ;
+                     POS2 = %EDITC( POS : '2')             ;
+                     POS3 = %EDITC( POS : '3')             ;
+                     POS4 = %EDITC( POS : '4')             ;
+                     POS5 = %EDITC( POS : '5')             ;
+                     POS6 = %EDITC( POS : '6')             ;
+                     POS7 = %EDITC( POS : '7')             ;
+                     POS8 = %EDITC( POS : '8')             ;
+                     POS9 = %EDITC( 123456 : '9')             ;
+                     POSA = %EDITC( POS : 'A')             ;
+                     POSB = %EDITC( POS : 'B')             ;
+                     POSC = %EDITC( POS : 'C')             ;
+                     POSD = %EDITC( POS : 'D')             ;
+                     POSJ = %EDITC( POS : 'J')             ;
+                     POSK = %EDITC( POS : 'K')             ;
+                     POSL = %EDITC( POS : 'L')             ;
+                     POSM = %EDITC( POS : 'M')             ;
+                     POSN = %EDITC( POS : 'N')             ;
+                     POSO = %EDITC( POS : 'O')             ;
+                     POSP = %EDITC( POS : 'P')             ;
+                     POSQ = %EDITC( POS : 'Q')             ;
+                     POSX = %EDITC( POS : 'X')             ;
+                     POSY = %EDITC( POS : 'Y')             ;
+                     POSZ = %EDITC( POS : 'Z')             ;
+                     NEG1 = %EDITC( NEG : '1')             ;
+                     NEG2 = %EDITC( NEG : '2')             ;
+                     NEG3 = %EDITC( NEG : '3')             ;
+                     NEG4 = %EDITC( NEG : '4')             ;
+                     NEG5 = %EDITC( NEG : '5')             ;
+                     NEG6 = %EDITC( NEG : '6')             ;
+                     NEG7 = %EDITC( NEG : '7')             ;
+                     NEG8 = %EDITC( NEG : '8')             ;
+                     NEG9 = %EDITC( -123456 : '9')             ;
+                     NEGA = %EDITC( NEG : 'A')             ;
+                     NEGB = %EDITC( NEG : 'B')             ;
+                     NEGC = %EDITC( NEG : 'C')             ;
+                     NEGD = %EDITC( NEG : 'D')             ;
+                     NEGJ = %EDITC( NEG : 'J')             ;
+                     NEGK = %EDITC( NEG : 'K')             ;
+                     NEGL = %EDITC( NEG : 'L')             ;
+                     NEGM = %EDITC( NEG : 'M')             ;
+                     NEGN = %EDITC( NEG : 'N')             ;
+                     NEGO = %EDITC( NEG : 'O')             ;
+                     NEGP = %EDITC( NEG : 'P')             ;
+                     NEGQ = %EDITC( NEG : 'Q')             ;
+                     NEGX = %EDITC( NEG : 'X')             ;
+                     NEGY = %EDITC( NEG : 'Y')             ;
+                     NEGZ = %EDITC( NEG : 'Z')             ;
+                    ZERO1 =   %EDITC( NONE : '1')           ;
+                    ZERO2 =   %EDITC( NONE : '2')           ;
+                    ZERO3 =   %EDITC( NONE : '3')           ;
+                    ZERO4 =   %EDITC( NONE : '4')           ;
+                    ZERO5 =   %EDITC( NONE : '5')           ;
+                    ZERO6 =   %EDITC( NONE : '6')           ;
+                    ZERO7 =   %EDITC( NONE : '7')           ;
+                    ZERO8 =   %EDITC( NONE : '8')           ;
+                    ZERO9 =   %EDITC(    0 : '9')           ;
+                    ZEROA =   %EDITC( NONE : 'A')           ;
+                    ZEROB =   %EDITC( NONE : 'B')           ;
+                    ZEROC =   %EDITC( NONE : 'C')           ;
+                    ZEROD =   %EDITC( NONE : 'D')           ;
+                    ZEROJ =   %EDITC( NONE : 'J')           ;
+                    ZEROK =   %EDITC( NONE : 'K')           ;
+                    ZEROL =   %EDITC( NONE : 'L')           ;
+                    ZEROM =   %EDITC( NONE : 'M')           ;
+                    ZERON =   %EDITC( NONE : 'N')           ;
+                    ZEROO =   %EDITC( NONE : 'O')           ;
+                    ZEROP =   %EDITC( NONE : 'P')           ;
+                    ZEROQ =   %EDITC( NONE : 'Q')           ;
+                    ZEROX =   %EDITC( NONE : 'X')           ;
+                    ZEROY =   %EDITC( NONE : 'Y')           ;
+                    ZEROZ =   %EDITC( NONE : 'Z')           ;
+               EXFMT SCRA                                   ;
+             *INLR = *ON                                    ;
+      /END-FREE

@@ -1,0 +1,50 @@
+/****************************************************************/
+/* Program name: RUNFTPC                                        */
+/* Purpose.....: Run FTP Command in Batch                       */
+/*                                                              */
+/* Date written: 1999/05/28                                     */
+/* Description :                                                */
+/*             : &LIB    - LIB contains &FILE                   */
+/*             : &FILF   - FILE in &LIB contains member &FTPSRC */
+/*             : &FTPSRC - Contains FTP Source Command          */
+/*             : &RMTSYS - Remote system                        */
+/*                                                              */
+/* Modification:                                                */
+/* Date       Name       Prefix Remarks                         */
+/* ---------- ---------- ------ ------------------------------- */
+/* 2008/02/26 Alan       AC                                     */
+/*==============================================================*/
+             PGM        PARM(&LIB &FILE &FTPSRC &FTPLOG &RMTSYS)
+             DCL        VAR(&LIB)    TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FILE)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FTPSRC) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FTPLOG) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RMTSYS) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOB_OUTQ) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOB_OQLIB) TYPE(*CHAR) LEN(10)
+             RTVJOBA    OUTQ(&JOB_OUTQ) OUTQLIB(&JOB_OQLIB)
+
+             OVRDBF     FILE(INPUT) TOFILE(&LIB/&FILE) MBR(&FTPSRC)
+
+             IF         COND(&FTPLOG *NE ' ') THEN(DO)
+             OVRDBF     FILE(OUTPUT) TOFILE(&LIB/&FILE) MBR(&FTPLOG)
+             ENDDO
+             ELSE       CMD(DO)
+             CHGJOB     OUTQ(*LIBL/QEZJOBLOG)
+             ENDDO
+
+             FTP        RMTSYS(&RMTSYS)
+
+             IF         COND(&FTPLOG *NE ' ') THEN(DO)
+             DLTOVR     FILE(OUTPUT)
+             ENDDO
+             ELSE       CMD(DO)
+             IF         COND(&JOB_OUTQ = '*DEV') THEN(DO)
+             CHGJOB     OUTQ(*DEV)
+             ENDDO
+             ELSE       CMD(DO)
+             CHGJOB     OUTQ(&JOB_OQLIB/&JOB_OUTQ)
+             ENDDO
+             ENDDO
+             DLTOVR     FILE(INPUT)
+             ENDPGM

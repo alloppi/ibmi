@@ -1,0 +1,39 @@
+             PGM
+
+             ADDENVVAR  ENVVAR(JAVA_HOME) +
+                          VALUE('/QOpenSys/QIBM/ProdData/JavaVM/jdk60+
+                            /32bit') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(QIBM_RPG_JAVA_PROPERTIES) +
+                          VALUE('-Djava.version=1.6;+
+                            -Djava.awt.headless=true;+
+                            -Dos400.stderr=file:/java/STDERR.TXT;+
+                            -Dos400.stdout=file:/java/STDOUT.TXT;') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(QIBM_USE_DESCRIPTOR_STDIO) VALUE('Y') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(CLASSPATH) +
+                          VALUE('.+
+                            :/javaapps/poi-3.13/poi-3.13-20150929.jar+
+                            :/javaapps/poi-3.13/poi-ooxml-3.13-20150929.jar+
+                            :/javaapps/poi-3.13/poi-ooxml-schemas-3.13-20150929.jar+
+                            :/javaapps/dom4j-1.6.1/dom4j-1.6.1.jar+
+                            :/javaapps/xmlbeans-2.6.0/lib/jsr173_1.0_api.jar+
+                            :/javaapps/xmlbeans-2.6.0/lib/xbean.jar') +
+                          LEVEL(*JOB) +
+                          REPLACE(*YES)
+
+             OVRDBF     FILE(PHBIG5F) TOFILE(THNCILIB/PHBIG5F)
+
+          /* CALL       PGM(PHCCHIDEMR)     Create .xls sheet */
+             CALL       PGM(PHCCHIDEMR) PARM('1')  /* Create .xlsx sheet */
+
+             CALL       PGM(PSXX17C) PARM('THNCILIB' 'QRPGSRC' +
+                          'PHCCHIFTP' 'PHCCHILOG' 'HKPM-D')      /* FTP */
+
+
+             DLTOVR     FILE(PHBIG5F)
+             ENDPGM

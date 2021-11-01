@@ -1,0 +1,39 @@
+      *====================================================================*
+      * Program name: RNDNBRR                                              *
+      * Purpose.....: Generate Random Number (12 Character)                *
+      *                                                                    *
+      * Modification:                                                      *
+      * Date       Name       Pre  Ver  Mod#  Remarks                      *
+      * ---------- ---------- --- ----- ----- -----------------------------*
+      * 2020/07/23 Alan       AC              New Develop                  *
+      *====================================================================*
+     H DftActGrp(*no)
+
+     D R_RndNbr        S             12A
+     D R_RtnCde        S              2P 0
+
+     D Random          PR                  ExtProc('CEERAN0')
+     D                               10U 0
+     D                                8F
+     D                               12A   Options(*Omit)
+
+     D Seed            S             10U 0 Inz(0)
+     D Float           S              8F
+     D Fc              S             12A
+
+     D $I              S              2P 0
+     D Alpha           S             10A   Inz('1234567890')
+
+     C     *Entry        PList
+     C                   Parm                    R_RndNbr
+     C                   Parm                    R_RtnCde
+
+      /Free
+       For $I = 1 to %Size(R_RndNbr);
+         Random(Seed : Float : fc);
+         %Subst(R_RndNbr : $I : 1) =
+           %Subst(Alpha : %Int(Float * 10 + 1) : 1);
+       EndFor;
+       *InLr = *On;
+      /End-Free
+

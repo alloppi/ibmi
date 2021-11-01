@@ -1,0 +1,223 @@
+Create Excel Sheet using Java POI Interface
+===========================================
+RPG can call Java interface to Apache's POI to create or modify Excel spreadsheets,
+  - Apache POI is the open source Java API for Microsoft Documents
+  - Scott Klement write open source RPG to interface POI
+
+Demo RPG Program using JNI interface
+====================================
+- Create Excel Sheet from assigment data file (THNCILIB/PHAD999F), call PHAD99DEMC
+      and Output Excel to FTP 'HKPM-D' /BKUP/DOWN
+- Create Excel Sheet for all chinese character (PHCCHIF, THNCILIB/PHBIG5F), call PHCCHIDEMC
+      and Output Excel to FTP 'HKPM-D' /BKUP/DOWN
+- Service program THTOLIB/HSSFR4 and Binding Dir THTOLIB/HSSF are required before running demo progr
+- Program source for demo program are put in THNCILIB/QRPGSRC
+- Program source for Scott program are temporary put in ALAN/POI313 and ALAN/QSRVSRC
+- Longer start up time using Java, around 15 seconds to create Excel Sheet with 1000 rows
+
+Demo CL command that call POI Java Program to write Excel File
+===============================================================
+- The CL command (THNCILIB/PF2XLS) and Java program have created to improve the performance the gene
+
+                                  Generate Excel from PF (PF2XLS)
+
+          Type choices, press Enter.
+
+          File . . . . . . . . . . . . . .                 Name
+            Library  . . . . . . . . . . .     *LIBL       Name, *LIBL
+          Excel path . . . . . . . . . . .   '/tmp/'
+            Filename . . . . . . . . . . .   'yourexcel.xlsx'
+
+- Create Excel Sheet from java class /java/poi/classes/hk/com/cisd/excel/PF2XLS3.class, TableInfo.cl
+    java source put on /java/poi/src/hk/com/cisd/excel/PF2XLS3.java, TableInfo.java
+- Compile java class by javac, see header in java source
+- Set owner / access authority for all java class and its source
+- Create CLLE program named PF2XLS* to involve PF2XLS3.class Java Program
+- Less time required calling Java than RPG JNI, around 4  seconds to create Excel Sheet with 50 rows
+-                                              ,around 6  seconds to create Excel Sheet with 1000 ro
+-                                              ,around 70 seconds to create Excel Sheet with 65000 r
+- This demostaration program has no implementation on error handling, may be futher study is require
+  and alert for user when error occurred.
+
+Documentation
+=============
+Refer to POI/HSSF from RPG Articles by Scott Klement: http://www.scottklement.com/poi/
+      or Excel support articles by Scott Klement    : http://www.easy400.net/hssfcgi/documentation/i
+      or PDF Presentation - Excel Spreadsheets from RPG:
+          https://www.scottklement.com/presentations/Excel%20Spreadsheets%20from%20RPG%20with%20POI.
+      POI - HSSF/XSSF API for Microsoft Excel       : https://poi.apache.org/spreadsheet/how-to.html
+
+Futher Modification using POI 3.13 by Alan
+==========================================
+- create RPGLE PR ss_text_ucs2 and function %ucs2 to convert Big5 to UTF-16 (CCSID 13488)
+- create RPGLE PR new_SXSSFWorkbook to create org.apache.poi.xssf.streaming.SXSSFWorkbook
+    SXSSF is streaming extension of XSSF that can save memory and faster to create large spreadsheet
+
+Limitation
+==========
+- RPG function %ucs2 is capable to mapping AS/400 DBCS to UTF-16 that will used by Java String
+- After checking all Big5 including 香港增補字符集 (totally 18791 characters) except the unusual C
+  (392 characters) cannot correctly mapping. Other than the following table at below, chinese charac
+  in AS400 can  correcly map to UTF-16 that means it can display correctly in Excel after conversion
+- Actually, there are only 41 characters contain mapping problem because most of them are undefined
+  or special symbols or those character cannot be inputted in AS/400
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    1) From?    A3C0
+           ?    A3C1
+                  ...
+                  ...
+                  ...
+           ?    A3FD
+       To  ?    A3FE                     34 Big5 non-display character + 29 undefined characters
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    2) From?    C879
+           ?    C87A
+                  ...
+                  ...
+                  ...
+           ?    C8CB
+       To  ?    C8CC                     50 Big5 undefined characters
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    3) From?    C8D4
+           ?    C8D5
+                  ...
+                  ...
+                  ...
+           ?    C8FD
+       To  ?    C8FE                     43 Big5 chinese characters cannot be mapped
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    4) From     8740
+                8741
+                  ...
+                  ...                      121 HKSCS chinese characters cannot input both Windows an
+                  ...                         - 87C2
+                87DE                        - 87D2
+       To       87DF                        - 87D6
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    5) From     8CDB
+                8CDD
+                  ...
+                  ...
+                  ...                          　
+                8D5E                     65  HKSCS chinese characters cannot input both Windows an
+       To       8D5F                        - 8CDC
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    6) From     C879
+                C87A
+                  ...
+                  ...
+                  ...                          　
+                C8A3
+       To       C8A4                     10  HKSCS chinese characters cannot be mapped, cannot inp
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    7) From     C8D4
+                C8D5
+                  ...
+                  ...
+                  ...                          　
+                C8FD
+       To       C8FE                     40 HKSCS chinese characters or symbols cannot be mapped,
+
+    Range 字型  Big5 ISO 10646 Map error Num of char. occur mapping problem
+    -----  ----   ---- --------- --------- ---------------------------------------------------------
+    8)        F9D6    7881     N/A
+              F9D7    92B9     N/A
+              F9D8    88CF     N/A
+              F9D9    58BB     N/A
+              F9DA    6052     N/A
+              F9DB    7CA7     N/A
+              F9DC    5AFA     N/A
+              F9DD    2554     N/A
+              F9DE    2566     N/A
+              F9DF    2557     N/A
+              F9E0    2560     N/A
+              F9E1    256C     N/A
+              F9E2    2563     N/A
+              F9E3    255A     N/A
+              F9E4    2569     N/A
+              F9E5    255D     N/A
+              F9E6    2552     N/A
+              F9E7    2564     N/A
+              F9E8    2555     N/A
+              F9E9    255E     N/A
+              F9EA    256A     N/A
+              F9EB    2561     N/A
+              F9EC    2558     N/A
+              F9ED    2567     N/A
+              F9EE    255B     N/A
+              F9EF    2553     N/A
+              F9F0    2565     N/A
+              F9F1    2556     N/A
+              F9F2    255F     N/A
+              F9F3    256B     N/A
+              F9F4    2562     N/A
+              F9F5    2559     N/A
+              F9F6    2568     N/A
+              F9F7    255C     N/A
+              F9F8    2551     N/A
+              F9F9    2550     N/A
+              F9FA    256D     N/A
+              F9FB    256E     N/A
+              F9FC    2570     N/A
+              F9FD    256F     N/A
+              F9FE    FFED     N/A     41 HKSCS chinese characters in AS/400 mapped wrongly
+
+   Big5 (Traditional Chinese) character code table can be found in: http://ash.jp/code/cn/big5tbl.ht
+  香港增補字符集can be found in: http://www.ogcio.gov.hk/tc/business/tech_promotion/ccli/terms/doc
+
+Installation
+============
+- Details Installation guide for POI setup may to this link:
+    http://www.easy400.net/hssfcgi/documentation/20100225.htm
+- Details Installation guide for RPG may refer to program source HSSFR4
+- Download the following Java library *.zip file to /javaapps/ and then unzip to these directories
+      From Apache POI 3.13 to /javaapps/poi-3.13/
+       - poi-3.13-20150929.jar
+       - poi-examples-3.13-20150929.jar
+       - poi-excelant-3.13-20150929.jar
+       - poi-ooxml-3.13-20150929.jar
+       - poi-ooxml-schemas-3.13-20150929.jar
+       - poi-scratchpad-3.13-20150929.jar
+      From DOM4J 1.6.1 to /javaapps/dom4j-1.6.1/
+       - dom4j-1.6.1.jar
+      From XMLBEANS 2.6.0 to /javaapps/xmlbeans-2.6.0/lib
+       - jsr173_1.0_api.jar
+       - xbean.jar
+- Set authority to these directory and *.jar file and make sure user have these access right *RX
+- Create service program HSSFR4
+- Create binding directory HSSF
+- Set Java Environment and Class Path i.e.
+      ADDENVVAR  ENVVAR(JAVA_HOME) +
+                   VALUE('/QOpenSys/QIBM/ProdData/JavaVM/jdk60/32bit') +
+                   REPLACE(*YES)
+      ADDENVVAR  ENVVAR(QIBM_RPG_JAVA_PROPERTIES) +
+                   VALUE('-Djava.version=1.6;+
+                     -Djava.awt.headless=true;+
+                     -Dos400.stderr=file:/java/STDERR.TXT;+
+                     -Dos400.stdout=file:/java/STDOUT.TXT;') REPLACE(*YES)
+      ADDENVVAR  ENVVAR(QIBM_USE_DESCRIPTOR_STDIO) VALUE('Y') REPLACE(*YES)
+      ADDENVVAR  ENVVAR(CLASSPATH) +
+                   VALUE('.+
+                     :/javaapps/poi-3.13/poi-3.13-20150929.jar+
+                     :/javaapps/poi-3.13/poi-ooxml-3.13-20150929.jar+
+                     :/javaapps/poi-3.13/poi-ooxml-schemas-3.13-20150929.jar+
+                     :/javaapps/dom4j-1.6.1/dom4j-1.6.1.jar+
+                     :/javaapps/xmlbeans-2.6.0/lib/jsr173_1.0_api.jar+
+                     :/javaapps/xmlbeans-2.6.0/lib/xbean.jar') +
+                   LEVEL(*JOB) REPLACE(*YES)
+- Set access authority for Java Environment: java/STDERR.TXT, /java/STDOUT.TXT
+

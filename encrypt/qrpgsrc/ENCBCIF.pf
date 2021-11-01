@@ -1,0 +1,60 @@
+     A*==============================================================*
+     A* File name: ENCBCIF                                           *
+     A*                                                              *
+     A* Purpose: BOC Credential Information File                     *
+     A*                                                              *
+     A* Date written: 2017/02/24                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2017/02/24 Alan       AC           New                       *
+     A*==============================================================*
+     A                                      REF(REFFILE)
+     A          R ENCBCIFR
+     A            BCIDC     R               TEXT('DELETE CODE')
+     A                                      REFFLD(RFDC)
+     A                                      COLHDG('BCIDC')
+     A            BCIRT     R               TEXT('REGISTRATION DATE AND TIME YY-
+     A                                      YYMMDDHHMM')
+     A                                      REFFLD(RFRT)
+     A                                      COLHDG('BCIRT')
+     A            BCIRP     R               TEXT('REGISTRATION PROGRAM')
+     A                                      REFFLD(RFRP)
+     A                                      COLHDG('BCIRP')
+     A            BCIUT     R               TEXT('UPDATE DATE AND TIME YYYYMMDD-
+     A                                      HHMM')
+     A                                      REFFLD(RFRT)
+     A                                      COLHDG('BCIUT')
+     A            BCIUP     R               TEXT('UPDATE PROGRAM NAME')
+     A                                      REFFLD(RFRP)
+     A                                      COLHDG('BCIUP')
+      *
+     A            BCIGMIP   R               TEXT('GATEWAY MACHINE IP')
+     A                                      REFFLD(RFIP)
+     A                                      COLHDG('BCIGMIP')
+     A            BCICBSAN      16A         TEXT('CBS ACCOUNT NO')
+     A                                      CCSID(65535)
+     A                                      COLHDG('BCICBSAN')
+      *                                    'BCICBSAN - use 14A only
+      *                                     but block size of AES encryption req
+     A            BCIUID        16A         TEXT('USER ID')
+     A                                      CCSID(65535)
+     A                                      COLHDG('BCIUID')
+      *                                    'BCIUID - use 6A only
+      *                                     but block size of AES encryption req
+     A            BCIPW         16A         TEXT('PASSWORD')
+     A                                      CCSID(65535)
+     A                                      COLHDG('BCIPW')
+      *                                    'BCIPW - use 12A only
+      *                                     but block size of AES encryption req
+     A            BCIECN        64A         TEXT('E-CERT NAME')
+     A                                      CCSID(65535)
+     A                                      COLHDG('BCIECN')
+      *                                    'BCIECN - use 50A only
+      *                                     but block size of AES encryption req
+     A            BCIECPW       16A         TEXT('E-CERT PASSWORD')
+     A                                      CCSID(65535)
+     A                                      COLHDG('BCIECPW')
+      *                                    'BCIECPW - use 16A only
+      *                                     but block size of AES encryption req

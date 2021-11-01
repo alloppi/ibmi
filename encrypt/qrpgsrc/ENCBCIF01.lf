@@ -1,0 +1,16 @@
+     A*==============================================================*
+     A* File name: ENCBCIF01                                         *
+     A*                                                              *
+     A* Description: Bank Credential Information File                *
+     A*                                                              *
+     A* Date written: 2017/02/24                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2017/02/24 Alan       AC           New                       *
+     A*==============================================================*
+     A          R ENCBCIFR                  PFILE(ENCBCIF)
+     A          K BCIGMIP
+     A          K BCIUID
+     A          O BCIDC                     CMP(EQ '9')

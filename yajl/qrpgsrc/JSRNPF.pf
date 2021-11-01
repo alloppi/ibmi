@@ -1,0 +1,54 @@
+     A*==============================================================*
+     A* File name: JSRNPF                                            *
+     A*                                                              *
+     A* Purpose: JSON Result Notice Parsed File                      *
+     A*                                                              *
+     A* Date written: 2021/08/06                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2021/08/30 Alan       AC           New Development           *
+     A*==============================================================*
+     A                                      REF(REFFILE)
+     A          R JSRNPFR
+     A            RNPDC     R               TEXT('DELETE CODE')
+     A                                      REFFLD(RFDC)
+     A                                      COLHDG('RNPDC')
+     A**          RNPRT     R               TEXT('REGISTRATION DATE AND TIME YY-
+     A**                                    YYMMDDHHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('RNPRT')
+     A**          RNPRP     R               TEXT('REGISTRATION PROGRAM')
+     A**                                    REFFLD(RFRP)
+     A**                                    COLHDG('RNPRP')
+     A**          RNPUT     R               TEXT('UPDATE DATE AND TIME YYYYMMDD-
+     A**                                    HHMM')
+     A**                                    REFFLD(RFRT)
+     A**                                    COLHDG('RNPUT')
+      *
+     A            RNPLUT    R               TEXT('LAST UPDATE TIME')
+     A                                      REFFLD(RFTMESTP)
+     A                                      COLHDG('RNPLUT')
+      *
+     A            RNPTCD    R               TEXT('TU CHECK DATE')
+     A                                      REFFLD(RFISOD)
+     A                                      COLHDG('RNPTCD')
+     A            RNPTSN    R               TEXT('TU CHECK SEQ NO')
+     A                                      REFFLD(RFSN5)
+     A                                      COLHDG('RNPTSN')
+      *
+     A            RNPOS          3P 0       TEXT('ORDER SEQUENCE')
+     A                                      COLHDG('RNPOS')
+     A            RNPBN         64A         TEXT('BUSINESS NUMBER')
+     A                                      COLHDG('RNPBN')
+      *
+     A            RNPON         64A         TEXT('ORDER NUMBER')
+     A                                      COLHDG('RNPON')
+     A            RNPEP         64A         TEXT('ELEMENT PATH')
+     A                                      COLHDG('RNPEN')
+      *
+     A            RNPVS        100A         TEXT('VALUE STRING')
+     A                                      COLHDG('RNPVS')
+     A            RNPVN         18P 4       TEXT('VALUE NUMBER')
+     A                                      COLHDG('RNPVN')

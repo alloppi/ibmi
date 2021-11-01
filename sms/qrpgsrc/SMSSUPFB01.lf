@@ -1,0 +1,15 @@
+     A*==============================================================*
+     A* File name...: SMSSUPFB01                                     *
+     A* Purpose.....: IT Support Request - Staff Information File    *
+     A* Date written: 2015/07/27                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- ---------------------- *
+     A* 2015/07/27 Alan       AC              New Development        *
+     A*==============================================================*
+     A          R SMSSUPFBR                 PFILE(SMSSUPFB)
+      *
+     A          K SMSSUPBPTY
+     A          K SMSSUPBGRP
+     A          K SMSSUPBPRI

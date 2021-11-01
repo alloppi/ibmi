@@ -1,0 +1,38 @@
+             PGM
+
+             ADDENVVAR ENVVAR(QIBM_QSH_CMD_OUTPUT) VALUE('FILE=stdout.txt') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(JAVA_HOME) +
+                          VALUE('/QOpenSys/QIBM/ProdData/JavaVM/jdk71/32bit') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(QIBM_RPG_JAVA_PROPERTIES) +
+                          VALUE('-Djava.awt.headless=true;+
+                            -Dos400.awt.native=true;+
+                            -Dos400.stderr=file:/java/stderr.txt;+
+                            -Dos400.stdout=file:/java/stdout.txt;') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(QIBM_USE_DESCRIPTOR_STDIO) VALUE('Y') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(CLASSPATH) +
+                          VALUE('.:./classes+
+                            :/javaapps/itext-2.1.7/lib/iText-2.1.7.jar+
+                            :/javaapps/itext-2.1.7/lib/iTextAsian.jar+
+                            :/javaapps/QR4i/QR4i.jar+
+                            :/javaapps/poi-3.13/poi-3.13-20150929.jar+
+                            :/javaapps/poi-3.13/poi-ooxml-3.13-20150929.jar+
+                            :/javaapps/poi-3.13/poi-ooxml-schemas-3.13-20150929.jar+
+                            :/javaapps/dom4j-1.6.1/dom4j-1.6.1.jar+
+                            :/javaapps/xmlbeans-2.6.0/lib/jsr173_1.0_api.jar+
+                            :/javaapps/xmlbeans-2.6.0/lib/xbean.jar+
+                            :/javaapps/mysql-connector-java-5.1.39-bin.jar') +
+                          REPLACE(*YES)
+
+             ADDENVVAR  ENVVAR(CLASSPATH) +
+                          VALUE('/javaapps/mysql-connector-java-5.1.39-bin.jar') +
+                          REPLACE(*YES)
+
+             ENDPGM

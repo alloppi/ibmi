@@ -1,0 +1,63 @@
+Install Java 8 SDK:
+===================
+  Windows Environment:
+    Java 8 SDK install in Windows path C:\Program Files\Java\jdk1.8.0_65
+    set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_65
+    set path=%path%;%JAVA_HOME%\bin
+    set CLASSPATH=.;
+  AS/400 QSH .profile environment:
+    export JAVA_HOME=/QOpenSys/QIBM/ProdData/JavaVM/jdk71/32bit
+    export PATH=$PATH:$JAVA_HOME/bin
+    export CLASSPATH=.:
+
+Build Apache Ant 1.9.11 from source download at https://www.apache.org/dist/ant/source/
+  Windows Environment:
+    set ANT_HOME=D:\javaapps\ant
+    set path=%path%;%ANT_HOME%\bin;
+    cd D:\javaapps
+    unzip apache-ant-1.9.11-src
+    cd D:\javaapps\apache-ant-1.9.11
+    // See manual from https://ant.apache.org/manual/install.html and output log to build_ant.log
+      build install > build_ant.log
+        warning: occur error in building javadoc but build jar are working, check build_ant.log
+  AS/400 QSH .profile environment:
+    export ANT_HOME=/javaapps/ant
+    export PATH=$PATH:$ANT_HOME/bin:
+    cd /javaapps
+    jar -xvf apache-ant-1.9.11-src.zip
+    cd /javaapps/apache-ant-1.9.11
+    // See manual from https://ant.apache.org/manual/install.html and output log to build_ant.log
+      sh build.sh install > build_ant.log
+        warning: occur error in building javadoc but build jar are working, check build_ant.log
+
+Build Apache Maven 3.3.9 from source in https://www.apache.org/dist/maven/maven-3/3.3.9/source/
+  Windows Environment:
+    set M2_HOME=D:\javaapps\maven
+    set path=%path%;%M2_HOME%\bin;
+    mkdir D:\javaapps\maven
+    cd D:\javaapps
+    unzip apache-maven-3.3.9-src.zip
+    cd D:\javaapps\apache-maven-3.3.9
+    //See manual from https://ant.apache.org/manual/index.html and output log to build_maven.log
+    ant -Dbuild=D:\javaapps\maven (Work OK)
+    ant -Dbuild=D:\javaapps\maven -l build_maven.log (Work NOT OK hang up)
+  AS/400 QSH .profile environment:
+    export M2_HOME=/javaapps/maven
+    export PATH=$PATH:$M2_HOME/bin:
+    mkdir /javaapps/maven
+    cd /javaapps
+    jar -xvf apache-maven-3.3.9-src.zip
+    cd /javaapps/apache-maven-3.3.9
+    //See manual from https://ant.apache.org/manual/index.html and output log to build_maven.log
+    ant -Dbuild=/javaapps/maven (Work OK)
+    ant -Dbuild=/javaapps/maven -l build_maven.log (Work NOT OK hang up)
+    download pom from http://repo1.maven.org/maven2  (151.101.40.209)
+
+Build ZXing 3.3.2 QR Code from source in https://github.com/zxing/zxing/tree/zxing-3.3.2
+  unzip zxing-zxing-3.3.2
+  cd D:\javaapps\zxing-zxing-3.3.2\core
+  mvn package -l build_core.log
+  cd D:\javaapps\zxing-zxing-3.3.2\javase
+  mvn package -l build_javase.log
+  ZXing QRCode package located in D:\javaapps\zxing-zxing-3.3.2\core\target\core-3.3.2.jar
+                                  D:\javaapps\zxing-zxing-3.3.2\javase\target\javase-3.3.2.jar

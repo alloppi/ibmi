@@ -1,0 +1,6 @@
+             PGM
+
+             SNDMSG     MSG('This is a test message') TOUSR(CYA012) +
+                          MSGTYPE(*INQ)
+
+             ENDPGM

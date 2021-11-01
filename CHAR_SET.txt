@@ -1,0 +1,53 @@
+UTF-8 is an encoding - Unicode is a character set
+-------------------------------------------------
+A character set is a list of characters with unique numbers (these numbers are sometimes referred to
+For example, in the Unicode character set, the number for A is 41.
+
+An encoding on the other hand, is an algorithm that translates a list of numbers to binary so it can
+For example UTF-8 would translate the number sequence 1, 2, 3, 4 like this:
+00000001 00000010 00000011 00000100
+
+Our data is now translated into binary and can now be saved to disk.
+
+All together now
+----------------
+Say an application reads the following from the disk:
+1101000 1100101 1101100 1101100 1101111
+
+The app knows this data represent a Unicode string encoded with UTF-8 and must show this as text to
+is to convert the binary data to numbers. The app uses the UTF-8 algorithm to decode the data. In th
+returns this:
+
+104 101 108 108 111
+
+Since the app knows this is a Unicode string, it can assume each number represents a character. We u
+character set to translate each number to a corresponding character. The resulting string is "hello"
+
+Conclusion
+
+So when somebody asks you "What is the difference between UTF-8 and Unicode?", you can now confident
+precise:
+
+UTF-8 and Unicode cannot be compared. UTF-8 is an encoding used to translate numbers into binary dat
+character set used to translate characters into numbers.
+
+In PC
+=====
+Unicode
+-------
+FF FE 46 D8 84 DC 0D 00 0A 00 DB E5
+      <---------->
+        UTF - 16
+         
+FF FE AA 89 1B 61 84 76 A2 5B 36 62
+      親  愛  的  客  戶
+
+UTF-8
+-------
+EF BB BF F0 A1 A2 84 0D 0A EE 97 9B
+         <--------->
+           UTF - 8
+             
+EF BB BF E8 A6 AA E6 84 9B E7 9A 84 E5 AE A2 E6 88 B6
+         <-親-> <-愛-> <-的-> <-客-><-戶->
+

@@ -1,0 +1,100 @@
+To print Chineses Characters in SQL listings, please override the printer file by running the comman
+Then run the SQL statement.
+
+OVRPRTF FILE(QPQUPRFIL) DEVTYPE(*AFPDS) LPI(6) CPI(12) FRONTMGN(0.1 0) PAGRTT(90) USRDFNOBJ(QGPL/PSF
+
+True Type Font
+==============
+Document Title: Loading Your Own True Type Fonts for Use with HPT and the FONTNAME DDS Keyword
+Abstract
+This document discusses an unsupported method using the Font Name (FONTNAME) DDS keyword with Host P
+to print True Type fonts other than the ones shipped with product 57xxSS1 Option 43 (Additional Font
+
+
+Document Description:
+The Font Name (FONTNAME) DDS keyword can successfully be used with Host Print Transform (HPT) to pri
+fonts shipped with products 5722SS1, 5761SS1, or 5770SS1 Option 43 (Additional Fonts) on an HP Laser
+PCL5-compatible printer; however, is there any way to use HPT to print True Type fonts other than th
+Option 43?
+
+Product 57xxSS1 Option 43 (Additional Fonts) supplies the following fonts in the /QIBM/ProdData/OS40
+directory in the Integrated File System (IFS):
+
+Monotype Sans WT
+Monotype Sans WT J
+Monotype Sans WT K
+Monotype Sans WT SC
+Monotype Sans WT TC
+Monotype Sans Duospace WT
+Monotype Sans Duospace WT J
+Monotype Sans Duospace WT K
+Monotype Sans Duospace WT SC
+Monotype Sans Duospace WT TC
+Times New Roman WT
+Times New Roman WT J
+Times New Roman WT K
+Times New Roman WT SC
+Times New Roman WT TC
+Thorndale Mono WT
+Thorndale Mono WT J
+Thorndale Mono WT K
+Thorndale Mono WT SC
+Thorndale Mono WT TC
+
+The supported method to include your own True Type fonts is to purchase the Infoprint Fonts for Mult
+(5648-E77) and optional feature D3MK, which includes the Font Installer for AFP Systems program. The
+Font Installer to process and upload your own True Type fonts to the /QIBM/UserData/OS400/Fonts/TTFo
+IFS, as opposed to the /QIBM/ProdData/OS400/Fonts/TTFonts directory where Option 43 places its True
+
+Contact your IBM marketing representative or IBM Business Partner for assistance in purchasing this
+
+Another method to include your own True Type fonts is to do the following:
+1. Ensure that the True Type font support Unicode.
+
+2. If you purchased True Type fonts from a third-party vendor, ensure that loading the fonts onto yo
+the fonts with i5/OS and your HP PCL-capable laser printers does not break any license agreement tha
+from that third-party vendor.
+
+3. Copy the *.ttf files for your True Type fonts to the /QIBM/UserData/OS400/Fonts/TTFonts directory
+
+4. Use the following Delete User Index (DLTUSRIDX) command to delete the QGSTTFIDX user index, or *U
+library QUSRSYS.
+
+DLTUSRIDX USRIDX(QUSRSYS/QGSTTFIDX)
+
+Note: i5/OS should automatically re-create the QGSTTFIDX user index to include both the True Type fo
+/QIBM/ProdData/OS400/Fonts/TTFonts directory that are supplied by Option 43 (Additional Fonts) and t
+True Type fonts that you have loaded into the /QIBM/UserData/OS400/Fonts/TTFonts directory.
+
+5. Generate a spooled file that has the Printer device type (DEVTYPE) parameter set to *AFPDS and us
+(FONTNAME) DDS keyword to specify the name of the True Type fonts that you have loaded into the IFS,
+file to your HP PCL-capable laser printers, and verify that the True Type fonts print when using Hos
+(HPT).
+
+
+Warning: This method is unsupported and is not guaranteed to work 100% of the time, if it works at a
+getting this method to work may require working through a consulting agreement. You also may be requ
+product 5648-E77 and optional feature D3MK in order to use your own True Type fonts.
+
+For More Information
+
+For more information, refer to the following Rochester Support Center knowledgebase document:
+
+414354658, Printing with TrueType Fonts Using the Font Name (FONTNAME) DDS Keyword:
+http://www-912.ibm.com/s_dir/slkbase.nsf/1ac66549a21402188625680b0002037e/5946cc7fb405c28e8625716900
+ighlight=2,414354658
+
+and refer to the TrueType and OpenType Fonts and FONTNAME (Font name) Keyword in Printer Files topic
+Information Center, which are available online at:
+
+http://publib.boulder.ibm.com/infocenter/iseries/v5r4/topic/rzalu/rzalucontruetype.htm
+http://publib.boulder.ibm.com/infocenter/iseries/v5r4/topic/rzakd/rzakdmstfontname.htm
+
+                                       Image       Chinese    Color      Outuput
+QR4I - RPG interface Java
+       Source                            N/A         ~         ~          Png
+Java - Itext                            B/W Yes      ~         ~          PDF
+
+
+
+

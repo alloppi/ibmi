@@ -1,0 +1,20 @@
+Outline
+=======
+Use ChgNTPA RMTSYS('STDTIME.GOV.HK')  ACTLOG(*POLL)
+* Host Table with entry 210.0.235.14     STDTIME.GOV.HK
+May Try other Server at 203.129.68.14
+THe Log is in /QIBM/USERDATA/OS400/TCPIP/NTP/QTOTyyyymmdd edit by EDTF
+There will be a job QTOTNP in QSYSWRK after STRTCPSVR SERVER(*NTP)
+Reference : http://publib.boulder.ibm.com/infocenter/iseries/v5r3/topic/rzakt/rzakt.pdf
+
+To Syn Software Clock to System Time
+=======
+CALL PGM(QSYS/QYPSSTRT) PARM(X'FFFFFFFA' X'00000001' 0 0)  where FFFFFFFA is the part of the job nam
+
+View Client Log
+===============
+WrkLnk '/QIBM/USERDATA/OS400/TCPIP/NTP', then option 5 beside NTP
+
+View Server Log
+===============
+WrkLnk '/QIBM/USERDATA/OS400/TCPIP/NTP/SERVER', then option 5 beside NTP

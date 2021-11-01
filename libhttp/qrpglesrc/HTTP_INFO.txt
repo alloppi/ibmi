@@ -1,0 +1,158 @@
+HTTPAPI Main Objects
+  |- INSTALL   *PGM     (Tool to build the HTTPAPIR4 service programs)
+  |- HTTPAPIR4 *SRVPGM  (The Hypertext Transfer Protocol API Service programs written by ILE RPGIV)
+  |- HTTPAPI   *BNDDIR  (HTTPAPI binding directory)
+  |- MKEXPATCL *PGM     (Build the eXpat service programs)
+  |- EXPAT     *SRVPGM  (Expat XML Parser written by C)
+  |- EXPAT     *BNDDIR  (Expat Binding Directory)
+
+HTTPAPI Main Source Files
+  |- EXPAT     (C source for eXpat Parser)
+  |- QCLSRC    (CL source to build HTTPAPI & eXpat service program for HTTPAPI)
+  |- QRPGLESRC (ILE RPG source of HTTPAPI service programs)
+  |- QSRVSRC   (Source for Binding Directory for HTTPAPI & eXpat)
+
+HTTPAPI Main Source Members & Main Subprocedure
+  |- COMM_H     (Generic communications driver interface for HTTPAPI)
+  |  - comm_resolve(): Resolve host name into binary IP address
+  |  - comm_Connect(): Connect to Server (COMM_H)
+  |  - comm_Upgrade(): Upgrade connection security (if it is the SSL driver, this starts
+  |                      SSL encryption)
+  |  - comm_hangup()
+  |
+  |- CONFIG_H   (HTTP-API compile-time configuration)
+  |- ERRNO_H    (Header for Error Handling in C/UNIX APIs)
+  |- EXPAT_H    (RPG defs for calling eXpat)
+  |- GSKSSL_H   (GSKit SSL API Header member)
+  |  - gsk_attribute_get_buffer(): Get information about SSL environment such as certificate store
+  |  - gsk_attribute_get_cert_info(): Get information about server / client certifcate
+  |  - gsk_attribute_get_enum_value(): Get enumerated data about SSL environment
+  |  - gsk_attribute_get_numeric_value(): Get numeric information about SSL environment
+  |  - gsk_attribute_set_buffer(): Set a specified buffer attribute to a value inside the SSL envir.
+  |  - gsk_attribute_set_enum(): Set a specified enumerated type attribute in SSL environment
+  |  - gsk_attribute_set_numeric_value(): Set numeric value for an SSL environment
+  |  - gsk_environment_close(): Close the SSL enviornment and release all storage associated
+  |  - gsk_environment_init(): Initialize the SSL enviornment after any required attributes are set
+  |  - gsk_environment_open(): Creates a new SSL enviornment handle used on subsequence gsk call
+  |  - gsk_secure_soc_close(): Close a secure session and free all the associated resources
+  |  - gsk_secure_soc_init(): Initates a secure session using the attributes for the SSL envir.
+  |  - gsk_secure_soc_misc(): Preforms miscellaneous functions such as restart SSL handshake,
+  |                             clear SSL session cache
+  |  - gsk_secure_soc_open(): Create a secure socket using the attributes of secure sessions
+  |  - gsk_secure_soc_read(): Reads data from a secure session
+  |  - gsk_secure_soc_startInit(): Start an asynchronus negotiation of a secure session
+  |  - gsk_secure_soc_write(): Write data to a secure session
+  |  - gsk_secure_soc_startRecv(): Initates an asynchronous receive operation on a secure session
+  |  - gsk_secure_soc_startSend(): Initates an asynchronous send operation on a secure session
+  |  - gsk_strerror(): Retrieves an error message from the return value from gsk API
+  |
+  |- HEADER_H   (Routines for working with Headers & Cookie)
+  |- HTTPAPI_H  (HTTP-API header member)
+  |
+  |- IFSIO_H    (Integrated File System API Header File)
+  |  - open():  Open IFS file int open(const char *path, int oflag, . . .)
+  |  - close(): Close IFS file int close(int fildes)
+  |  - write(): Write to a file
+  |
+  |- PRIVATE_H  (Global/Private HTTPAPI definitions)
+  |  - atoll(): converts a character string to a long value
+  |
+  |- SIGNAL_H   (Signal Handling Definitions)
+  |  - Qp0sEnableSignals(): Enable a process for signals
+  |  - Qp0sDisableSignals(): Disable signals
+  |  - sigemptyset(): initialize an empty signal set
+  |  - sigaddset(): add signal to signal set
+  |  - sigaction(): Set signal action
+  |  - alarm(): Send an alarm signal after XX seconds
+  |
+  |- SOCKET_H   (Header File for Sockets API)
+  |  - inet_addr(): Converts an address from dotted-decimal format to a 32-bit IP address
+  |  - gethostbyname(): Resolves a domain name to an IP address
+  |  - getservbyname(): Get Port Number for Service Name
+  |  - recv(): receive data from socket
+  |  - socket(): Create socket
+  |  - setsockopt(): Set Socket Options
+  |  - connect(): Connect to a host
+  |  - close(): End Socket Connection
+  |  - fcntl(): Change Descriptor Attributes
+  |  - select(): wait for events on multiple sockets
+  |
+  |- CCSIDR4    (Routines for ASCII/EBCDIC translation using iconv() )
+  |  - http_xlatedyn() Translate data from ASCII <--> EBCDIC using a dynamically sized output buffer
+  |  - http_xlate(): Translate data from ASCII <--> EBCDIC
+  |  - TblXLateDyn(): Translate using table. Translate input to a dynamically allocated
+  |                     output buffer
+  |  - TblXlate(): Translate from ASCII <--> EBCDIC using a *TBL
+  |  - CCSIDxlate(): Translate data from ASCII <--> EBCDIC using a pointer to the data
+  |  - http_xlatep(): Translate data from ASCII <--> EBCDIC (using a pointer instead of a variable)
+  |  - iconvdyn(): Run the iconv() API and output to a dynamic memory buffer
+  |
+  |- COMMSSLR4  (** SSL/TLS Communication Driver)
+  |  - CommSSL_New(): Build a new TCP communications driver
+  |  - CommSSL_Upgrade(): Upgrade socket to SSL
+  |  - CommSSL_LineRead(): Read data from socket as a CR/LF terminated
+  |  - CommSSL_Read(): Read data from socket w/a timeout
+  |  - CommSSL_BlockWrite(): Write data to socket in a fixed-length
+  |  - block_init(): Initialize https (HTTP over SSL/TLS) protocol
+  |  - https_cleanup(): Clean up & free storage used by the SSL environment
+  |  - gskit_cleanup(): Clean up the GSKit SSL environment
+  |  - SSL_force_protocol(): Force a particular SSL protocol
+  |  - SSL_debug_cert_info(): Print certificate info into debug file
+  |  - SSL_validate_cert(): Verify the partner's certificate
+  |  - ssl_debug_cert_body(): Print certificate body into debug file
+  |  - ssl_debug_cert_elem(): Print certificate element into debug file
+  |
+  |- COMMTCPR4  (** TCP Sockets Communication Driver)
+  |  - CommTcp_Resolve(): Resolve a hostname to an IP address
+  |  - DNS_Info(): Display DNS Resolver information
+  |  - CommTCP_FD_ZERO(): Clear All descriptors in a set
+  |  - CommTCP_FD_SET(): Set a File Descriptor in a set ON...  for use w/Select()
+  |  - CommTCP_FD_ISSET(): Determine if a file desriptor is on or off
+  |
+  |- ENCODERR4  (Routines for encoding HTTP data)
+  |- HEADERR4   (Routines for working with Headers & Cookie)
+  |  - header_parse(): Parse HTTP header & protocol information
+  |  - header_load_cookies(): Parse the cookies in the HTTP headers and load them into
+  |                             the cookie list
+  |- HTTPAPIR4  (**HTTP-API service program)
+  |  - http_url_post(): Post data to CGI script and get document
+  |  - http_url_post_raw(): Post data to CGI script and get document
+  |  - http_persist_open(): Open a persistent HTTP session
+  |  - http_persist_post(): Post data to CGI script and get document using a persistent connection
+  |  - http_persist_close(): End a persistent HTTP session
+  |  - http_long_ParseURL(): Parse URL into it's component parts
+  |  - http_select_commdriver():  Select & initialize communications driver by communications type
+  |                                 (http/https)
+  |  - proxy_tunnel(): establishes a tunnel through a proxy and allow communicate directly with the
+  |                      destination HTTP server (required for SSL)
+  |  - setUrlAuth(): Set auth credentials if found in the URL
+  |  - chainst(): **Performs the logic of an HTTP POST
+  |  - http_select_commdriver(): Select & initialize communications driver by communications type
+  |                                (http/https)
+  |  - CommTcp_Read(): Read data from socket w/a timeout
+  |  - http_setAuth(): Set HTTP Authentication Information
+  |  - SendReq(): Send request chain
+  |  - RecvResp(): Receives an HTTP response chain from the server
+  |  - parse_resp_chain(): parse important fields from the response
+  |  - RecvChunk(): receive (download) data using chunked transfer-encoding
+  |  - RecvDoc(): receive (Download) http document
+  |  - http_close(): close HTTP connection
+  |  - interpret_proxy_auth(): Interpret (parse & save) the Proxy-Authenticate: header
+  |  - SendDoc(): This sends a document body, such as those used by the PUT or POST HTTP commands
+  |  - SendRaw(): This sends a document body, such as those used by the PUT or POST HTTP commands
+  |                 but uses a callback instead of a buffer
+  |  - get_chunk_size(): This receives the chunk size from the http stream
+  |
+  |- HTTPUTILR4 (Misc Utilities that HTTPAPI uses)
+  |  - debug_msg(): Add a diagnostic message to the debugging log
+  |  - debug_write(): write debugging data to the debug log file
+  |  - xdealloc(): De-allocate memory
+  |  - SetError(): Called by other procedures to set an error that calling applications can retrieve
+  |                  with HTTP_ERROR
+  |  - debug_close(): close current debugging log file
+  |  - debug_proc()
+  |  - http_error(): Return the last error that occurred
+  |
+  |- HTTPXMLR4  (Routines for XML parsing with EXPAT)
+  |- INSTALLR4  (Used during install process)
+  |- XMLSTUBR4  (Stub routines)

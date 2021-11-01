@@ -1,0 +1,52 @@
+About Journalling in Phoenix system
+===================================================
+1. Create Journal Receiver (CrtJrnRcv):- PHDTLIB/PHJRNRCV
+2. Create Journal (CrtJrn):- PHDTLIB/PHJRN
+3. Start Journal Physical File (Strjrnpf):- PBJL01C reading PHZ7F
+4. Before running program, Start Commitment Control (StrCmtCtl):- PIMN0
+   - or STRCMTCTL LCKLVL(*CHG) DFTJRN(PHDTLIB/PHJRN)
+5. After running program. End Commitment Control (EndCmtCtl):- PIMN01C
+6. Before delete journal, End Journal Physical (EndJrnPF)
+7. There are some reference command by using "GO CMDJRN"
+
+Procedure to display journal to a SQL readable file
+===================================================
+1. DSPJRN JRN(PHDTLIB/PHJRN) FILE((PHDTLIB/PHCMF)) ENTTYP(*RCD)
+   OUTPUT(*OUTFILE) OUTFILE(QTEMP/JRNOUT) ENTDTALEN(5000)
+   * for V4R2M0, should specified the file name such as PHCMF
+
+2. CPYF FROMFILE(QTEMP/JRNOUT) TOFILE(THNCILIB/JRNPHCMF)
+   MBROPT(*REPLACE) FMTOPT(*NOCHK)
+
+NOTE: The 'JRNPHCMF' should be created using QDDSSRCJRN in THNCILIB.
+
+      Value in parameter ENTDTALEN( ) should be large enough to hold
+      full record of the file in question.
+3. - If OS is V5R2 or before try type in date, time, and select all record, for example
+     DSPJRN JRN(PHDTLIB/PHJRN) RCVRNG(PHDTLIB/PHJRNR2242 PHDTLIB/PHJRNR2242) FR
+     OMTIME(20030916) TOTIME(20030917 210000) OUTPUT(*OUTFILE) OUTFILE(QTEMP/AB
+     C) ENTDTALEN(3000)
+   - Before copy to JRNPHCMF, delete record like JOENTT = 'JF', 'JM', 'MR'
+   - Select only JOOBJ = 'PHCMF'
+
+Automatically starting journaling
+===================================================
+Using a data area named QDFTJRN, you can automatically start journaling when a non-integrated file s
+area, data queue, or file) is created, moved, or restored into the library, thus, ensuring the very
+object will be recorded in the journal and that no lock on the user's part prevents journaling from
+library. The QDFTJRN data area must exist in the library where the object is being added.
+
+Note:
+The QDFTJRN data area must be created by the user.
+For Example
+                               Display Data Area
+                                                             System:   PROMISE6
+ Data area . . . . . . . :   QDFTJRN
+   Library . . . . . . . :     THTDLIB
+ Type  . . . . . . . . . :   *CHAR
+ Length  . . . . . . . . :   25
+ Text  . . . . . . . . . :
+
+            Value
+ Offset      *...+....1....+....2....+....3....+....4....+....5
+     0      'PHDTLIB   PHJRN     *FILE'

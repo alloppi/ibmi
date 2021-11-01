@@ -1,0 +1,21 @@
+/*===================================================================*/
+/* Program name: XMLEX1C                                             */
+/* Purpose.....: US Security Council Consolidated list Parsing       */
+/*                                                                   */
+/* Date written: 2019/03/06                                          */
+/*                                                                   */
+/* Modification:                                                     */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- ---- ---- ----- --------------------------- */
+/* 2019/03/06 Alan       AC              New development             */
+/*===================================================================*/
+             PGM        PARM(&RPYFILE &RTNCDE)
+             DCL        VAR(&RPYFILE) TYPE(*CHAR) LEN(50)
+             DCL        VAR(&RTNCDE) TYPE(*DEC) LEN(2 0) VALUE(0)
+
+             CLRPFM     FILE(XMLEX1F)
+
+             CALL       PGM(XMLEX1R) PARM(&RPYFILE &RTNCDE)
+
+             RETURN
+             ENDPGM

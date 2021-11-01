@@ -1,0 +1,38 @@
+/*===================================================================*/
+/* Program name: AMLXG1C                                             */
+/* Purpose.....: Anti Money Laundering                               */
+/*               AML XG Create & Send XML Request (Looping)          */
+/* Spec. ......:                                                     */
+/*                                                                   */
+/* Date written: 2020/07/29                                          */
+/*                                                                   */
+/*                                                                   */
+/* Modification:                                                     */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- --- ----- ----- ----------------------------*/
+/* 2020/07/29 Alan       AC              New Development             */
+/*===================================================================*/
+             PGM
+             DCL        VAR(&COUNTER) TYPE(*DEC) LEN(3 0)
+
+             ADDLIBLE   LIB(ALAN)
+             MONMSG     MSGID(CPF2103)
+
+             CHGJOB     JOBMSGQFL(*PRTWRAP)
+
+/* Loop this program forever */
+             DOUNTIL    COND('1' *EQ '2')
+
+/* Call program AMLXG1C1 take less than 1 minute */
+             CALL       PGM(AMLXG1R)
+
+/* Delay for 2 minutes */
+             DLYJOB     DLY(120)
+
+             CHGVAR     VAR(&Counter) VALUE(&Counter + 1)
+/* Run for 7 hours */
+             IF         COND(&Counter >= 140) THEN(LEAVE)
+
+             ENDDO
+
+             ENDPGM

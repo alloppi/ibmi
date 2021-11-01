@@ -1,0 +1,24 @@
+Library : QUSRSYS
+- File : QATM*
+
+Troubleshooting calls from RPG to Java using EXTPROC(*JAVA)
+===========================================================
+- https://www.ibm.com/developerworks/rational/cafe/docBodyAttachments/2681-102-2-7220/Troubleshootin
+  2.html
+- https://onrpgle.wordpress.com/2011/09/09/cl-to-rpgle-to-java/
+
+Java Version
+============
+- 2 ways
+  > in Command line, java *version
+  > in qsh, java -version
+  > go licpgm, '10'-Display installed licensed programs, lookup for '5770JV1'
+
+java.security.cert.CertificateException: Certificates does not conform to algorithm constraints
+===============================================================================================
+- Amend
+  the /QOpenSys/QIBM/ProdData/JavaVM/jdkXX/YYbit/jre/lib/security/java.security file
+  where XX is the version of JDK and YY is either 32 or 64 bits
+- Setting jdk running version, said in 6.0 32 bits
+  > in command line, "ADDENVVAR ENVVAR(JAVA_HOME) VALUE('/QOpenSys/QIBM/ProdData/JavaVM/jdk60/32bit'
+    after use remove by "RMVENVVAR ENVVAR(JAVA_HOME)"

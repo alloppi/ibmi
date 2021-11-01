@@ -1,0 +1,58 @@
+The following steps show how to deploy HTTPAPI source from LIBHTTP to
+PHSRCLIB
+
+It can replace PHSRCLIB to THNCILIB if it is a developing library
+
+1.) Create the below source physical file in PHSRCLIB
+          CRTSRCPF FILE(PHSRCLIB/EXPAT)     RCDLEN(112) TEXT('Expat C source')
+          CRTSRCPF FILE(PHSRCLIB/QCLSRC)    RCDLEN(112) TEXT('CL source')
+          CRTSRCPF FILE(PHSRCLIB/QDDSSRCHT) RCDLEN(92)  TEXT('HTTPAPI DDS source')
+          CRTSRCPF FILE(PHSRCLIB/QRPGLESRC) RCDLEN(112) TEXT('ILE RPG IV Source')
+          CRTSRCPF FILE(PHSRCLIB/QSH)       RCDLEN(124) TEXT('QShell script source')
+          CRTSRCPF FILE(PHSRCLIB/QSRVSRC)   RCDLEN(112) TEXT('Binding source')
+          CRTSRCPF FILE(PHSRCLIB/QXMLGENS)  RCDLEN(112) TEXT('XMLGEN Script Source')
+
+2.) Change the above source files owner to PGMRGRP
+
+3.) Copy all members under the below PF-SRC
+      from library LIBHTTP -> PHSRCLIB
+          EXPAT     -> EXPAT
+          QCLSRC    -> QCLSRC
+          QDDSSRC   -> QDDSSRCHT  *Different File Name
+          QRPGLESRC -> QRPGLESRC
+          QSH       -> QSH
+          QSRVSRC   -> QSRVSRC
+          QXMLGENS  -> QXMLGENS
+
+5.) Change source of INSTALL program located in PHSRCLIB/QCLSRC (INSTALL)
+      - Change QDDSSRC -> QDDSSRCHT
+
+6.) Execute the install program that describes in README file
+  6.1) Build the INSTALL program:
+         CHGCURLIB CURLIB(PHOBJLIB)
+         CRTCLPGM  PGM(PHOBJLIB/INSTALL) SRCFILE(PHSRCLIB/QCLSRC)
+         CHGOBJOWN OBJ(PHOBJLIB/INSTALL) OBJTYPE(*PGM) NEWOWN(PGMRGRP)
+
+  6.2) Use the INSTALL program to build everything else:
+         CALL INSTALL
+
+  6.3) Select the following option in INSTALL interactive program
+        - Select "N" for Question: 'Would you like to build the sample programs?'
+        - Input "PHOBJLIB" for Question: 'Library name for HTTPAPI objects:'
+        - Select "Y" for question: 'At runtime, use *LIBL to find HTTPAPI?'
+        - Take default for other selections
+
+  6.4) Change the below objects owner to PGMRGRP,
+         CHGOBJOWN OBJ(PHOBJLIB/HTTPAPIR4) OBJTYPE(*SRVPGM) NEWOWN(PGMRGRP)
+         CHGOBJOWN OBJ(PHOBJLIB/HTTPAPI)   OBJTYPE(*BNDDIR) NEWOWN(PGMRGRP)
+         CHGOBJOWN OBJ(PHOBJLIB/EXPAT)     OBJTYPE(*SRVPGM) NEWOWN(PGMRGRP)
+         CHGOBJOWN OBJ(PHOBJLIB/EXPAT)     OBJTYPE(*BNDDIR) NEWOWN(PGMRGRP)
+
+  6.5) Remove the below install program objects in PHOBJLIB if necessary
+         INSTALL   *PGM
+         MKEXPATCL *PGM
+
+  6.6)  For more details, please check README for the reference
+
+7.) Delete library LIBHTTP
+

@@ -1,0 +1,20 @@
+     A*==============================================================*
+     A* File name: CHKCHIFA                                          *
+     A*                                                              *
+     A* Purpose: Check Invalid Chinese Character (Black List)        *
+     A*                                                              *
+     A* Date written: 2019/09/17                                     *
+     A*                                                              *
+     A* Remarks :                                                    *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2019-09-17 Alan       AC           New                       *
+     A*==============================================================*
+     A                                      UNIQUE
+     A                                      REF(REFFILE)
+     A          R CHKCHIFAR
+     A            XRBLKC         4O         TEXT('BLACK LIST CHARACTER')
+     A                                      COLHDG('BLACK LIST CHARACTER')
+     A          K XRBLKC

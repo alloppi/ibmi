@@ -1,0 +1,17 @@
+     A*==============================================================*
+     A* File name: ENCKEYF                                           *
+     A*                                                              *
+     A* Purpose: BOC Encryption Key File                             *
+     A*                                                              *
+     A* Date written: 2017/02/24                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Prefix Mod#  Remarks                   *
+     A* ---------- ---------- ------ ----- ------------------------- *
+     A* 2017/02/24 Alan       AC           New                       *
+     A*==============================================================*
+     A          R ENCKEYFR
+     A            KEY           16          TEXT('ENCRYPTION KEY')
+     A                                      CCSID(65535)
+     A                                      COLHDG('KEY')
+     A*

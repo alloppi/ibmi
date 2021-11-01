@@ -1,0 +1,15 @@
+/*===================================================================*/
+/* Program name: RTVTIMSTPC                                          */
+/* Purpose.....: Retrieve Milliseconds Timestamp                     */
+/* Date written: 2017/05/19                                          */
+/*                                                                   */
+/* Date       Name       Pre  Ver  Mod#  Remarks                     */
+/* ---------- ---------- --- ----- ----- ----------------------------*/
+/* 2017/05/19 Alan       AC              Develop                     */
+/*===================================================================*/
+             PGM        PARM(&TIMESTAMP)
+             DCL        VAR(&TIMESTAMP) TYPE(*CHAR) LEN(20)
+
+             RTVSYSVAL  SYSVAL(QDATETIME) RTNVAR(&TIMESTAMP)
+
+             ENDPGM

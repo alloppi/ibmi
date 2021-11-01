@@ -1,0 +1,53 @@
+http://www-1.ibm.com/servers/eserver/iseries/access/fwoverview.htm
+(Or you may use CfgTCP-> 21. Configure related tables
+                         -> 1. Work with service table entries)
+The only required ports are 8476 and 449. The other ports will only
+need to be opened if you are using a function that they support.  Most
+users will want to open 23, 449 and 8470 thru 8476.
+Also, be aware that parts of iSeries Operations Navigator, which is par
+part of Client Access also use port 2001 (and 2010 for SSL) to access
+the Web Admin Server.
+  23 (Port Telnet)
+ 449 (Port Mapper)
+     - Sever Mapper, as-svrmap
+8470 (Central server - Needed wheneve PC5250 or Data Transfer is used)
+     - License Management, as-central
+8471 (Database server)
+     - Database Access, as-database
+8472 (DataQueues server)
+     - Data Queues, as-dtaq
+8473 (File server)
+     - Network Drivers, as-file
+8474 (Print server)
+     - Network Printers, as-netprt
+8475 (Remote command server)
+     - Remote Command, as-rmtcmd
+8476 (Signon server)
+     - Signon Verification, as-signon
+8480 (Ultimedia server)
+9480 (Ultimedia server with SSL on)
+5555 (Management Central server)
+5556 (Management Central server with SSL on)
+ 446 (DDM server - Sometimes used by Clienet Access OLE DB Suport
+ 448 (DDM server with SSL on)
+5110 (MAPI server - Needed if these Mai API are being used)
+ 992 (Telnet with SSL on)
+9470 (Central Server with SSL on)
+9471 (Database Server with SSL on)
+9472 (Dataqueues server with SSL on)
+9473 (File Server with SSL on)
+9474 (Print Server with SSL on)
+9475 (Remote command server with SSL on)
+9476 (Signon server with SSL on)
+======================================================
+Here are the port needed for AS400 interface with Web Server
+Services / Port
+as-svrmap /tcp 449
+as-signon /tcp  8476
+as-data /tcp 8471
+
+as-signon-s /tcp 9476
+as-database-s /tcp 9471
+
+JDBC  50000
+JDBC 3470

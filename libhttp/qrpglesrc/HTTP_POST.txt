@@ -1,0 +1,706 @@
+http_url_post(url, post data pointer, length of ): Post data to CGI script
+  and get document (HTTPAPIR4)
+    Parameter: url to post to
+               pointer to data to post
+               length of data to post
+               Filename (in IFS) to save file
+               (optional) give up in seconds if no data is received
+               (optional) content type
+    Return: unsigned int
+
+    debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+    open(): open IFS file for writing HTTP response (O_WRONLY = write only) (IFSIO_H)
+        if it exists,
+            truncate it (O_TRUNC = truncate)
+        else
+            create it (O_CREAT = create) and assign the ASCII codepage to it
+        if open file error occured
+            SetError(): Called by other procedures to set an error message that
+              calling applications can retrieve
+                                                  with HTTP_ERROR (HTTPUTILR4)
+    // According to optional parameters received, call the 'raw' post procedure
+    http_url_post_raw(): Post data to CGI script and get document (HTTPAPIR4)
+    close(): closed IFS file (IFSIO_H)
+
+
+    http_url_post_raw(): Post data to CGI script and get document (HTTPAPIR4)
+        http_persist_open(): Open a persistent HTTP session (HTTPAPIR4)
+        http_persist_post(): Post data to CGI script and get document using
+          a persistent connection (HTTPAPIR4)
+        http_persist_close(): End a persistent HTTP session (HTTPAPIR4)
+
+
+        http_persist_open(): Open a persistent HTTP session (HTTPAPIR4)
+            debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+            //  Set up optional parameters (timeout)
+            http_long_ParseURL(): Parse URL into it's component parts (HTTPAPIR4)
+            Proxy address provided?
+            http_select_commdriver(): Select & initialize communications driver by
+              communications type (http/https) (HTTPAPIR4)
+            comm_resolve() (procptr): Resolve host name into binary IP address (COMM_H)
+                // The procedure pointer will execute 'COMMSSL_RESOLVE'
+            comm_Connect() (procptr) : Connect to Server (COMM_H)
+                // The p_Connect procedure pointer will execute 'COMMSSL_CONNECT'
+            COMMSSL_CONNECT procedure
+            if proxy establish?
+                proxy_tunnel(): establishes a tunnel through a proxy and allow communicate
+                  directly with the destination
+                HTTP server (required for SSL) (HTTPAPIR4)
+                http_persist_close(): End a persistent HTTP session (HTTPAPIR4)
+            endif
+            comm_Upgrade(): Upgrade connection security (if it is the SSL driver,
+              this starts SSL encryption) (COMM_H)
+            // The p_Upgrade procedure pointer will execute 'COMMSSL_UPGRADE'
+
+        http_persist_post(): Post data to CGI script and get document using
+          a persistent connection (HTTPAPIR4)
+            debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+            // Set Timeout, user-agent, content-type for HTTP 1.1 Protocol (HTTPAPIR4)
+            // Handle SOAPaction (HTTPAPIR4)
+            http_long_ParseURL(): Parse URL into it's component parts (HTTPAPIR4)
+            setUrlAuth(): Set auth credentials if user and password found in the URL
+              (Optional) (HTTPAPIR4)
+            http_xlatedyn(): Translate data from ASCII <--> EBCDIC using a dynamically sized
+              output buffer (CCSIDR4)
+            do_post(): performs the logic of an HTTP POST (HTTPAPIR4)
+            xdealloc(): de-allocate memory (HTTPUTILR4)
+
+        http_persist_close(): End a persistent HTTP session (HTTPAPIR4)
+            http_close(): close HTTP connection (HTTPAPIR4)
+
+
+            debug_msg() Add a diagnostic message to the debugging log (HTTPUTILR4)
+                http_xlate(): Translate data from ASCII <--> EBCDIC (CCSIDR4)
+                debug_write(): write debugging data to the debug log file (HTTPUTILR4)
+
+            http_long_ParseURL(): Parse URL into it's component parts (HTTPAPIR4)
+                // Breaks a uniform resource locator (URL) into it's component pieces for use with
+                  the http: or https: protocols.
+                debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                // If this is a relative URL, convert it from a relative to an absolute URL by
+                  adding previous host & path
+                // Validate HTTP url should look like
+                //   http://www.server.com/somedir/somefile.ext
+                //   https://www.server.com/somedir/somefile.ext
+                //
+                //   and may optionally contain a user name, password & port number:
+                //   or http://user:passwd@www.server.com:80/somedir/somefile.ext
+                // Extract url into Service (http:/https:), username, password, host, port, path
+
+            http_select_commdriver(): Select & initialize communications driver by
+              communications type (http/https) (HTTPAPIR4)
+                if http  => p_CommNew = %paddr('COMMTCP_NEW') (COMMTCPR4)
+                if https => p_CommNew = %paddr('COMMSSL_NEW') (COMMSSLR4)
+                // execute procedure COMMTCP_NEW SSL communication driver by procptr
+                eval    p_CommDriver = comm_new
+
+            CommTcp_Resolve(): Resolve a hostname to an IP address (COMMSTCPR4)
+                DNS_Info(): Display DNS Resolver information (COMMSTCPR4)
+                // Resolve host to address
+                // Check if host is specified as a raw IP address
+                // such as http://323223677/path/to/file.html
+                atoll(): converts a character string to a long value (PRIVATE_H)
+                // Check if host is specified as a "dotted" IP address
+                // such as http://192.168.5.1/path/to/file.html
+                inet_addr(): Converts an address from dotted-decimal format to a 32-bit IP address
+                  (SOCKET_H)
+                // Try looking up host as a domain name
+                // such as http://www.example.com/path/to/file.html
+                gethostbyname(): Resolves a domain name to an IP address (SOCKET_H)
+                // Resolve service to host
+                // If port number was part of URL, use it directly
+                // Otherwise, look it up in the system's services table
+                getservbyname(): Get Port Number for Service Name
+                // Or, if all else fails, fall back to a default
+                if https
+                    sin_port = 443
+                else
+                    sin_port = 80
+                // Socket remains in blocking mode until connection is complete then
+                  switches to non-blocking.
+                // Signals are used to handle timeouts on the connect request
+
+            CommTCP_New(): Build a new TCP communications driver (COMMTCPR4)
+                xalloc(): Allocate memory (HTTPUTILR4)
+                p_Resolve   =%paddr('COMMTCP_RESOLVE')
+                p_Connect   =%paddr('COMMTCP_CONNECT')
+                p_Upgrade   =%paddr('COMMTCP_UPGRADE')
+                p_Read      =%paddr('COMMTCP_READ')
+                p_BlockRead =%paddr('COMMTCP_BLOCKREAD')
+                p_BlockWrite=%paddr('COMMTCP_BLOCKWRITE')
+                p_LineRead  =%paddr('COMMTCP_LINEREAD')
+                p_LineWrite =%paddr('COMMTCP_LINEWRITE')
+                p_Hangup    =%paddr('COMMTCP_HANGUP')
+                p_Cleanup   =%paddr('COMMTCP_CLEANUP')
+
+            CommSSL_New(): Build a new TCP communications driver (COMMSSLR4)
+                // Connection built from CommTCP driver
+                p_Resolve   =%paddr('COMMTCP_RESOLVE')
+                p_Read      =%paddr('COMMTCP_READ')
+                p_BlockRead =%paddr('COMMTCP_BLOCKREAD')
+                p_BlockWrite=%paddr('COMMTCP_BLOCKWRITE')
+                p_LineRead  =%paddr('COMMTCP_LINEREAD')
+                p_LineWrite =%paddr('COMMTCP_LINEWRITE')
+                p_Hangup    =%paddr('COMMTCP_HANGUP')
+                // SSL-specific connection
+                p_Connect   =%paddr('COMMSSL_CONNECT')
+                p_Upgrade   =%paddr('COMMSSL_UPGRADE')
+                p_Cleanup   =%paddr('COMMSSL_CLEANUP')
+                CommSSL_Connect(): connect to a server using SSL
+                // If SSL has not yet been initialized, initialize it with default values
+                https_init(): Initialize https (HTTP over SSL/TLS) protocol (COMMSSLR4)
+                if defined(HTTP_BLOCK_ON_CONNECT)
+                    CommTCP_ConnectBlocking(): Connect to server using blocking mode (COMMTCPR4)
+                else
+                    CommTCP_ConnectNonBlock(): Connect to server using non-blocking mode
+                      (COMMTCPR4)
+
+            CommSSL_Upgrade(): Upgrade socket to SSL
+                // create a secure socket from the environment handle, associate it with
+                  our socket, and initialize it
+                gsk_secure_soc_open(): Create a secure socket using the attributes of
+                  secure sessions (GSKSSL_H)
+                // Set secure socket data structure including 30 second timeout value and
+                  socket descriptor
+                gsk_attribute_set_numeric_value(): Set numeric value for an SSL environment
+                  (GSKSSL_H)
+                // Exchange certificate that is perform SSL handshake
+                gsk_secure_soc_init(); Initates a secure session using the attributes for
+                  the SSL environment (GSKSSL_H)
+                // Write certificate information to debugging log
+                gsk_attribute_get_numeric_value(): Get numeric information about SSL environment
+                  (GSKSSL_H)
+                SSL_debug_cert_info(): Print certificate info into debug file (COMMSSLR4)
+                // Validate SSL certificate against user-supplied certificate verification routine
+                SSL_validate_cert(): Verify the partner's certificate (COMMSSLR4)
+                if above procedures have error occured,
+                    close(): End Socket Connection (SOCKET_H)
+                    gsk_secure_soc_close(): Close a secure session and free all the
+                      associated resources (GSKSSL_H)
+                // Since SSL is now active, use the SSL routines instead of the plain TCP ones
+                    p_Read      =%paddr('COMMSSL_READ')
+                    p_BlockRead =%paddr('COMMSSL_BLOCKREAD')
+                    p_BlockWrite=%paddr('COMMSSL_BLOCKWRITE')
+                    p_LineRead  =%paddr('COMMSSL_LINEREAD')
+                    p_LineWrite =%paddr('COMMSSL_LINEWRITE')
+                    p_Hangup    =%paddr('COMMSSL_HANGUP')
+
+            setUrlAuth(): Set auth credentials if user and password found in the URL (HTTPAPIR4)
+                http_setAuth(): Set HTTP Authentication Information (HTTPAPIR4)
+
+            http_xlatedyn(): Translate data from ASCII <--> EBCDIC using a dynamically sized
+              output buffer (CCSIDR4)
+                if defined(HTTP_USE_TABLES)
+                    TblXLateDyn(): Translate using table. Translate input to a dynamically
+                    allocated output buffer (CCSIDR4)
+                else
+                    CCSIDXLateDyn(): Translate using CCSID. Translate input to a dynamically
+                    allocated output buffer (CCSIDR4)
+
+            do_post(): performs the logic of an HTTP POST (HTTPAPIR4)
+                debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                // Build an HTTP/1.1 request chain
+                // (If Connection is done via Proxy, an URI instead of just the path has
+                //  to be sent)
+                // eg.  'POST ' + path +  ' HTTP/1.1' + CRLF + hostname + ':' + port +
+                        'User-Agent: ' + User Agent + CRLF +
+                        'Content-Type: ' + Content Type + CRLF +
+                        'SOAPAction: ' + SOAP Action + CRLF +// Optional
+                        'Expect: 100-continue' + CRLF +
+                        'Content-Length: ' + length of posted data + CRLF +
+                        'Proxy-Authorization: Basic ' + Proxy Authorization String + CRLF
+                        // Optional
+                        Cookie information // Optional
+                // Send request chain & get response
+                SendReq(): Send request chain (HTTPAPIR4)
+                RecvResp(): Receives an HTTP response chain from the server (HTTPAPIR4)
+                // Interpret response.  It can be "100" meaning that we continue with
+                // a POST request. Or an error.
+                parse_resp_chain(): parse important fields from the response chain (HTTPAPIR4)
+                // If we received the go-ahead, send the document
+                SendProc() (procptr): (HTTPAPIR4)
+                    execute procedure SendDoc(): or SendRaw()
+                    SendDoc(): This sends a document body, such as those used by the PUT or
+                      POST HTTP commands ((HTTPAPIR4)
+                    SendRaw(): This sends a document body, such as those used by the PUT or
+                      POST HTTP commands,
+                      but uses a callback instead of a buffer (HTTPAPIR4)
+                RecvResp(): Receives an HTTP response chain from the server (HTTPAPIR4)
+                parse_resp_chain(): parse important fields from the response chain (HTTPAPIR4)
+                // receive the document from the server
+                if %scan('chunked')
+                    RecvChunk(): receive (download) data using chunked transfer-encoding
+                      (HTTPAPIR4)
+                else
+                    RecvDoc(): receive (Download) http document (HTTPAPIR4)
+
+            xdealloc(): de-allocate memory (HTTPUTILR4)
+                if defined(TERASPACE)
+                    ts_free(): Frees one previous allocation of teraspace (PRIVATE_H)
+                else
+                    dealloc:  Frees one previous allocation of heap storage (RPG OpCode)
+
+            http_close(): close HTTP connection (HTTPAPIR4)
+                debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                debug_close(): close current debugging log file (HTTPUTILR4)
+                comm_hangup(): (COMM_H)
+
+
+
+                http_xlate(): Translate data from ASCII <--> EBCDIC (CCSIDR4)
+                    if defined(HTTP_USE_TABLES)
+                        TblXlate(): Translate from ASCII <--> EBCDIC using a *TBL (CCSIDR4)
+                    else
+                        CCSIDxlate(): Translate data from ASCII <--> EBCDIC using a pointer to
+                          the data (CCSIDR4)
+
+                debug_write(): write debugging data to the debug log file (off by default)
+                  (HTTPUTILR4)
+                    debug_proc():  (HTTPUTILR4)
+                    open(): open IFS file for writing HTTP response (O_WRONLY = write only)
+                      (IFSIO_H)
+                    http_xlate(): Translate data from ASCII <--> EBCDIC (CCSIDR4)
+                    write(): Write to a file (IFSIO_H)
+
+                https_init(): Initialize https (HTTP over SSL/TLS) protocol (COMMSSLR4)
+                    debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                    https_cleanup(): Clean up & free storage used by the SSL environment
+                      (COMMSSLR4)
+                        if error, SetError(): set an error message (HTTPUTILR4)
+                    gsk_environment_open(): creates a new GSKit Enviorment (GSKSSL_H)
+                        if error, SetError(): set an error message (HTTPUTILR4)
+                    // Clean up the GSKit environment since it uses
+                      a significant portion of memory
+                    CEE4RAGE(): Register Activation Group Exit Procedure (COMMSSLR4)
+                    CEESGL(): Signal a Condition (COMMSSLR4)
+                    // If no application ID was given, use the *SYSTEM certificate store
+                      as our keyring,
+                    otherwise use that to associate with the digital certificate manager
+                    gsk_attribute_set_buffer(): (GSKSSL_H)
+                        if error, SetError(): set an error message (HTTPUTILR4)
+                    // tell GSKit that we're a client application
+                    gsk_attribute_set_enum(GSK_CLIENT_SESSION): (GSKSSL_H)
+                    // How shall we validate the server's certificate?
+                    gsk_attribute_set_enum(GSK_SERVER_AUTH_TYPE): (GSKSSL_H)
+                    // How shall we validate a client certificate?
+                    gsk_attribute_set_enum(GSK_CLIENT_AUTH_TYPE): (GSKSSL_H)
+                    // If requested, set the allowed SSL protocol versions
+                    SSL_force_protocol(): Force a particular SSL protocol (COMMSSLR4)
+                    // If requested, set up a certificate validation callback
+                    gsk_attribute_set_callback(): (GSKSSL_H)
+                    // Initialize the SSL environment. After this, secure sessions can be created!
+                    gsk_environment_init(): (GSKSSL_H)
+                        if error, SetError(): set an error message (HTTPUTILR4)
+                    SSL_debug_cert_info(): Print certificate info into debug file (COMMSSLR4)
+
+                CommTCP_ConnectBlocking(): Connect to server using blocking mode (COMMTCPR4)
+                    // Create socket
+                    socket(): Create socket (SOCKET_H)
+                    // Force buffer sizes to 128k
+                    setsockopt(): Set Socket Options (SOCKET_H)
+                    // Set up a signal handler to handle SIGALRM
+                    Qp0sEnableSignals(): Enable a process for signals (SIGNAL_H)
+                    sa_handler = %paddr('ALARM_HANDLER')
+                    sigemptyset(): initialize an empty signal set (SIGNAL_H)
+                    sigaddset(): add signal to signal set (SIGNAL_H)
+                    sigaction(): Set signal action (SIGNAL_H)
+                    // Tell the system to issue a SIGALRM after peTimeout seconds
+                    alarm(): Send an alarm signal after XX seconds (SIGNAL_H)
+                    // Start the connect process
+                    connect(): Connect to a host (SOCKET_H)
+                    if error occured
+                        close(): End Socket Connection (SOCKET_H)
+                        alarm(0): Turn off the signal (SIGNAL_H)
+                        Qp0sDisableSignals(): Disable signals (SIGNAL_H)
+                    endif
+                    // turn off future signals so they don't interrupt other parts of the program
+                    alarm(0): Turn off the signal (SIGNAL_H)
+                    Qp0sDisableSignals(): Disable signals (SIGNAL_H)
+                    // Now that we're connected, switch to nonblocking mode,
+                    // so timeouts will work for the rest of the program
+                    fcntl(): Change Descriptor Attributes (SOCKET_H)
+
+                // Connection is made while socket is in non-blocking mode
+                CommTCP_ConnectNonBlock(): Connect to server using non-blocking mode (COMMTCPR4)
+                    // Create socket
+                    socket(): Create socket (SOCKET_H)
+                    // Force buffer sizes to 8k
+                    setsockopt(): Set Socket Options (SOCKET_H)
+                    // Put socket in nonblocking mode so we can do timeouts, etc
+                    fcntl(): Change Descriptor Attributes (SOCKET_H)
+                    // Start the connect process
+                    connect(): Connect to a host (SOCKET_H)
+                    if errno <> EINPROGRESS
+                        close(): End Socket Connection (SOCKET_H)
+                    // Wait for connect to complete:
+                    // because these are non-blocking sockets,
+                    // the API's above will almost always complete before the connection
+                    // is finished
+                    CommTCP_FD_Zero(): Clear All descriptors in a set (COMMTCPR4)
+                    CommTCP_FD_Set(): Set a File Descriptor in a set ON...  for use w/Select()
+                      (COMMTCPR4)
+                    // Select is used to wait for i/o on multiple sockets.  This prevents your job
+                    // from "blocking" on one socket read, while there is data to read on
+                    // another socket
+                    select(): wait for events on multiple sockets (SOCKET_H)
+                    // Determine if a file desriptor is on or off (COMMTCPR4)
+                    if CommTCP_FD_IsSet() = *OFF
+                        close(): End Socket Connection (SOCKET_H)
+                    endif
+                    connect(): Connect to a host (SOCKET_H)
+                    if error occured
+                        close(): End Socket Connection (SOCKET_H)
+                    endif
+
+                SSL_debug_cert_info(): Print certificate info into debug file (COMMSSLR4)
+                    gsk_attribute_get_cert_info(): Get information about
+                      server / client certifcate
+                    ssl_debug_cert_body(): Print certificate body into debug file (COMMSSLR4)
+                    ssl_debug_cert_elem(): Print certificate element into debug file (COMMSSLR4)
+
+                SSL_validate_cert(): Verify the partner's certificate (COMMSSLR4)
+                    // Ask GSKit for certificate information
+                    gsk_attribute_get_cert_info(): Get information about
+                      server / client certifcate
+                    // Loop through the certificate elements
+                    // If text, convert to EBCDIC
+                    http_xlatep(): Translate data from ASCII <--> EBCDIC (using a pointer)
+                      instead of a variable) (CCSIDR4)
+                    // Run the callback
+                    cert_val_callback(): (COMMSSLR4)
+
+                http_setAuth(): Set HTTP Authentication Information (HTTPAPIR4)
+                    debug_msg():
+                    if        peAuthType<>HTTP_AUTH_BASIC
+                        setError(): set an error message (HTTPUTILR4)
+                    // Calculate strings for NO authentication
+                    if        peAuthType = HTTP_AUTH_NONE
+                        return
+                    http_xlate(): Translate data from ASCII <--> EBCDIC (CCSIDR4)
+                    base64_encode(): Encodes a data stream into BASE64 encoding (ENCODERR4)
+
+                TblXLateDyn(): Translate using table. Translate input to a dynamically allocated
+                  output buffer (CCSIDR4)
+                    memcpy(): Copy block of memory (IBM supplied API)
+                    http_xlatep(): Translate data from ASCII <--> EBCDIC (using a pointer
+                      instead of a variable) (CCSIDR4)
+                    xdealloc(): de-allocate memory (HTTPUTILR4)
+
+                CCSIDXLateDyn(): Translate using CCSID. Translate input to a dynamically allocated
+                  output buffer (CCSIDR4)
+                    /if not defined(HTTP_USE_TABLES)
+                        HTTP_SetCCSIDs(): Set the CCSIDs used for ASCII/EBCDIC translation
+                          (CCSIDR4)
+                        iconvdyn(): Run the iconv() API and output to a dynamic memory buffer
+                          (CCSIDR4)
+                    /endif
+
+                SendReq(): Send request chain (HTTPAPIR4)
+                    http_xlatep(): Translate data from ASCII <--> EBCDIC (using a pointer)
+                      instead of a variable) (CCSIDR4)
+                    comm_BlockWrite() (procptr):
+                      execute CommSSL_BlockWrite(): Write data to socket in a fixed-length block
+                        (COMMSSLR4)
+
+                RecvResp(): Receives an HTTP response chain from the server (HTTPAPIR4)
+                    debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                    dou       not repeating
+                        comm_lineread() (propcptr):
+                          execute CommSSL_LineRead(): Read data from socket as a CR/LF
+                            terminated line (COMMSSLR4)
+                        if nothing received,
+                            http_error(): Return the last error that occurred (HTTPUTILR4)
+                        // translate response chain to EBCDIC
+                        http_xlatep(): Translate data from ASCII <--> EBCDIC (using a pointer)
+                          instead of a variable) (CCSIDR4)
+                        // check for "continue" type codes: if we get them, we'll look for
+                        // a whole new chain :)
+                    enddo
+
+                Parse_resp_chain(): parse important fields from the response chain (HTTPAPIR4)
+                    // Make an uppercase copy of the response chain so we can do case-insensitive
+                    // searching on it
+                    // parse out transfer-encoding
+                    // parse out content-length if using "identity,"(this is irrelevant
+                    // for "chunked")
+                    // parse out www-authenticate: header: (used when userid/password
+                    // for actual site
+                    // is required)
+                    // parse proxy-authenticate: header: (used when userid/password for proxy
+                    // is required)
+                    interpret_proxy_auth(): Interpret (parse & save) the Proxy-Authenticate:
+                      header (HTTPAPIR4)
+                    // parse out 'location:' header: (used for redirects)
+                    // Call HTTP header parsing module
+                    header_parse(): Parse HTTP header & protocol information (HEADERR4)
+                    header_load_cookies(): Parse the cookies in the HTTP headers and load them
+                      into the cookie list (HEADERR4)
+                    // Call user supplied parsing proc if available
+                    parse_hdrs() (procptr):
+                    parse_hdr_long() (procptr):
+
+                SendDoc(): This sends a document body, such as those used by the PUT or POST
+                  HTTP commands (HTTPAPIR4)
+                    debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                    dow       wwLeft > 0
+                        comm_BlockWrite() (procptr):
+                            execute CommSSL_BlockWrite(): Write data to socket in
+                              a fixed-length block (COMMSSLR4)
+                        upload_sts(): (HTTPAPIR4)
+                    enddo
+
+                SendRaw(): This sends a document body, such as those used by the PUT or POST
+                  HTTP commands, but uses a callback instead of a buffer (HTTPAPIR4)
+                    debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                    dow       peDataSize > wwSent
+                        Callback(): (HTTPAPIR4)
+                        comm_BlockWrite() (procptr):
+                          execute CommSSL_BlockWrite(): Write data to socket in
+                            a fixed-length block
+                            (COMMSSLR4)
+                        upload_sts(): (HTTPAPIR4)
+                    enddo
+
+                RecvChunk(): receive (download) data using chunked transfer-encoding (HTTPAPIR4)
+                    debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                    dow       Forever
+                        // Receive the size of the next chunk of data
+                        get_chunk_size(): This receives the chunk size from the http stream
+                          (HTTPAPIR4)
+                          We use it so we know how big the next chunk of data is (HTTPAPIR4)
+                        // Receive data until we have an entire chunk
+                        dou       wwLeft = 0
+                            comm_BlockRead() (procptr):
+                              execute CommSSL_BlockRead(): Read data from socket in
+                                a fixed-length block (COMMSSLR4)
+                            // Write any received data to the save procedure
+                            saveproc():  (HTTPAPIR4)
+                            download_sts(): (HTTPAPIR4)
+                        enddo
+                    enddo
+
+                RecvDoc(): receive (Download) http document (HTTPAPIR4)
+                    debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                    dow       forever
+                        comm_BlockRead() (procptr):
+                          execute CommSSL_BlockRead(): Read data from socket in
+                            a fixed-length block (COMMSSLR4)
+                        saveproc():  (HTTPAPIR4)
+                        download_sts():  (HTTPAPIR4)
+                    enddo
+
+                debug_close(): close current debugging log file (HTTPUTILR4)
+                    close(): closed IFS debugging log file (IFSIO_H)
+
+
+                    TblXlate(): Translate from ASCII <--> EBCDIC using a *TBL (CCSIDR4)
+                        HTTP_SetTables(): Set the CCSIDs used for ASCII/EBCDIC translation
+                          (CCSIDR4)
+                        dow       peSize > 0
+                            QDCXLATE(): Converts data through the use of a table object (CCSIDR4)
+                        enddo
+
+                    CCSIDxlate(): Translate data from ASCII <--> EBCDIC using a pointer to
+                      the data (CCSIDR4)
+                        HTTP_SetCCSIDs(): Set the CCSIDs used for ASCII/EBCDIC translation
+                          (CCSIDR4)
+                        iconv(): Converts a buffer of characters from one set identifier (CCSID)
+                          into another CCSID (CCSIDR4)
+
+                    https_cleanup(): Clean up & free storage used by the SSL environment
+                      (COMMSSLR4)
+                        gskit_cleanup(): Clean up the GSKit SSL environment
+
+                    SSL_force_protocol(): Force a particular SSL protocol (COMMSSLR4)
+                        // Set the SSLv2 protocol on or off
+                        gsk_attribute_set_enum(GSK_PROTOCOL_SSLV2): (GSKSSL_H)
+                        // Set the SSLv3 protocol on or off
+                        gsk_attribute_set_enum(GSK_PROTOCOL_SSLV3): (GSKSSL_H)
+                        // Set the TLSv1 protocol on or off
+                        gsk_attribute_set_enum(GSK_PROTOCOL_TLSV1): (GSKSSL_H)
+
+                    ssl_debug_cert_body(): Print certificate body into debug file (COMMSSLR4)
+                        http_xlate(): Translate data from ASCII <--> EBCDIC (CCSIDR4)
+                        dow       peLen > CHUNK
+                            debug_msg(): Add a diagnostic message to the debugging log
+                              (HTTPUTILR4)
+                                                enddo
+
+                    ssl_debug_cert_elem(): Print certificate element into debug file (COMMSSLR4)
+                        http_xlate(): Translate data from ASCII <--> EBCDIC (CCSIDR4)
+                        http_xlatep(): Translate data from ASCII <--> EBCDIC (using a pointer)
+                          instead of a variable) (CCSIDR4)
+                        debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+
+                    http_xlatep(): Translate data from ASCII <--> EBCDIC (using a pointer
+                      instead of a variable) (CCSIDR4)
+                        /if defined(HTTP_USE_TABLES)
+                            TblXlate(): Translate from ASCII <--> EBCDIC using a *TBL (CCSIDR4)
+                        /else
+                            CCSIDxlate(): Translate data from ASCII <--> EBCDIC using a pointer
+                              to the data (CCSIDR4)
+                        /endif
+
+                    base64_encode(): Encodes a data stream into BASE64 encoding (ENCODERR4)
+                        base64_init(): Initializes the base64 alphabet used by base64_encode
+                          (ENCODERR4)
+                        dow       wwPos <= peInputLen
+                            // First Output Byte = Leftmost 6 bits of the first input byte
+                            // Second Output Byte = rightmost 2 bits of the first input byte and
+                            // leftmost 4 bits of 2nd input byte
+                            // Third Output Byte = rightmost 4 bits of the 2nd input byte and
+                            // leftmost 2 bits of 3nd input byte
+                            // or '=' if there was only one input byte
+                            // Fourth Output Byte = rightmost 6 bits of the 3nd input byte
+                            // or '=' if there were less than 3 input bytes
+                        enddo
+
+                    http_SetCCSIDs(): Set the CCSIDs used for ASCII/EBCDIC translation (CCSIDR4)
+                        /if defined(HTTP_USE_TABLES)
+                            SetError(): set an error message (HTTPUTILR4)
+                        /else
+                            iconv_close(): closes the conversion descriptor code (CCSIDR4)
+                            iconv_open(): performs initializations to convert character encodings
+                              from the source CCSID (CCSIDR4)
+                        /endif
+
+                    iconvdyn(): Run the iconv() API and output to a dynamic memory buffer
+                      (CCSIDR4)
+                        dow       '1'
+                            iconv(): Converts a buffer of characters from one set identifier
+                              (CCSID) into another CCSID (CCSIDR4)
+                            if        errno <> E2BIG
+                                xdealloc(): de-allocate memory (HTTPUTILR4)
+                            endif
+                        enddo
+
+                    xalloc(): Allocate memory (HTTPUTILR4)
+                        alloc (OpCode)
+
+                    CommSSL_BlockWrite(): Write data to socket in a fixed-length block (COMMSSLR4)
+                        dow       wwLeft > 0
+                            gsk_secure_soc_write(): Write data to a secure session (GSKSSL_H)
+                            if rc <> GSK_OK
+                                CommTCP_FD_Zero(): Clear All descriptors in a set (COMMTCPR4)
+                                CommTCP_FD_Set(): Set a File Descriptor in a set ON (COMMTCPR4)
+                                select(): Wait for events on multiple sockets (SOCKET_H)
+                            if CommTCP_FD_IsSet() = *Off : // Determine if a file desriptor is
+                              on or off (COMMTCPR4)
+                                setError(): set an error message (HTTPUTILR4)
+                            endif
+                            debug_write():  write debugging data to the debug log file
+                              (off by default) (HTTPUTILR4)
+                        enddo
+
+                    CommTCP_LineWrite(): Write data to socket as a CR/LF terminated line
+                      (COMMTCPR4)
+                        memcpy(): Copy block of memory (IBM supplied API)
+                        commTcp_BlockWrite(): Write data to socket in a fixed-length block
+                          (COMMSSLR4)
+                        wwEOL = x'0d0a'
+                        xdealloc(): de-allocate memory (HTTPUTILR4)
+
+                    CommTcp_Read(): Read data from socket w/a timeout (COMMTCPR4)
+                        dou  wwLen > 0
+                            recv(): receive data from socket
+                            // error handling if errno <> EAGAIN
+                            // time out by wait for recv() to complete
+                            CommTCP_FD_Zero(): Clear All descriptors in a set (COMMTCPR4)
+                            CommTCP_FD_Set(): Set a File Descriptor in a set ON (COMMTCPR4)
+                            Select(): Wait for events on multiple sockets (SOCKET_H)
+                            if CommTCP_FD_IsSet() = *Off : // Determine if a file desriptor is
+                              on or off (COMMTCPR4)
+                                setError(): set an error message (HTTPUTILR4)
+                        enddo
+
+                    CommTCP_BlockRead(): Read data from socket in a fixed-length block (COMMTCPR4)
+                        // Same as commTcp_Read() but read data in a fixed-length block
+                        dow       wwLeft > 0
+                            commTcp_Read(): Read data from socket w/a timeout (COMMTCPR4)
+                        enddo
+
+                    CommSSL_BlockRead(): Read data from socket in a fixed-length block (COMMSSLR4)
+                        dow       peSize > 0
+                            CommSSL_read(): Read data from socket w/a timeout (COMMSSLR4)
+                        enddo
+
+                    CommSSL_LineRead(): Read data from socket as a CR/LF terminated line
+                      (COMMSSLR4)
+                        dow       forever
+                            CommSSL_Read(): Read data from socket w/a timeout (COMMSSLR4)
+                            if        ch=x'0a'
+                                return
+                        enddo
+
+                    CommSSL_Read(): Read data from socket w/a timeout (COMMSSLR4)
+                        dou       rc = GSK_OK
+                            gsk_secure_soc_read(): Reads data from a secure session
+                            if        rc <> GSK_OK
+                                CommTCP_FD_Zero(): Clear All descriptors in a set (COMMTCPR4)
+                                CommTCP_FD_Set(): Set a File Descriptor in a set ON (COMMTCPR4)
+                                select(): Wait for events on multiple sockets (SOCKET_H)
+                                // Determine if a file desriptor is on or off (COMMTCPR4)
+                                if CommTCP_FD_IsSet() = *Off
+                                    setError(): set an error message (HTTPUTILR4)
+                                endif
+                        enddo
+                        debug_write(): write debugging data to the debug log file
+                          (off by default) (HTTPUTILR4)
+
+                    http_error(): Return the last error that occurred (HTTPUTILR4)
+                        // Returns the human-readable error message
+
+                    interpret_proxy_auth(): Interpret (parse & save) the Proxy-Authenticate:
+                      header (HTTPAPIR4)
+                        debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                        // extract the value of this keyword (and nothing else)
+                        // Check if we deal with basic authentication
+
+                    header_parse(): Parse HTTP header & protocol information (HEADERR4)
+                        header_clean(): free up all header data (HEADERR4)
+                        // Break response chain into individual headers and
+                        // call header_process for each
+                        dow       next < %len(resp)
+                            // Find end of HTTP header
+                            // Find end of keyword, start of value
+                            // Get name of header & value
+                            // look for next header
+                        enddo
+
+                    header_load_cookies(): Parse the cookies in the HTTP headers and load them
+                      into the cookie list (HEADERR4)
+                        debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                        cookie_read(): Write the current cookie record to disk (HEADERR4)
+                        http_header(): retrieve the value of an HTTP header (HEADERR4)
+                        dow       rawCookie <> ''
+                            cookie_parse(): This parses a cookie into a cookie data structure
+                              (HEADERR4)
+                            cookie_reject(): This checks to see if a cookie should be rejected
+                              (HEADERR4)
+                            cookie_set(): Set the value of a cookie in the cookie cache (HEADERR4)
+                        enddo
+                        cookie_dump(): Dump the cookie cache to disk (HEADERR4)
+
+                    CommTCP_HangUp(): Disconnect session
+                        close(): End Socket Connection (SOCKET_H)
+
+                    CommSSL_CleanUp(): Cleanup module (COMMSSLR4)
+                        xdealloc(): de-allocate memory (HTTPUTILR4)
+
+                    get_chunk_size(): This receives the chunk size from the http stream
+                      (HTTPAPIR4)
+                        debug_msg(): Add a diagnostic message to the debugging log (HTTPUTILR4)
+                        comm_LineRead() (propcptr):
+                          execute CommSSL_LineRead(): Read data from socket as a CR/LF
+                            terminated line (COMMSSLR4)
+                        http_xlate(): Translate data from ASCII <--> EBCDIC (CCSIDR4)
+                        sscanf(): Read formatted data from string (IBM supplied API)
+
+
+                        base64_init(): Initializes the base64 alphabet used by base64_encode
+                          (ENCODERR4)
+
+                        header_clean(): free up all header data (HEADERR4)
+                            1             do        hdrs
+                                xdealloc(): de-allocate memory (HTTPUTILR4)
+                            enddo

@@ -1,0 +1,30 @@
+     A*==============================================================*
+     A* File name...: BNK_TFRF                                       *
+     A* Purpose.....: Interactive Internal Transfer Request          *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- ---------------------- *
+     A* 2016/11/22 Alan       AC                                     *
+     A*==============================================================*
+     A          R BNK_TFRFR
+     A*           TFDBTACTNO    14A         TEXT('Debit Account No.')
+     A*                                     COLHDG('Debit' 'A/C' 'No')
+     A*           TFDBTCUR       3A         TEXT('Debit Currency')
+     A*                                     COLHDG('Debit' 'Cur')
+     A            TFDBTAMT      15P 2       TEXT('Debit Amount')
+     A                                      COLHDG('Debit' 'Amt')
+     A            TFBENACTNO    14A         TEXT('Beneficiary Account No.')
+     A                                      COLHDG('Bene' 'A/C' 'No')
+     A            TFBENACTNM    70A         TEXT('Beneficiary Account Name')
+     A                                      COLHDG('Bene' 'A/C' 'Name')
+     A*           TFPAYCUR       3A         TEXT('Payment Currency')
+     A*                                     COLHDG('Pay' 'Cur')
+     A*           TFEQUAMT      15P 2       TEXT('Equivalent Amount')
+     A*                                     COLHDG('Equiv' 'Amt')
+     A            TFCUSREF      15A         TEXT('Customer Reference')
+     A                                      COLHDG('Cus' 'Ref')
+     A*           TFEXCGCTC      6P 0       TEXT('Exchange Contract')
+     A*                                     COLHDG('Exchg' 'Cont')
+     A            TFVALDATE       L         TEXT('Value Date')
+     A                                      COLHDG('Value' 'Date')

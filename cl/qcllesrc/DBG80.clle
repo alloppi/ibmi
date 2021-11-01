@@ -1,0 +1,14 @@
+/* Program name: DBG80                                                                            */
+/* Purpose.....: Reset STRDBG to 80 x 24                                                          */
+/*                                                                                                */
+/* Modification:                                                                                  */
+/* Date       Name       Pre  Ver  Mod#  Remarks                                                  */
+/* ---------- ---------- --- ----- ----- -------------------------------------------------------- */
+/* 2020/12/04 Alan       AC              New                                                      */
+/*================================================================================================*/
+             PGM
+
+             RMVENVVAR  ENVVAR('ILE_DEBUGGER_1') LEVEL(*JOB)
+             MONMSG     MSGID(CPFA981)
+
+             ENDPGM

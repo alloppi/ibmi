@@ -1,0 +1,149 @@
+Code Page Cross OS Platform
+----------------------------------
+  PC                                 AS400                                    FTP Server
+  +------------------+              +------------------+  ltype c 950        +------------------+
+  | Check by Command |   937        |                  |  ---------------->  | chcp return 437  |
+  | 'chcp' Code Page |----------->  |   DB2            |                     +------------------+
+  | 950              |  Client Acc  |   EBCDIC         |                     | Big5 -我x'A7DA'|
+  |                  |  Traditonal  |                  |                     +------------------+
+  +------------------+  Chinese Ext +------------------+   http
+  | Big5 -我x'A7DA'| ------------>|      x'4F5C'     |  --------+              FTP Server
+  +------------------+              +------------------+          |             +------------------+
+                                                                  |             | chcp return 437  |
+                                                                  + ------>     +------------------+
+                                                           IBM 819, ISO-8859-12 |      x'7C2A'     |
+                                                            using table         +------------------+
+                            WRKTBL TBL(QUSRSYS/QTCPASC)     QUSRSYS/QTCPASC       * Not Correct *
+                                                               4F -> 7C
+                                                               5C -> 2A
+
+Printing Chinese Data in SQL print
+----------------------------------
+OVRPRTF FILE(QPQUPRFIL) DEVTYPE(*AFPDS) PAGESIZE(66 120) LPI(6) CPI(15)
+
+SMS
+---
+http://202.140.96.185/app/servlet/GenSendSM?acc=promise&pwd=sa3y9otp&msisdn=90982696&suffix=0&req_sm
+
+
+To print Arial, here are the information:
+1. What need to be installed
+Arial is equivalent to Sonoran Sans Serif.
+It is included in Advanced Function Printing Fonts/400 (5769-FNT, option 3-6)
+http://publib.boulder.ibm.com/infocenter/iseries/v6r1m0/index.jsp?topic=/rzahc/rzahcswslpsze.htm
+It is a chargable license program. Please contact BP for purchasing the license program.
+
+2. How to install 5769-FNT
+Use RSTLICPGM to specify 5769FNT and relevant options.
+
+3. How to specify AFP font when print
+After install 5769FNT and relevant options, you will see QFNT03, QFNT04, QFNT05, QFNT06 libraries ad
+option installed)
+WRKLIB QFNT0x, option 12 and you can look for desired coded font name (*FNTRSC)
+
+a) For printer device file, change DEVTYPE to *AFPDS
+
+b) Use EITHER one of the following method to specify the font being used:
+i) Specify coded font resource name in printer file by CHGPRTF or OVRPRTF
+Font character set:
+Character set . . . . . . . . Name, *FONT
+Library . . . . . . . . . . *LIBL Name, *LIBL, *CURLIB
+Code page . . . . . . . . . . Name
+Library . . . . . . . . . . *LIBL Name, *LIBL, *CURLIB
+Point size . . . . . . . . . . *NONE 0.1-999.9, *NONE
+Coded font:
+Coded font . . . . . . . . . . Name, *FNTCHRSET
+Library . . . . . . . . . . *LIBL Name, *LIBL, *CURLIB
+Point size . . . . . . . . . . *NONE 0.1-999.9, *NONE
+ii) Using DDS and printer files
+http://publib.boulder.ibm.com/infocenter/iadthelp/v6r0/index.jsp?topic=/com.ibm.etools.iseries.langr
+fn.htm
+http://publib.boulder.ibm.com/infocenter/iseries/v6r1m0/index.jsp?topic=/rzalu/rzaluexternalexmp.htm
+     DDS Example:-
+      A*
+      A          R REC1
+      A            FLD1           8A    10 13CDEFNT(QFNTCPL/X0BRTR)
+      A*
+      A            FLD2          10A    11 13CDEFNT(QFNTCPL/X0BRTP +
+      A                                      (*POINTSIZE 10.1))
+      A            FLD3          10A    20 13CDEFNT(QFNTCPL/X0BRTP +
+      A                                      (*POINTSIZE 5.0 3.0))
+Note: FONT cannot be used with *POINTSIZE in V5R4
+      You may download tools to test fonts in AS400
+      http://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/FLASH10380
+      FONT is for Printer Resident
+      FNTCHRSET(Charter set Code page) or CDEFNT(Code Font) is AFP fonts are stored in AS400 (QFNTxx
+
+1. For information about AFP Font Collection, please start from here:
+http://www-03.ibm.com/systems/i/software/print/afpfonts_ww.html
+
+2. To check what is already installed in iSeries, you can use WRKFNTRSC or using iNav > AFP Manager
+Fonts to check
+You will see a list of library and resource names.
+
+To check the meaning of individual libraries and how to install them, please refer here:
+AFP FONT COLLECTION FONTS
+http://publib.boulder.ibm.com/prsys/pdfs/i1002241.pdf
+
+3. To check font information, FGID and how a font look like, please refer to this technote:
+http://www-912.ibm.com/s_dir/slkbase.NSF/DocNumber/8712759
+
+Another way to check if the font is available in your system.
+Please refer to p.37-52 in this book and check which fonts you would like to print.
+Font Summary for AFP Font Collection S544-5633-02
+http://publib.boulder.ibm.com/prsys/pdfs/54456332.pdf
+
+For example, you want to print Times New Roman. Refer to p.42 in this book.
+Code page is T1001148 and character set identifier is CnN200p0 (substitue 'n' with '0' and for 'p' r
+p.37)
+
+So I can find the font resource is avaiable in iSeries:
+
+Object Type Library Attribute Text
+T1001148 *FNTRSC CDEPAG CDEPAG International ECECP
+T1001148 *FNTRSC QFNTCPL CDEPAG INTERNATIONAL - ECECP
+T1001148 *FNTRSC QFNT01 CDEPAG International ECECP
+
+C0N200A0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200B0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200D0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200F0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200H0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200J0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200N0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200T0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N200Z0 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N20000 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+C0N20060 *FNTRSC QFNT04 FNTCHRSET TIMES NEW ROMAN LATIN1-roma
+
+=======
+Outline
+=======
+In http://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=5B18 , no corresponding HKSCS for U+5B1
+ANSI: FA40
+For HK Gov    : http://www.ogcio.gov.hk/ccli/unicode/structure/cli_tools.html
+For Microsoft : http://www.microsoft.com/hk/hkscs/code/HKSCS.htm
+                http://www.microsoft.com/hk/hkscs/chinese/default.aspx
+What AS400 can print chinese, should have ANSI (Big 5) -> EBCDIC
+
+Note window notepad shows chinese character - CHAN
+     for ANSI : AF B3
+     for Unicode : 73 96 (U+9673, i.e. position swap)
+
+PHFNTLIB
+========
+According to IBM sending the attachment, the maximum number of Chinese Fonts that can be created fro
+Starting from C241 (AS400) FA40 (PC) to E2FD (AS400) F9FE (PC).
+- 仿宋體
+- Availabe Code Font can be found with WRKOBJPDM LIB(PHFNTLIB) OBJ(*ALL) OBJTYPE(*FNTRSC) OBJATR(CDE
+  currently are
+                X0G16T      *FNTRSC     CDEFNT      TRAD-CHINESE GOTHIC 16X16 G16T
+                X0M24T      *FNTRSC     CDEFNT      TRAD-CHINESE MING 22X22 M24T
+                X0M32T      *FNTRSC     CDEFNT      TRAD-CHINESE MING 28X28 M32T
+
+CCSID
+=====
+         CCSID
+UTF-8  :  1208
+UCS-2  : 13488
+UTF-16 :  1200

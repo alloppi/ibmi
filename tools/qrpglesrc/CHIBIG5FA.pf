@@ -1,0 +1,17 @@
+     A*==============================================================*
+     A* File name: CHIBIGFA                                          *
+     A*                                                              *
+     A* Description: Big5 Character Code including HKSCS             *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- -----------------------*
+     A* 2015/03/20 Alan       AC              New                    *
+     A*==============================================================*
+     A          R CHIBIGFAR
+     A            BIG5CODE       4A         TEXT('BIG5 CODE')
+     A                                      COLHDG('BIG5 CODE')
+     A            BIG5CHAR       4O         TEXT('BIG5 CHARACTER')
+     A                                      COLHDG('BIG5 CHARACTER')
+     A            BIG5HEXA       4A         TEXT('BIG5 CODE IN HEXA')
+     A                                      COLHDG('CODE IN HEXA TEXT')

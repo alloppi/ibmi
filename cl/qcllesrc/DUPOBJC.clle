@@ -1,0 +1,180 @@
+ /*====================================================================================*/
+ /* Program name: DUPOBJC                                                              */
+ /* Purpose.....: Create Selected Duplicate Objects in Library                         */
+ /* Usage.......: Copy from object                   : PH*                             */
+ /*               Copy from library                  : PHFRMLIB                        */
+ /*               Obj. type select to copy           : *ALL, *FILE, *PGM ..            */
+ /*               Obj. attrib select to copy         : *ALL, PF, LF ...                */
+ /*               Copy Obj.change date >= input      : 20170630 (yyyymmdd)             */
+ /*               Copy Obj.change date time >= input : 20170630090101 (yyyymmddhhmmss) */
+ /*               Obj. owner select to copy          : *ALL, PGMRGRP                   */
+ /*               Duplicate file data?               : *YES, *NO                       */
+ /*               Copy to library                    : PHTOLIB                         */
+ /*               Copied object new owner            : *FROMLIB                        */
+ /* Remark......: Delete existed object in to library before copying                   */
+ /*                                                                                    */
+ /* Date       Name       Pre  Ver  Mod#  Remarks                                      */
+ /* ---------- ---------- --- ----- ----- ---------------------------------------------*/
+ /* 2017/06/14 Alan       AC        06616 New Development                              */
+ /*====================================================================================*/
+             PGM        PARM(&FROMOBJ &FROMLIB &OBJTYPE &OBJATTR +
+                          &CHGDATE &CHGDATTIM &OWNER &DATA &TOLIB &NEWOWNER)
+
+             DCL        VAR(&FROMOBJ)   TYPE(*CHAR) LEN(10)  /* Copy from object wildcard ie. PH* */
+             DCL        VAR(&FROMLIB)   TYPE(*CHAR) LEN(10)  /* Copy from library                 */
+             DCL        VAR(&OBJTYPE)   TYPE(*CHAR) LEN(10)  /* Obj. type select to copy ie.*FILE */
+             DCL        VAR(&OBJATTR)   TYPE(*CHAR) LEN(10)  /* Obj.attrib select to copy ie.PF   */
+             DCL        VAR(&CHGDATE)   TYPE(*CHAR) LEN(8)   /* Copy Obj.change date>=select date */
+             DCL        VAR(&CHGDATTIM) TYPE(*CHAR) LEN(14)  /* Obj.change date =  select date &  */
+                                                             /* Obj.change time >= select time    */
+             DCL        VAR(&OWNER)     TYPE(*CHAR) LEN(10)  /* Obj. owner select to copy         */
+             DCL        VAR(&DATA)      TYPE(*CHAR) LEN(4)   /* Duplicate file data?              */
+             DCL        VAR(&TOLIB)     TYPE(*CHAR) LEN(10)  /* Copy to library                   */
+             DCL        VAR(&NEWOWNER)  TYPE(*CHAR) LEN(10)  /* Copied object new owner           */
+
+             DCL        VAR(&SUBRRTN)   TYPE(*INT)  VALUE(0)
+             DCL        VAR(&LIBTYPE)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&LIBTEXT)   TYPE(*CHAR) LEN(50)
+             DCL        VAR(&OVRNAME)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&OBJCOUNT)  TYPE(*DEC)  LEN(4 0)
+             DCL        VAR(&MSGID)     TYPE(*CHAR) LEN(7)
+             DCL        VAR(&MSGDTA)    TYPE(*CHAR) LEN(256)
+             DCL        VAR(&MSGF)      TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSGFLIB)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RTNTYPE)   TYPE(*CHAR) LEN(2)
+
+             DCL        VAR(&W1CHGDATE) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&W2CHGDATE) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&W2CHGTIME) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&W1NEWOWNER) TYPE(*CHAR) LEN(10)
+             DCLF       FILE(QSYS/QADSPOBJ)
+
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL($ABEND))
+
+ /* Change value for object selection */
+             CHGVAR     VAR(&OBJATTR) VALUE(%UPPER(&OBJATTR))
+             CHGVAR     VAR(&OWNER)   VALUE(%UPPER(&OWNER))
+             CHGVAR     VAR(&DATA)    VALUE(%UPPER(&DATA))
+
+             IF         COND(%CHECK('0123456789' &CHGDATE) *NE 0) THEN(DO)
+               IF         COND(&CHGDATE = '*ALL') THEN( +
+                 CHGVAR     VAR(&W1CHGDATE) VALUE('000000'))
+               ELSE       CMD(CHGVAR VAR(&W1CHGDATE) VALUE('999999'))
+             ENDDO
+             ELSE       CMD(CVTDAT DATE(&CHGDATE) TOVAR(&W1CHGDATE) +
+                          FROMFMT(*YYMD) TOFMT(*MDY) TOSEP(*NONE))
+
+             IF         COND(%CHECK('0123456789' &CHGDATTIM) *NE 0) THEN(DO)
+               IF         COND(&CHGDATTIM = '*ALL') THEN(DO)
+                 CHGVAR     VAR(&W2CHGDATE) VALUE('000000')
+                 CHGVAR     VAR(&W2CHGTIME) VALUE('000000')
+               ENDDO
+               ELSE       CMD(DO)
+                 CHGVAR     VAR(&W2CHGDATE) VALUE('999999')
+                 CHGVAR     VAR(&W2CHGTIME) VALUE('999999')
+               ENDDO
+             ENDDO
+             ELSE CMD(DO)
+               CVTDAT     DATE(%SST(&CHGDATTIM 1 8)) TOVAR(&W2CHGDATE) +
+                            FROMFMT(*YYMD) TOFMT(*MDY) TOSEP(*NONE)
+               CHGVAR     VAR(&W2CHGTIME) VALUE(%SST(&CHGDATTIM 9 6))
+             ENDDO
+
+ /* Create To library if not exists by subroutine */
+             CHKOBJ     OBJ(QSYS/&TOLIB) OBJTYPE(*LIB)
+               MONMSG     MSGID(CPF9801 CPF9810) EXEC(CALLSUBR SUBR($CRTLIB) RTNVAL(&SUBRRTN))
+
+             IF         COND(&SUBRRTN = 1) THEN(GOTO CMDLBL($ABEND))
+
+ /* Display objects description in library */
+             DSPOBJD    OBJ(&FROMLIB/&FROMOBJ) OBJTYPE(&OBJTYPE) +
+                          OUTPUT(*OUTFILE) OUTFILE(QTEMP/DSPOBJD) +
+                          OUTMBR(*FIRST *REPLACE)
+
+             OVRDBF     FILE(QADSPOBJ) TOFILE(QTEMP/DSPOBJD)
+
+ /* Create duplicate object one by one if condition selected */
+ $LOOP:      RCVF
+               MONMSG     MSGID(CPF0864) EXEC(GOTO CMDLBL($EOF))
+
+             IF         COND((&ODOBAT  = &OBJATTR   *OR &OBJATTR   = '*ALL')   *AND +
+                             (&ODCDAT >= &W1CHGDATE *OR &W1CHGDATE = '000000') *AND +
+                             (&ODCDAT  = &W2CHGDATE *OR &W2CHGDATE = '000000') *AND +
+                             (&ODLTIM >= &W2CHGTIME *OR &W2CHGTIME = '000000') *AND +
+                             (&ODOBOW  = &OWNER     *OR &OWNER     = '*ALL')) THEN(DO)
+
+ /* Delete existed object in to library before copying */
+               DLTOBJ     OBJ(&TOLIB/&ODOBNM) OBJTYPE(&ODOBTP)
+                 MONMSG     MSGID(CPF2105)
+
+ /* Improve copying performance by increase buffer if object size huge */
+               IF         COND(&ODOBAT = 'PF' & &ODOBSZ = 9999999999 & &DATA = '*YES') THEN(DO)
+                 CHGVAR     VAR(&OVRNAME) VALUE('@' || %SST(&ODOBNM 2 9))
+                 OVRDBF     FILE(&OVRNAME) TOFILE(&FROMLIB/&ODOBNM) +
+                              OVRSCOPE(*JOB) SEQONLY(*YES *BUF256KB)
+                 OVRDBF     FILE(&ODOBNM) TOFILE(&TOLIB/&ODOBNM) +
+                              OVRSCOPE(*JOB) SEQONLY(*YES *BUF256KB)
+                 CPYF       FROMFILE(&FROMLIB/&OVRNAME) +
+                              TOFILE(&TOLIB/&ODOBNM) MBROPT(*REPLACE) +
+                              CRTFILE(*YES) FROMRCD(1) FMTOPT(*NOCHK)
+               ENDDO
+               ELSE       CMD(DO)
+                 CRTDUPOBJ  OBJ(&ODOBNM) FROMLIB(&FROMLIB) OBJTYPE(&OBJTYPE) +
+                              TOLIB(&TOLIB) DATA(&DATA)
+               ENDDO
+
+ /* Change object owner */
+               IF         COND(&NEWOWNER = '*FROMLIB') THEN( +
+                            CHGVAR VAR(&W1NEWOWNER) VALUE(&ODOBOW))
+               ELSE       CMD(CHGVAR VAR(&W1NEWOWNER) VALUE(&NEWOWNER))
+               CHGOBJOWN  OBJ(&TOLIB/&ODOBNM) OBJTYPE(&ODOBTP) NEWOWN(&W1NEWOWNER)
+
+             CHGVAR     VAR(&OBJCOUNT) VALUE(&OBJCOUNT + 1)
+             ENDDO
+
+             GOTO       CMDLBL($LOOP)
+
+ $EOF:
+             DLTOVR     FILE(QADSPOBJ)
+               MONMSG     MSGID(CPF9841)
+             DLTF       FILE(QTEMP/DSPOBJD)
+               MONMSG     MSGID(CPF2125)
+
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA(%CHAR(&OBJCOUNT) *BCAT 'objects +
+                          duplicated to library' *BCAT &TOLIB) TOUSR(*SYSOPR) MSGTYPE(*COMP)
+             RETURN
+
+ /* Send unexpected error message */
+ $ABEND:
+             RCVMSG     MSGTYPE(*LAST) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+                          RTNTYPE(&RTNTYPE) MSGF(&MSGF) +
+                          SNDMSGFLIB(&MSGFLIB)
+
+ /* Handle escape message */
+             IF         COND((&RTNTYPE = '15') *OR (&RTNTYPE = '17')) THEN( +
+               SNDPGMMSG MSGID(&MSGID) MSGF(&MSGF) MSGDTA(&MSGDTA) MSGTYPE(*DIAG) TOMSGQ(*SYSOPR))
+
+             IF         COND(&MSGID = 'CPF2130') THEN( +
+               SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Error when +
+                            duplicate object' *BCAT &ODOBNM) TOMSGQ(*SYSOPR) +
+                            MSGTYPE(*DIAG))
+
+ /* Send error message to calling program */
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Program +
+                          DUPOBJC (Create Selected Duplicate Objects) ended abnormally, +
+                          check QSYSOPR message for error details') +
+                          MSGTYPE(*ESCAPE)
+
+ /* Create Library Subsoutine =========================================*/
+             SUBR       SUBR($CRTLIB)
+             RTVLIBD    LIB(&FROMLIB) TYPE(&LIBTYPE) TEXT(&LIBTEXT)
+             MONMSG     MSGID(CPF9810) EXEC(RTNSUBR RTNVAL(1))
+
+             CHGVAR     VAR(&LIBTYPE) VALUE('*' || &LIBTYPE)
+
+             CRTLIB     LIB(&TOLIB) TYPE(&LIBTYPE) TEXT(&LIBTEXT)
+             ENDSUBR
+ /*====================================================================*/
+
+ $END:       ENDPGM

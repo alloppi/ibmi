@@ -1,0 +1,54 @@
+/*================================================================================================*/
+/* Read IFS Directory                                                                             */
+/* Refer from https://www.mcpressonline.com/                                                      */
+/* programming-other/cl/the-cl-corner-trying-to-get-a-handle-on-your-ifs                          */
+/*================================================================================================*/
+
+PGM        PARM(&Dir_In)
+
+Dcl        Var(&Dir_In)     Type(*Char) Len(32)
+Dcl        Var(&Dir)        Type(*Char) Len(33)
+Dcl        Var(&Dir_Ptr)    Type(*Ptr)
+Dcl        Var(&DirEnt_Ptr) Type(*Ptr)
+Dcl        Var(&DirEnt)     Type(*Char) Len(696) +
+             Stg(*Based) BasPtr(&DirEnt_Ptr)
+Dcl        Var(&LenOfName)  Type(*UInt) Stg(*Defined) +
+             DefVar(&DirEnt 53)
+Dcl        Var(&Name)       Type(*Char) Len(640) +
+             Stg(*Defined) DefVar(&DirEnt 57)
+Dcl        Var(&MsgTxt)     Type(*Char) Len(300)
+Dcl        Var(&Null)       Type(*Char) Len(1) +
+             Value(x'00')
+Dcl        Var(&Null_Ptr)   Type(*Ptr)
+
+ChgVar     Var(&Dir) Value(&Dir_In *TCat &Null)
+
+MonMsg     MsgID(MCH3601) Exec(Do)
+               RcvMsg MsgType(*Last)
+               ChgVar Var(&Dir) Value('.' *TCat &Null)
+           EndDo
+
+CallPrc    Prc('opendir') Parm((&Dir)) RtnVal(&Dir_Ptr)
+If         Cond(&Dir_Ptr = &Null_Ptr) Then(Do)
+               SndPgmMsg Msg('Directory not found') +
+                 ToPgmQ(*Ext)
+           Return
+EndDo
+
+CallPrc    Prc('readdir') +
+             Parm((&Dir_Ptr *ByVal)) RtnVal(&DirEnt_Ptr)
+
+DoWhile    Cond(&DirEnt_Ptr *NE &Null_Ptr)
+           ChgVar Var(&MsgTxt) +
+             Value(%sst(&Name 1 &LenOfName))
+
+           SndPgmMsg Msg(&MsgTxt) ToPgmQ(*Ext)
+
+           CallPrc Prc('readdir') +
+             Parm((&Dir_Ptr *ByVal)) RtnVal(&DirEnt_Ptr)
+
+EndDo
+
+CallPrc    Prc('closedir') Parm((&Dir_Ptr *ByVal))
+
+EndPgm

@@ -1,0 +1,130 @@
+     A*=================================================================*
+     A* File name: JDBCEX1F                                             *
+     A*                                                                 *
+     A* Purpose: JDBC Example 1                                         *
+     A*                                                                 *
+     A* Date written: 2018/03/15                                        *
+     A*                                                                 *
+     A* Modification:                                                   *
+     A* Date       Name       Prefix Mod#  Remarks                      *
+     A* ---------- ---------- ------ ----- ---------------------------- *
+     A* 2018/13/15 Alan                                                 *
+     A*=================================================================*
+     A                                      REF(REFFILE)
+     A          R JDBCEX1FR
+     A            MDSSDC    R               TEXT('DELETE CODE')
+     A                                      REFFLD(RFDC)
+     A                                      COLHDG('MDSSDC')
+     A            MDSSRT    R               TEXT('REGISTRATION DATE AND TIME YY-
+     A                                      YYMMDDHHMM')
+     A                                      REFFLD(RFRT)
+     A                                      COLHDG('MDSSRT')
+     A            MDSSRP    R               TEXT('REGISTRATION PROGRAM')
+     A                                      REFFLD(RFRP)
+     A                                      COLHDG('MDSSRP')
+     A            MDSSUT    R               TEXT('UPDATE DATE AND TIME YYYYMMDD-
+     A                                      HHMM')
+     A                                      REFFLD(RFRT)
+     A                                      COLHDG('MDSSUT')
+     A            MDSSUP    R               TEXT('UPDATE PROGRAM NAME')
+     A                                      REFFLD(RFRP)
+     A                                      COLHDG('MDSSUP')
+      *
+     A            MDSSSPD   R               TEXT('SALES PERFORMANCE DATE')
+     A                                      REFFLD(RFISOD)
+     A                                      COLHDG('MDSSSPD')
+     A            MDSSSN    R               TEXT('SEQUENCE NO.')
+     A                                      REFFLD(RFSN)
+     A                                      COLHDG('MDSSSN')
+      *
+     A            MDSSAC    R               TEXT('AREAR CODE')
+     A                                      REFFLD(RFHAC)
+     A                                      COLHDG('MDSSAC')
+     A            MDSSBC    R               TEXT('BRANCH CODE')
+     A                                      REFFLD(RFBC)
+     A                                      COLHDG('MDSSBC')
+      *
+     A            MDSSDNLN  R               TEXT('DAILY NEW LOAN NO.')
+     A                                      REFFLD(RFDNLN)
+     A                                      COLHDG('MDSSDNLN')
+     A            MDSSMNLN  R               TEXT('MONTHLY NEW LOAN NO.')
+     A                                      REFFLD(RFMNLN)
+     A                                      COLHDG('MDSSMNLN')
+     A            MDSSMNLNT R               TEXT('MONTHLY NEW LOAN NO. TARGET')
+     A                                      REFFLD(RFMNLN)
+     A                                      COLHDG('MDSSMNLNT')
+     A            MDSSMNLP  R               TEXT('MONTHLY NEW LOAN PERFORMANCE -
+     A                                      (IN %)')
+     A                                      REFFLD(RFNLP)
+     A                                      COLHDG('MDSSMNLP')
+      *
+     A            MDSSDLA   R               TEXT('DAILY LOAN AMOUNT')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSDLA')
+     A            MDSSMLA   R               TEXT('MONTHLY LOAN AMOUNT')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSMLA')
+     A            MDSSMLAT  R               TEXT('MONTHLY LOAN AMOUNT TARGET')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSMLAT')
+     A            MDSSMLAP  R               TEXT('MONTHLY LOAN AMOUNT -
+     A                                      PERFORMANCE (IN %)')
+     A                                      REFFLD(RFNLP)
+     A                                      COLHDG('MDSSMLAP')
+      *
+     A            MDSSDAIN  R               TEXT('DAILY ACCOUNT INCREASE -
+     A                                      NUMBER (F. ACCT)')
+     A                                      REFFLD(RFAINN)
+     A                                      COLHDG('MDSSDAIN')
+     A            MDSSMAIN  R               TEXT('MONTHLY ACCOUNT INCREASE -
+     A                                      NUMBER (F. ACCT)')
+     A                                      REFFLD(RFAINN)
+     A                                      COLHDG('MDSSMAIN')
+     A            MDSSMAINT R               TEXT('MONTHLY ACCOUNT INCREASE -
+     A                                      NUMBER (F. ACCT) TARGET')
+     A                                      REFFLD(RFAINN)
+     A                                      COLHDG('MDSSMAINT')
+     A            MDSSMAINP R               TEXT('MONTHLY ACCT INCREASE No. -
+     A                                      (F. ACCT) PERFORMANCE %')
+     A                                      REFFLD(RFNLP)
+     A                                      COLHDG('MDSSMAINP')
+      *
+     A            MDSSDBIA  R               TEXT('DAILY BALANCE INCREASE -
+     A                                      AMOUNT (F. BAL)')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSDBIA')
+     A            MDSSMBIA  R               TEXT('MONTHLY BALANCE INCREASE -
+     A                                      AMOUNT')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSMBIA')
+     A            MDSSMBIAT R               TEXT('MONTHLY BALANCE INCREASE -
+     A                                      AMOUNT TARGET')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSMBIAT')
+     A            MDSSMBIAP R               TEXT('MONTHLY BALANCE INCREASE -
+     A                                      AMOUNT PERFORMANCE (IN %)')
+     A                                      REFFLD(RFNLP)
+     A                                      COLHDG('MDSSMBIAP')
+      *
+     A            MDSSLRTUT R               TEXT('LAST REAL TIME UPDATE TIME')
+     A                                      REFFLD(RFRTUT)
+     A                                      COLHDG('MDSSLRTUT')
+      *
+     A            MDSSDTB   R               TEXT('DAILY TRANSFER BALANCE')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSDTB')
+     A            MDSSMTB   R               TEXT('MONTHLY TRANSFER BALANCE')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSMTB')
+     A            MDSSMTBT  R               TEXT('MONTHLY TRANSFER BALANCE -
+     A                                      TARGET')
+     A                                      REFFLD(RFMDAMT)
+     A                                      COLHDG('MDSSMTBT')
+     A            MDSSMTBP  R               TEXT('MONTHLY TRANSFER BALANCE -
+     A                                      PERFORMANCE (IN %)')
+     A                                      REFFLD(RFNLP)
+     A                                      COLHDG('MDSSMTBP')
+     A            MDSSLTBUT R               TEXT('LAST TRANSFER BALANCE -
+     A                                      UPDATE TIME')
+     A                                      REFFLD(RFRTUT)
+     A                                      COLHDG('MDSSLTBUT')

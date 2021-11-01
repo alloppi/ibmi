@@ -1,0 +1,13 @@
+     A*==============================================================*
+     A* File name   : CHGSPLFF                                       *
+     A* Purpose     : Change Spool File Content                      *
+     A*                                                              *
+     A* Date written: 2010/04/13                                     *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- ---------------------- *
+     A* 2010/04/13 Alan       AC              New development        *
+     A*==============================================================*
+     A          R CHGSPLFFR
+     A            SPLLIN       133A

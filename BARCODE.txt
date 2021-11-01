@@ -1,0 +1,23 @@
+Outline
+=======
+- Barcode should be printed using Code 128 Character Set B font
+- Maximum size of the barcode is 1.5 cm (Height) x 9 cm (Width)
+- Minimum size of the barcode is 1.0 cm (Height) x 5.5 cm (Width)
+
+DDS
+===
+The format of the keyword is:
+BARCODE(bar-code-ID [height] [[*HRZ | *VRT]
+[*HRI | *HRITOP | *NOHRI] [*AST | *NOAST]
+[modifier] [unit-width]
+[wide/narrow-ratio]
+[PDF417 data]
+[Data Matrix data]
+[Maxicode data]])
+
+Example
+The following example shows how to specify the BARCODE keyword.
+|...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+A                                       6  5'01234567'
+A                                           BARCODE(CODE128 2 *HRITOP *HRZ +
+A                                           (*WIDTH 0.1) (*RATIO 2) X'01')

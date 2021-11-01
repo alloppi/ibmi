@@ -1,0 +1,27 @@
+     A*==============================================================*
+     A* File name...: SMSSUPFB                                       *
+     A* Purpose.....: IT Support Request - Staff Information File    *
+     A*                                                              *
+     A* Modification:                                                *
+     A* Date       Name       Pre  Ver  Mod#  Remarks                *
+     A* ---------- ---------- --- ----- ----- ---------------------- *
+     A* 2015/07/22 Alan       AC              New                    *
+     A*==============================================================*
+     A                                      UNIQUE
+     A          R SMSSUPFBR
+     A            SMSSUPBSTF     4A         TEXT('Staff No.')
+     A                                      COLHDG('Staff' 'No.')
+     A            SMSSUPBPTY     7A         TEXT('Party')
+     A                                      COLHDG('Party')
+     A            SMSSUPBGRP     1A         TEXT('Group')
+     A                                      COLHDG('Group')
+     A            SMSSUPBPRI     1A         TEXT('Priority')
+     A                                      COLHDG('Priority')
+     A            SMSSUPBNAM     8A         TEXT('Staff Name')
+     A                                      COLHDG('Staff' 'Name')
+     A            SMSSUPBTEL     8A         TEXT('Telephone')
+     A                                      COLHDG('Telephone')
+     A            SMSSUPBEML    25A         TEXT('E-Mail')
+     A                                      COLHDG('E-Mail')
+      *
+     A          K SMSSUPBSTF

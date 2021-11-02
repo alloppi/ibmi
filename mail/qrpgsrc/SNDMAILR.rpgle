@@ -12,19 +12,19 @@
       * Pre-request                                                       *
       * 1 Use the CFGTCP then option 12 to add the Host Name for this     *
       *   and Domain Name for this machine                                *
-      *   Eg  Host Name   : PROMISE 4                                     *
-      *       Domain Name : PROMISE_HK                                    *
+      *   Eg  Host Name   : SYSTEM 4                                      *
+      *       Domain Name : SYSTEM_HK                                     *
       *                                                                   *
       * 2 Define the Host name for this machine in host tabel by          *
       *   CFGTCP then option 10                                           *
       *   Eg. Internet         Host                                       *
       *       Address          Name                                       *
-      *       172.18.101.14    PROMISE4.PROMISE_HK                        *
+      *       xxx.xx.xxx.xx    SYSTEM.SYSTEM_HK                           *
       *                                                                   *
       * 3 Config the SMTP Server                                          *
-      *   CHGSMTPA MAILROUTER('SMTP.PROMISE.COM.HK')                      *
+      *   CHGSMTPA MAILROUTER('SMTP.SYSTEM.COM.HK')                       *
       *                                                                   *
-      * 4 Add Host Table Entry 202.64.33.147    SMTP.PROMISE.COM.HK       *
+      * 4 Add Host Table Entry xxx.xx.xx.xxx    SMTP.SYSTEM.COM.HK        *
       *                                                                   *
       * 5 Start the SMTP Server, after that, you can find the 4 jobs      *
       *   as below in QsysWrk sub-system                                  *
@@ -55,14 +55,14 @@
       *                                                                   *
       * Upload by FTP                                                     *
       * FTP command :                                                     *
-      * Connect to Host - FTP Promise3                                    *
+      * Connect to Host - FTP SYSTEM                                      *
       *   then login                                                      *
       * Put file to Host - Put c:\abc.txt thncilib/QHTMSRC.MTHSTM         *
       * Exit FTP         - Quit                                           *
       * Sample in MIME :                                                  *
-      * From: =?big5?B?xHi668ZG?= <alan.yl@cisd.com.hk>                   *
-      * To: =?big5?B?tF6l/aXN?= <promise@promise.com.hk>                  *
-      * 　　彭先生                                                      *
+      * From: =?big5?B?xHi668ZG?= <alan@system.com.hk>                    *
+      * To: =?big5?B?tF6l/aXN?= <dept@system.com.hk>                      *
+      * 　　先生                                                        *
       * Subject: =?big5?B?tPq41Q==?=                                      *
       *          測試                                                   *
       * Content-Type: text/plain;                                         *

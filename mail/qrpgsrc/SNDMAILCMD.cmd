@@ -3,15 +3,15 @@
 /* Purpose.....: Send Email Command                                */
 /* Description : Creat by command                                  */
 /*  CRTCMD lib/SNDMAILCMD srcfile(srclib/srcfile) pgm(lib/SNDMAILR)*/
-/*                        SEND AN E-MAIL MESSAGE (PSXX81CMD)       */
+/*                        SEND AN E-MAIL MESSAGE (SNDMAILCMD       */
 /*                                                                 */
 /*  TYPE COMMAND PSXX81CMD AND PRESS F4                            */
 /*                                                                 */
 /*  MIME HEADER FILE NAME  . . . . . > '/EMAIL/EMAIL'              */
-/*  E-MAIL ADDRESS OF RECIPIENT  . . > ALAN.YL@CISD.COM.HK         */
+/*  E-MAIL ADDRESS OF RECIPIENT  . . > ALAN@SYSTEM.COM.HK          */
 /*  NAME OF E-MAIL RECIPIENT . . . . > ALAN                        */
-/*  E-MAIL ADDRESS OF SENDER . . . . > PROMISE@PROMISE.COM.HK      */
-/*  NAME OF E-MAIL SENDER  . . . . . > PROMISE                     */
+/*  E-MAIL ADDRESS OF SENDER . . . . > DEPT@SYSTEM.COM.HK          */
+/*  NAME OF E-MAIL SENDER  . . . . . > DEPT                        */
 /*  FILE ATTACHMENT  . . . . . . . . > *NONE                       */
 /*  SUBJECT .........................> 'TESTING'                   */
 /*                                                                 */

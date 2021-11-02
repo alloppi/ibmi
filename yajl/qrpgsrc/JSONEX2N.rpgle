@@ -100,12 +100,12 @@
            exsr @CrtHeadBody;
            w1SndDtlF = w1Path + 'SndDtl2.json';
            w1RcvDtlF = w1Path + 'RcvDtl2.json';
-           w1URL = w1Domain + '/instalpre/promiseOutApi/order/orderList';
+           w1URL = w1Domain + '/instalpre/systemOutApi/order/orderList';
 
          when P_APIType = '3';
            w1SndDtlF = w1Path + 'SndDtl3.json';
            w1RcvDtlF = w1Path + 'RcvDtl3.json';
-           w1URL = w1Domain + '/instalpre/promiseOutApi/risk/resultNotice';
+           w1URL = w1Domain + '/instalpre/systemOutApi/risk/resultNotice';
            w1ReqBody =
                    '{'
                  + '"businessNo":"1234567890",'
@@ -119,7 +119,7 @@
          when P_APIType = '4';
            w1SndDtlF = w1Path + 'SndDtl4.json';
            w1RcvDtlF = w1Path + 'RcvDtl4.json';
-           w1URL = w1Domain + '/instalpre/promiseOutApi/order/successResults';
+           w1URL = w1Domain + '/instalpre/systemOutApi/order/successResults';
            w1ReqBody =
                    '{'
                  + '"orderNos":['
@@ -131,7 +131,7 @@
          when P_APIType = '5';
            w1SndDtlF = w1Path + 'SndDtl5.json';
            w1RcvDtlF = w1Path + 'RcvDtl5.json';
-           w1URL = w1Domain + '/instalpre/promiseOutApi/order/confirm';
+           w1URL = w1Domain + '/instalpre/systemOutApi/order/confirm';
            w1ReqBody =
                    '{'
                  + '"action":"approveList",'

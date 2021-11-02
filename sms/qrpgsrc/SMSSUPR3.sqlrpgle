@@ -30,8 +30,8 @@
       * Desc........: Data Send out in HTTP protocol, get from        *
       *               Com Trace,                                      *
       *               GET /app/servlet/nGenSendSM?acc=                *
-      *               promise&pwd=sa3y9otp&msisdn=9098                *
-      *               2696&suffix=0&req_sms_status=y&m                *
+      *               xxxxxxx&pwd=xxxxxxxx&msisdn=123456              *
+      *               7890&suffix=0&req_sms_status=y&m                *
       *               sg=%7C*                                         *
       * For Smartone: Eng - 306 Char (153 x 2 SMS message)            *
       *               Chi - 134 Double Char (67 x 2 SMS message)      *

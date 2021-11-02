@@ -40,7 +40,7 @@ Note:
 The QDFTJRN data area must be created by the user.
 For Example
                                Display Data Area
-                                                             System:   PROMISE6
+                                                             System:   SYSTEM
  Data area . . . . . . . :   QDFTJRN
    Library . . . . . . . :     THTDLIB
  Type  . . . . . . . . . :   *CHAR

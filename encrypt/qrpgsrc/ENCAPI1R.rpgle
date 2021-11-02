@@ -115,7 +115,7 @@
       *   The key size can be 1 - 128.
       *   30 RC4-compatible
       *   The key size can be 1 - 256. Because of the nature of the RC4-compatible operation, using
-      *   e than one message will severely compromise security.
+      *   e than one message will severely company security.
       *   50 RSA
       *   The key size specifies the modulus length in bits and must be an even number in the range
       *   RSA public and private key parts are stored in the key record.

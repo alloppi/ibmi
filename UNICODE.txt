@@ -23,7 +23,7 @@ OVRPRTF FILE(QPQUPRFIL) DEVTYPE(*AFPDS) PAGESIZE(66 120) LPI(6) CPI(15)
 
 SMS
 ---
-http://202.140.96.185/app/servlet/GenSendSM?acc=promise&pwd=sa3y9otp&msisdn=90982696&suffix=0&req_sm
+http://xxx.xxx.xx.xxx/app/servlet/GenSendSM?acc=xxxxxxx&pwd=xxxxxxxx&msisdn=12345678&suffix=0&req_sm
 
 
 To print Arial, here are the information:
@@ -130,8 +130,8 @@ Note window notepad shows chinese character - CHAN
      for ANSI : AF B3
      for Unicode : 73 96 (U+9673, i.e. position swap)
 
-PHFNTLIB
-========
+FNTLIB
+======
 According to IBM sending the attachment, the maximum number of Chinese Fonts that can be created fro
 Starting from C241 (AS400) FA40 (PC) to E2FD (AS400) F9FE (PC).
 - 仿宋體

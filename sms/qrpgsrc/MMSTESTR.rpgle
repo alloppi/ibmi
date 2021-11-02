@@ -60,7 +60,7 @@
           'To: +85297218700' + CRLF +
           'Subject: MMS_Subject_Test' + CRLF +
           'X-Client-MMS-Id: bdffcc42-3dc2-11e6-ac61-9e71128cae77' + CRLF +
-          'X-SS-Mms-DAPI-Username: Promise' + CRLF +
+          'X-SS-Mms-DAPI-Username: system' + CRLF +
           'X-SS-Mms-DAPI-Password: xxxxxxxx';
 
         rc = http_url_post(

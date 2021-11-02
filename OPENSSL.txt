@@ -4,11 +4,11 @@ Configurate OpenSSL by configuration file: openssl.cnf
 - set OPENSSL_CONF=c:\xampp\apache\conf\openssl.cnf
 
 Generate a private key with password protect:
-- openssl genrsa -out private.pem -passout pass:promise -des3 2048
+- openssl genrsa -out private.pem -passout pass:pwd -des3 2048
 
 Write corresponding self-signed certificate:
-- openssl req -new -x509 -key private.pem -passin pass:promise -out cert.pem -subj "/C=CN/ST=/L=Hong
-  Ltd./OU=IT Department/CN=promise.com.hk"
+- openssl req -new -x509 -key private.pem -passin pass:pwd -out cert.pem -subj "/C=CN/ST=/L=Hong
+  Ltd./OU=IT Department/CN=abc.com.hk"
 
 Zip the larger file using jar:
 - jar cfM upload.zip 5Mphoto1.jpg 5Mphoto2.jpg 5Mphoto3.jpg 5Mphoto4.jpg 5Mphoto5.jpg
@@ -28,7 +28,7 @@ Remove random password in source:
 Send encrypt larger file and encrypted password file to destination
 ===================================================================
 Decrypt the password file with private key:
-- openssl smime -decrypt -binary -in passwd.bin.enc -inkey private.pem -passin pass:promise -des3 -o
+- openssl smime -decrypt -binary -in passwd.bin.enc -inkey private.pem -passin pass:pwd -des3 -o
 
 Decrypt the larger file:
 - openssl enc -d -aes-256-cbc -base64 -salt -in upload.zip.enc -out upload.enc.zip -pass file:./pass
@@ -79,7 +79,7 @@ openssl version, 2015-11-26 V6R1 both in 0.9.7.d 17 version
 
 Create Symetric aes key (for Doc net)
 ========================================
-openssl enc -aes-256-cbc -k promise -P -md sha1
+openssl enc -aes-256-cbc -k sysname -P -md sha1
  -aes-256-cbc : AES algorithm with key size 256 bits in CBC-mode.
  -k- : This option allows you to set the key used for encryption or decryption
  -P  : Additionally to any encryption tasks, this prints the key, initialization vector and salt val

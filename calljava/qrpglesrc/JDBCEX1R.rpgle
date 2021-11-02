@@ -8,11 +8,11 @@
       *                               Scott Klement, May 7, 2009                                *
       *                                                                                         *
       *  MySQL Server:                                                                          *
-      *     ** First, give access right to remote access from Promise3                          *
-      *        using user 'root' and password 'promise' **                                      *
+      *     ** First, give access right to remote access from SysName                           *
+      *        using user 'root' and password 'pwd' **                                          *
       *     - mysql -h localhost -u root -p                                                     *
       *     - GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.18.101.16'                             *
-      *       IDENTIFIED BY 'promise' WITH GRANT OPTION;                                        *
+      *       IDENTIFIED BY 'user' WITH GRANT OPTION;                                           *
       *     - FLUSH PRIVILEGES;                                                                 *
       *     - use mysql;                                                                        *
       *     - // check host=172.18.101.16, user=root in user table                              *
@@ -35,10 +35,10 @@
       *     CALL JDBCEX1R PARM('user' 'password')                                               *
       *                                                                                         *
       *     Replace 'root' with your userid on the MySQL server                                 *
-      *     and 'promise' with your password.                                                   *
+      *     and 'user' with your password.                                                      *
       *                                                                                         *
       *  Check program result using MySQL command                                               *
-      *     - use promise_intranet                                                              *
+      *     - use system_intranet                                                               *
       *     - show tables;                                                                      *
       *     - select * from md_kpi_value;                                                       *
       *                                                                                         *
@@ -97,9 +97,9 @@
        // Connect to MySQL database
        //  change the jdbc:mysql string to reference your IP address
        //  and the database name!
-       //  'jdbc:mysql://172.18.101.31:3306/promise_intranet?useSSL=true'
+       //  'jdbc:mysql://172.18.101.01:3306/system_intranet?useSSL=true'
          W1String = 'jdbc:mysql://' + %Trim(mdip)
-                    + ':3306/promise_intranet?useSSL=true';
+                    + ':3306/system_intranet?useSSL=true';
        conn = JDBC_Connect( 'com.mysql.jdbc.Driver'
          : %trim(W1String)
          : %trim(userid)

@@ -35,8 +35,8 @@
        // Create QR code using the MECARd format so it comes up as a contact on
        // the phone.
        //
-       gTxt  = 'MECARD:N:Chan,Alan;ADR:14/F., Luk Kwok Center, 72 Gloucester ' +
-               ' Road, Wanchai;TEL:+85231991199;EMAIL:cya012@promise.com.hk;;';
+       gTxt  = 'MECARD:N:Chan,Alan;ADR:Hong Kong' +
+               ';TEL:+85212345678;EMAIL:dept@abc.com.hk;';
        gFile = '/javaapps/QRCode/myCard.png';
        GenQR(gTxt: gWidth: gHeight: gFile: gResult);
        exsr chkErr;
@@ -44,7 +44,7 @@
        //
        // Create QR code that will prefill an email with TO, SUB and BODY
        //
-       gTxt  = 'MATMSG:TO:cya012l@promise.com.hk;SUB:Gen QR Code Test;' +
+       gTxt  = 'MATMSG:TO:dept@abc.com.hk;SUB:Gen QR Code Test;' +
                'BODY:Hi Alan, Can you see the correct QR code?;';
        gFile = '/javaapps/QRCode/myMsg.png';
        GenQR(gTxt: gWidth: gHeight: gFile: gResult);
@@ -53,7 +53,7 @@
        //
        // Create QR code that will contain a URL
        //
-       gTxt  = 'https://www.promise.com.hk';
+       gTxt  = 'https://www.abc.com.hk';
        gFile = '/javaapps/QRCode/myURL.png';
        GenQR(gTxt: gWidth: gHeight: gFile: gResult);
        exsr chkErr;

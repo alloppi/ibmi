@@ -168,14 +168,13 @@
      C                   Iter
      C                   EndIf
       *
-     C                   When      SMSSUPASUP = 'PROMISE'
+     C                   When      SMSSUPASUP = 'SYSTEM'
      C                   EndSl
       *
      C                   EndIf
       *
       * Get Staff Phone No. / Email
-     C                   If        SMSSUPASTF = 'CISD'
-     C                             or SMSSUPASTF = 'PROMISE'
+     C                   If        SMSSUPASTF = 'SYSTEM'
      C                   Eval      W1Staff = W1SupStaff
      C                   Else
      C                   Eval      W1Staff = SMSSUPASTF
@@ -219,7 +218,7 @@
      C                   Eval      W1EmlFile   = '/Email/Support'
      C                               + W1TimeStamp
      C                   Eval      W1SndEmlAdr = %Trim(O_SysName)
-     C                                         + '@PROMISE.COM.HK'
+     C                                         + '@ABC.COM.HK'
      C                   Eval      W1SndName  = %Trim(O_SysName)
      C                   Eval      W1NbrFiles = 0
      C                   Eval      W1AttachFile(1) = '*NONE'

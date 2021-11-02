@@ -372,7 +372,7 @@
  2x  C                   When      TFBENACTNO = '01287502982487'
      C                   Eval      TFBENACTNM = 'DONALDO COMPANY'
  2x  C                   Other
-      *                  Eval      TFBENACTNM = 'PROMISE'
+      *                  Eval      TFBENACTNM = 'XXXXXXX'
      C                   Eval      TFBENACTNM = *Blank
  2e  C                   Endsl
      C                   Eval      TFCUSREF   = 'CUSTREF' + %char(i)

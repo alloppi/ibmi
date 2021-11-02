@@ -17,8 +17,8 @@
       * Desc........: Data Send out in HTTP protocol, get from        *
       *               Com Trace,                                      *
       *               GET /app/servlet/nGenSendSM?acc=                *
-      *               promise&pwd=sa3y9otp&msisdn=9098                *
-      *               2696&suffix=0&req_sms_status=y&m                *
+      *               xxxxxxx&pwd=xxxxxxxx&msisdn=0123                *
+      *               4567&suffix=0&req_sms_status=y&m                *
       *               sg=%7C*                                         *
       * For Smartone: Eng - 306 Char (153 x 2 SMS message)            *
       *               Chi - 134 Double Char (67 x 2 SMS message)      *
@@ -173,9 +173,9 @@
       *
      C                   Eval      w1Tel  = P_Tel
       *
-     C                   Eval      w1SMSAcc = 'promise'
+     C                   Eval      w1SMSAcc = 'xxxxxxx'
      C                   Eval      w1SMSpwd = 'xxxxxxx'
-     C                   Eval      w1API = '/appprod'
+     C                   Eval      w1API = '/xxxxxxx'
       *
      C                   Select
      C                   When      P_ConTyp = '1'

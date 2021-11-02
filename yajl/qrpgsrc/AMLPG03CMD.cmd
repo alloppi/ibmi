@@ -13,7 +13,7 @@
 /*  Private Key File(w/o .asc Ext)     sftp_private                                        */
 /*  Public Key File (w/o .asc Ext)     sftp_public                                         */
 /*  Key User Name  . . . . . . . . .   AML                                                 */
-/*  Key User E-mail  . . . . . . . .   itdept@promise.com.hk                               */
+/*  Key User E-mail  . . . . . . . .   itdept@system.com.hk                                */
 /*  Private Key Password . . . . . .                                                       */
 /*  Return Code  . . . . . . . . . .                                                       */
 /*                                                                                         */
